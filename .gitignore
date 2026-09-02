@@ -1,0 +1,11 @@
+data/raw/
+data/processed/*.csv
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.env
+.DS_Store
+
+# Keep the final checkpoints and logs used for the submitted results —
+# unignore selectively near the end of the project rather than committing
+# every intermediate run.

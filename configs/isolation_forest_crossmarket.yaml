@@ -1,0 +1,39 @@
+# Config: Isolation Forest, Cross-Market feature set (unsupervised benchmark)
+
+experiment_name: isolation_forest_crossmarket_gspc
+
+data:
+  panel_path: data/processed/panel_full.csv
+  target_index: GSPC
+  feature_set: cross_market
+  label_strategy: regime_hmm   # used only for evaluation, not training (unsupervised)
+
+split:
+  train_start: 2000-01-01
+  train_end: 2015-12-31
+  val_start: 2016-01-01
+  val_end: 2018-12-31
+  test_start: 2019-01-01
+  test_end: 2024-12-31
+
+imbalance:
+  method: none   # unsupervised — SMOTE does not apply
+
+model:
+  type: isolation_forest
+  params:
+    n_estimators: 200
+    contamination: 0.07   # matches expected 5-10% anomaly prevalence
+    max_samples: auto
+
+evaluation:
+  metrics: [pr_auc, f1, mcc]
+  n_seeds: 5
+  seed_base: 42
+
+explainability:
+  run_shap: false   # tree-based but typically used here as the non-XAI benchmark
+
+output:
+  checkpoint_path: results/checkpoints/isolation_forest_crossmarket_gspc.pkl
+  log_path: logs/isolation_forest_crossmarket_gspc.log
