@@ -9,3 +9,5 @@ __pycache__/
 # Keep the final checkpoints and logs used for the submitted results —
 # unignore selectively near the end of the project rather than committing
 # every intermediate run.
+.claude/settings.local.json
+.claude/settings.local.json
