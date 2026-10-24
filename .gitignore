@@ -11,3 +11,5 @@ __pycache__/
 # every intermediate run.
 .claude/settings.local.json
 .claude/settings.local.json
+
+.claude/

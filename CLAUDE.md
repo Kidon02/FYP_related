@@ -13,6 +13,20 @@ foreign features plotted against VIX (2019-2024).
 ## Data rules
 - The data date range (2000-01-01 to 2024-12-31) must never be changed.
 - Do not re-run data_pipeline.py unless explicitly asked; panel_full.csv is fixed.
+- TED is excluded from all features. FRED discontinued TEDRATE on 2022-01-21 and
+  the forward-fill leaves it stale at 0.09 for the remaining 738 rows. The exclusion
+  is listed in configs/features.yaml and asserted in code/features.py.
+- Deviations from the brief, approved by the user when the feature build was planned:
+  1. EPU lag: EPU for month M is published in early month M+1, so features use the
+     value for month M-1, then lag 1 day (`epu.publication_lag_months: 1`). The brief
+     specified a lag-1 day only, which would leak the rest of the month.
+  2. Volume: lag-1 log volume is replaced by lag-1 log volume minus its trailing
+     252-day mean, computed from data up to t-1 (`volume.normalise_trailing_window`).
+     Raw log volume is non-stationary.
+  3. MACD signal is divided by close, and Bollinger width is divided by the middle
+     band (`technical.macd_normalise_by_close`, `bollinger_normalise_by_middle`).
+     Both are scale-free; raw values are in index points, which range from about
+     1,400 to 6,000 for the S&P 500.
 
 ## Environment
 - Windows with Git Bash. Quote any path containing spaces; use forward slashes.
@@ -33,12 +47,31 @@ code/, configs/, data/raw, data/processed, results/, logs/, thesis_tables/, data
   results/labels_{IDX}.csv.
 - code/train.py and code/test.py are stubs that import modules not yet written
   (data_utils, model_factory, metrics, explain).
+- code/features.py (`python code/features.py --index GSPC`): builds
+  data/processed/features_{IDX}.csv (wide) and feature_groups_{IDX}.csv. Configured
+  in configs/features.yaml. Runs a no-lookahead test (perturb rows from T onward,
+  check features at or before T are unchanged) and asserts no label-derived names.
+  GSPC: 6036 rows, Domestic-Only 16 features, Cross-Market 28. Constant features
+  are dropped and printed. FTSE volume is not constant, and GSPC has one zero-volume
+  day (2023-05-24, treated as missing and carried forward).
+- code/baseline_models.py (`python code/baseline_models.py --index GSPC`): XGBoost and
+  L2 logistic regression on both feature sets and both label sets, 5 seeds (42-46).
+  Configured in configs/baseline_models.yaml. Writes results/baseline_models_{IDX}.csv,
+  logs/baseline_models_{IDX}_grid.csv and thesis_tables/baseline_models_{IDX}_settings.txt.
+  Grid and threshold use validation only. Asserts that labels reproduce from labelling.py.
+- Known input issues, not yet addressed: N225 volume is zero on 615 days, mostly
+  2000-2002; N225 and FTSE forward-filled holidays create zero-return rows (5.9% and
+  2.0% of N225/FTSE days). Test-period EPU_US and DGS10 are outside the train range
+  (EPU_US max 504 vs 284 in train; DGS10 min 0.52 vs 1.43).
+- labelling.py has a known warm-up issue: rows where the z-score is undefined are
+  counted as normal. features.py drops them, but labelling.py and its results have
+  not been changed yet.
 
 ## Open items
 - Confirm the six crisis events in CRISIS_EVENTS against the supervisor's email.
 - HMM is fit on the full sample: state as a limitation or refit on 2000-2015.
-- Next: feature engineering (domestic, foreign, macro, technical groups; build
-  Domestic-Only and Cross-Market feature sets), then modelling.
+- Next: N225 and FTSE runs of features.py and baseline_models.py, then decide how to
+  handle the labelling warm-up and the out-of-range macro features.
 
 ## Planned modelling
 Walk-forward split: train 2000-2015, validation 2016-2018, test 2019-2024.

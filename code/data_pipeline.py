@@ -13,8 +13,12 @@ Implements the "Semester One, Month 1" section of the supervisor's brief:
       for local holidays), daily log-returns, and rolling 21-day realised
       volatility.
 
+Raw yfinance_*.csv / fred_*.csv files in data/raw/ are loaded from cache when
+they exist. Pass --refresh to re-download them (this overwrites the raw files).
+
 Usage:
     python code/data_pipeline.py
+    python code/data_pipeline.py --refresh
     python code/data_pipeline.py --epu-us data/raw/US_Policy_Uncertainty_Data.xlsx \\
         --epu-japan data/raw/Japan_Policy_Uncertainty_Data.xlsx \\
         --kaggle data/raw/kaggle_global_indices.csv
@@ -45,38 +49,93 @@ def _flatten_columns(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def fetch_yfinance(start, end):
-    """Retrieve daily OHLCV for the three target indices via yfinance."""
-    import yfinance as yf
+def _check_cache_range(path, index, start, end, require_end_coverage):
+    """
+    Stop if a cached raw file does not match the requested date range.
+    The first or last day may not be a trading day, so the ends get a
+    10-day tolerance. FRED series can be discontinued before `end`
+    (TEDRATE stops in 2022), so end coverage is only required for yfinance.
+    """
+    tol = pd.Timedelta(days=10)
+    start_ts, end_ts = pd.Timestamp(start), pd.Timestamp(end)
+    problem = None
+    if index.min() > start_ts + tol:
+        problem = f"starts {index.min().date()}, after requested start {start}"
+    elif index.max() > end_ts:
+        problem = f"runs to {index.max().date()}, after requested end {end}"
+    elif require_end_coverage and index.max() < end_ts - tol:
+        problem = f"ends {index.max().date()}, before requested end {end}"
+    if problem:
+        raise RuntimeError(f"Cached file {path} {problem}. Re-run with --refresh to re-download.")
 
+
+def fetch_yfinance(start, end, refresh=False, sources=None):
+    """
+    Retrieve daily OHLCV for the three target indices via yfinance.
+
+    An existing data/raw/yfinance_{name}.csv is loaded instead of downloaded
+    unless `refresh` is set. Raw files are only written when downloading.
+    `sources` (dict name -> "cache" | "download") records where each came from.
+    """
     frames = {}
     for name, ticker in TICKERS.items():
-        print(f"Fetching {name} ({ticker}) from yfinance...")
-        df = yf.download(ticker, start=start, end=end, progress=False)
-        if df is None or df.empty:
-            raise RuntimeError(f"yfinance returned no data for {ticker}.")
-        df = _flatten_columns(df)
-        df = df.loc[:, ["Close", "Volume"]]
-        df.columns = [f"{name}_close", f"{name}_volume"]
-        df.to_csv(f"{RAW_DIR}/yfinance_{name}.csv")
+        path = f"{RAW_DIR}/yfinance_{name}.csv"
+        if os.path.exists(path) and not refresh:
+            df = pd.read_csv(path, index_col=0, parse_dates=True)
+            _check_cache_range(path, df.index, start, end, require_end_coverage=True)
+            print(f"[cache] {path}")
+            source = "cache"
+        else:
+            import yfinance as yf
+
+            print(f"[download] {name} ({ticker}) from yfinance...")
+            df = yf.download(ticker, start=start, end=end, progress=False)
+            if df is None or df.empty:
+                raise RuntimeError(f"yfinance returned no data for {ticker}.")
+            df = _flatten_columns(df)
+            df = df.loc[:, ["Close", "Volume"]]
+            df.columns = [f"{name}_close", f"{name}_volume"]
+            df.to_csv(path)
+            source = "download"
+        if sources is not None:
+            sources[path] = source
         frames[name] = df
     return frames
 
 
-def fetch_fred(start, end):
-    """Retrieve macro/volatility series from FRED. Requires FRED_API_KEY."""
-    from fredapi import Fred
+def fetch_fred(start, end, refresh=False, sources=None):
+    """
+    Retrieve macro/volatility series from FRED.
 
-    api_key = os.environ.get("FRED_API_KEY")
-    if not api_key:
-        raise EnvironmentError("Set FRED_API_KEY before fetching FRED series.")
-    fred = Fred(api_key=api_key)
+    An existing data/raw/fred_{name}.csv is loaded instead of downloaded
+    unless `refresh` is set. FRED_API_KEY is only needed for files that
+    have to be downloaded.
+    """
+    fred = None
     frames = {}
     for name, series_id in FRED_SERIES.items():
-        print(f"Fetching {name} ({series_id}) from FRED...")
-        s = fred.get_series(series_id, observation_start=start, observation_end=end)
-        s.name = name
-        s.to_csv(f"{RAW_DIR}/fred_{name}.csv")
+        path = f"{RAW_DIR}/fred_{name}.csv"
+        if os.path.exists(path) and not refresh:
+            s = pd.read_csv(path, index_col=0, parse_dates=True).iloc[:, 0]
+            s.name = name
+            _check_cache_range(path, s.index, start, end, require_end_coverage=False)
+            print(f"[cache] {path}")
+            source = "cache"
+        else:
+            if fred is None:
+                from fredapi import Fred
+
+                api_key = os.environ.get("FRED_API_KEY")
+                if not api_key:
+                    raise EnvironmentError("Set FRED_API_KEY before fetching FRED series.")
+                fred = Fred(api_key=api_key)
+            print(f"[download] {name} ({series_id}) from FRED...")
+            s = fred.get_series(series_id, observation_start=start, observation_end=end)
+            s.name = name
+            s.to_csv(path)
+            source = "download"
+        if sources is not None:
+            sources[path] = source
         frames[name] = s
     return frames
 
@@ -155,10 +214,12 @@ def compute_realized_vol(returns, window=21):
     return returns.rolling(window).std()
 
 
-def build_panel(start, end, epu_us_path=None, epu_japan_path=None, kaggle_path=None, base="GSPC"):
+def build_panel(start, end, epu_us_path=None, epu_japan_path=None, kaggle_path=None, base="GSPC",
+                refresh=False):
     ensure_dirs()
 
-    price_frames = fetch_yfinance(start, end)
+    sources = {}
+    price_frames = fetch_yfinance(start, end, refresh=refresh, sources=sources)
     aligned = align_calendar(price_frames, base=base)
 
     panel = pd.DataFrame(index=aligned[base].index)
@@ -169,11 +230,16 @@ def build_panel(start, end, epu_us_path=None, epu_japan_path=None, kaggle_path=N
         panel[f"{name}_rv21"] = compute_realized_vol(panel[f"{name}_logret"], window=21)
 
     try:
-        fred_frames = fetch_fred(start, end)
+        fred_frames = fetch_fred(start, end, refresh=refresh, sources=sources)
         for name, s in fred_frames.items():
             panel[name] = s.reindex(panel.index).ffill()
     except EnvironmentError as e:
         print(f"Skipping FRED retrieval: {e}")
+
+    from_cache = [p for p, src in sources.items() if src == "cache"]
+    downloaded = [p for p, src in sources.items() if src == "download"]
+    print(f"Raw files from cache ({len(from_cache)}): {', '.join(from_cache) or 'none'}")
+    print(f"Raw files downloaded ({len(downloaded)}): {', '.join(downloaded) or 'none'}")
 
     if epu_us_path and epu_japan_path:
         epu_us, epu_jp = load_epu(epu_us_path, epu_japan_path)
@@ -208,5 +274,11 @@ if __name__ == "__main__":
     parser.add_argument("--epu-japan", default=None)
     parser.add_argument("--kaggle", default=None)
     parser.add_argument("--base", default="GSPC", choices=list(TICKERS.keys()))
+    parser.add_argument(
+        "--refresh", action="store_true",
+        help="Re-download yfinance/FRED data and overwrite data/raw files. "
+             "Without it, existing raw files are loaded from cache.",
+    )
     args = parser.parse_args()
-    build_panel(args.start, args.end, args.epu_us, args.epu_japan, args.kaggle, args.base)
+    build_panel(args.start, args.end, args.epu_us, args.epu_japan, args.kaggle, args.base,
+                refresh=args.refresh)
