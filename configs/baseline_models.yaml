@@ -1,0 +1,47 @@
+# Baseline model comparison: XGBoost and L2 logistic regression.
+# Run for each target with: python code/baseline_models.py --index GSPC
+
+split:
+  train: [2000-01-01, 2015-12-31]
+  validation: [2016-01-01, 2018-12-31]
+  test: [2019-01-01, 2024-12-31]
+
+seeds:
+  base: 42
+  n: 5                  # seeds 42-46; mean and std reported
+
+imbalance:
+  method: smote         # fitted on the training set only, after scaling
+  k_neighbors: 5
+  sampling_strategy: auto
+
+scaler: standard        # fitted on the training set only
+
+selection:
+  # Hyperparameters chosen by mean validation PR-AUC across the seeds.
+  metric: pr_auc
+  # Decision threshold chosen per seed by maximising F1 on validation only.
+  threshold: max_f1_on_validation
+
+models:
+  xgboost:
+    fixed:
+      objective: binary:logistic
+      eval_metric: aucpr
+      subsample: 0.8
+      colsample_bytree: 0.8
+      tree_method: hist
+      device: cpu
+    grid:
+      max_depth: [2, 4]
+      n_estimators: [100, 300]
+      learning_rate: [0.05, 0.1]
+  logistic_regression:
+    fixed:
+      solver: lbfgs
+      max_iter: 1000
+    grid:
+      C: [0.01, 0.1, 1, 10]
+
+label_sets: [baseline, hmm]
+feature_set_names: [domestic_only, cross_market]
