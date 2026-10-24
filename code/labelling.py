@@ -137,6 +137,11 @@ if __name__ == "__main__":
     parser.add_argument("--index", default="GSPC", choices=["GSPC", "N225", "FTSE"])
     parser.add_argument("--window", type=int, default=252)
     parser.add_argument("--baseline-threshold", type=float, default=2.5)
+    parser.add_argument(
+        "--regime-thresholds", type=float, nargs=2, default=(2.5, 3.0),
+        metavar=("LOW_VOL", "HIGH_VOL"),
+        help="z-score thresholds for the low-vol and high-vol regimes (default: 2.5 3.0)",
+    )
     args = parser.parse_args()
 
     panel = pd.read_csv(args.panel, index_col=0, parse_dates=True)
@@ -144,7 +149,8 @@ if __name__ == "__main__":
     vol = panel[f"{args.index}_rv21"]
 
     table, baseline, hmm_label, regime = build_evaluation_table(
-        returns, vol, window=args.window, baseline_threshold=args.baseline_threshold
+        returns, vol, window=args.window, baseline_threshold=args.baseline_threshold,
+        regime_thresholds=tuple(args.regime_thresholds),
     )
     print(table.to_string(index=False))
 

@@ -38,7 +38,7 @@ def ensure_dirs():
     os.makedirs(PROCESSED_DIR, exist_ok=True)
 
 
-def _flatten_columns(df):
+def _flatten_columns(df: pd.DataFrame) -> pd.DataFrame:
     """Guard against yfinance returning MultiIndex columns in some versions."""
     if isinstance(df.columns, pd.MultiIndex):
         df.columns = df.columns.get_level_values(0)
@@ -53,10 +53,11 @@ def fetch_yfinance(start, end):
     for name, ticker in TICKERS.items():
         print(f"Fetching {name} ({ticker}) from yfinance...")
         df = yf.download(ticker, start=start, end=end, progress=False)
+        if df is None or df.empty:
+            raise RuntimeError(f"yfinance returned no data for {ticker}.")
         df = _flatten_columns(df)
-        df = df[["Close", "Volume"]].rename(
-            columns={"Close": f"{name}_close", "Volume": f"{name}_volume"}
-        )
+        df = df.loc[:, ["Close", "Volume"]]
+        df.columns = [f"{name}_close", f"{name}_volume"]
         df.to_csv(f"{RAW_DIR}/yfinance_{name}.csv")
         frames[name] = df
     return frames
@@ -104,7 +105,9 @@ def load_epu(us_xlsx_path, japan_xlsx_path):
             if c not in ("Year", "Month") and pd.api.types.is_numeric_dtype(df[c])
         )
         print(f"  {path}: using column '{value_col}' as the EPU value")
-        date = pd.to_datetime(dict(year=df["Year"], month=df["Month"], day=1))
+        date = pd.to_datetime(
+            pd.DataFrame({"year": df["Year"], "month": df["Month"], "day": 1})
+        )
         return pd.Series(df[value_col].values, index=date)
 
     us = _parse(us_xlsx_path).rename("EPU_US")
