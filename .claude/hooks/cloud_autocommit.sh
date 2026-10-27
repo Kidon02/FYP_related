@@ -6,29 +6,35 @@
 set -uo pipefail
 cd "$CLAUDE_PROJECT_DIR" || exit 1
 
+# A refusal exits 2, so Claude sees the reason and fixes it before the cloud platform's
+# own Stop hook (which asks Claude to commit and push) gets it committed. If Claude is
+# already continuing because of a Stop hook, exit 1 (a notice only) so it cannot loop.
+INPUT=""
+[ -t 0 ] || INPUT=$(cat)
+case "$INPUT" in *'"stop_hook_active":true'*|*'"stop_hook_active": true'*) REFUSE=1 ;; *) REFUSE=2 ;; esac
+refuse() { git reset -q; echo "Auto-commit refused: $1 Fix this before committing or pushing." >&2; exit "$REFUSE"; }
+# The platform's Stop hook runs git at the same moment, so retry while index.lock is held.
+retry() { for _ in 1 2 3 4 5; do "$@" && return 0; sleep 1; done; return 1; }
+
 # Leave a merge, rebase or cherry-pick that Claude is in the middle of alone.
 for f in MERGE_HEAD CHERRY_PICK_HEAD REVERT_HEAD rebase-merge rebase-apply; do
   [ -e "$(git rev-parse --git-path "$f")" ] && exit 0
 done
 
-git add -A
+retry git add -A || exit 1
 if ! git diff --cached --quiet; then
-  # Same safety checks as scripts/weekly_commit.sh.
+  # Same safety checks as scripts/weekly_commit.sh, per file so the refusal names it.
   KEY_RE="(api[_-]?key|token|secret)[^=:]*[=:][[:space:]]*[\"']?[A-Za-z0-9]{20,}"
-  if grep -Eiq "$KEY_RE" < <(git diff --cached -U0); then
-    git reset -q
-    echo "Auto-commit skipped: staged changes look like they contain a key or token." >&2
-    exit 1
-  fi
   mapfile -t FILES < <(git diff --cached --name-only)
   for f in "${FILES[@]}"; do
+    if grep -Eiq "$KEY_RE" < <(git diff --cached -U0 -- "$f"); then
+      refuse "$f looks like it contains an API key or token, and the repo is public. Read keys from environment variables instead."
+    fi
     if [ -f "$f" ] && [ "$(wc -c < "$f")" -gt 52428800 ]; then
-      git reset -q
-      echo "Auto-commit skipped: $f is over 50 MB." >&2
-      exit 1
+      refuse "$f is over 50 MB; delete it or add it to .gitignore."
     fi
   done
-  git commit -q -m "Cloud session snapshot $(TZ=Asia/Singapore date +%Y-%m-%d): ${#FILES[@]} file(s) changed" \
+  retry git commit -q -m "Cloud session snapshot $(TZ=Asia/Singapore date +%Y-%m-%d): ${#FILES[@]} file(s) changed" \
     -m "$(printf '%s\n' "${FILES[@]:0:20}")" || exit 1
 fi
 
