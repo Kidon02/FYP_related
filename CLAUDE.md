@@ -34,6 +34,18 @@ foreign features plotted against VIX (2019-2024).
 - `FRED_API_KEY` env var is needed only by data_pipeline.py. Never commit keys.
 - The repo is public on GitHub.
 
+## Commits (automated)
+- Laptop: Task Scheduler task "FYP weekly commit" runs scripts/weekly_commit.sh every
+  Sunday 21:00 SGT (a missed run starts after the next sign-in). It commits all changes,
+  rebases onto origin/main and pushes. Log: ~/fyp_weekly_commit.log.
+- Cloud sessions (claude.ai web/app): the Stop hook .claude/hooks/cloud_autocommit.sh
+  commits and pushes the session's claude/ branch after every turn, since idle cloud VMs
+  are reclaimed.
+- Routine "FYP weekly cloud commit" (claude.ai/code/routines) merges unmerged claude/*
+  branches into main every Sunday 22:07 SGT. Delete a cloud branch on GitHub before then
+  to keep it out of main.
+- Cloud sessions have no data: data/raw/ and data/processed/*.csv are gitignored.
+
 ## Layout
 code/, configs/, data/raw, data/processed, results/, logs/, thesis_tables/, data_readme.txt
 
