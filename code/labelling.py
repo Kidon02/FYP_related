@@ -1,57 +1,106 @@
 """
-Month 2-3 pipeline: anomaly labelling.
+Anomaly labelling: three schemes, all causal (configs/labelling.yaml).
 
-Implements both labelling strategies from the supervisor's brief:
-  - Baseline: rolling 252-day z-score threshold on daily log-returns.
-  - Regime-conditioned: 2-state Gaussian HMM fit on realised volatility,
-    with separate z-score thresholds calibrated per regime.
+  1. Baseline: |rolling 252-day z-score of the log-return| > 2.5.
+  2. Regime-dependent threshold: the same z-score, with the threshold set by the
+     HMM regime on day t (filtered probabilities).
+  3. Regime-standardised: each return standardised by the mean and std of the last
+     252 returns before t in the same regime, where the regime for day t is the one
+     predicted from information up to t-1; one threshold for all regimes.
 
-Also builds the labelling evaluation table required by the supervisor's
-project-plan feedback: prevalence, mean run length, and concordance with
-named crisis events, comparing baseline vs HMM labels.
+The HMM (code/regimes.py) is fit on 2000-2015 only and applied forward with the
+forward recursion. The original full-sample HMM (Viterbi path over 2000-2024, which
+uses future data) is kept only as a sensitivity analysis: label hmm_fullsample.
 
 Usage:
-    python code/labelling.py --panel data/processed/panel_full.csv --index GSPC
+    python code/labelling.py --index GSPC
+
+Writes:
+    results/labels_{IDX}.csv                 per-day labels and regime probabilities
+    results/labelling_evaluation_{IDX}.csv   the three schemes, on the days all three define
+    results/hmm_sensitivity_{IDX}.csv        causal vs full-sample HMM labels
+    results/hmm_params_{IDX}.json            frozen HMM parameters and fit diagnostics
+Days where a label is undefined are left empty, never counted as normal.
 """
 
 import argparse
+import json
+import os
 
 import numpy as np
 import pandas as pd
+import yaml
 
-# Six crisis events spanning the dataset's stated regimes (dot-com bust,
-# GFC, European debt crisis, COVID, 2022 rate-hike cycle) plus Aug 2015,
-# which the brief already names for local SHAP analysis. Placeholder until
-# confirmed against the supervisor's actual feedback email — swap these for
-# his exact list before this goes in the report.
-CRISIS_EVENTS = {
-    "Dot-com bust (2002 trough)": "2002-10-09",
-    "GFC / Lehman collapse": "2008-09-15",
-    "European debt crisis (US downgrade)": "2011-08-08",
-    "China devaluation selloff": "2015-08-24",
-    "COVID-19 crash": "2020-03-16",
-    "2022 rate-hike / UK gilt crisis": "2022-09-23",
+from regimes import check_filter_causality, fit_hmm, forward_filter, most_probable
+
+CONFIG_PATH = "configs/labelling.yaml"
+SCHEMES = {
+    "baseline": "Baseline (rolling z-score)",
+    "hmm": "Regime-dependent threshold (causal HMM)",
+    "regime_std": "Regime-standardised (causal HMM)",
 }
 
 
+def load_config(path=CONFIG_PATH):
+    with open(path, "r") as f:
+        return yaml.safe_load(f)
+
+
 def rolling_zscore(returns, window=252):
-    """Rolling z-score using only trailing data (no lookahead)."""
+    """Rolling z-score using only data up to and including day t (no lookahead)."""
     mean = returns.rolling(window).mean()
     std = returns.rolling(window).std()
     return (returns - mean) / std
 
 
+def flag(z, threshold):
+    """1 where |z| exceeds the threshold (a number or a per-day Series), 0 where not, NaN where undefined."""
+    thr = threshold if isinstance(threshold, pd.Series) else pd.Series(float(threshold), index=z.index)
+    return (z.abs() > thr).astype(float).where(z.notna() & thr.notna())
+
+
 def baseline_label(returns, window=252, threshold=2.5):
     """Flag a day anomalous if |rolling z-score| exceeds `threshold`."""
-    z = rolling_zscore(returns, window=window)
-    return (z.abs() > threshold).astype(int)
+    return flag(rolling_zscore(returns, window=window), threshold)
 
 
-def fit_hmm_regimes(vol_series, n_states=2, random_state=42):
+def regime_conditioned_label(returns, regime, window=252, thresholds=(2.5, 3.0)):
     """
-    Fit a Gaussian HMM on realised volatility and return a per-day regime
-    label, ordered so that 0 = low-volatility and 1 = high-volatility
-    (hmmlearn does not guarantee state ordering, so this remaps it).
+    thresholds = (low_vol_threshold, high_vol_threshold). The high-vol
+    threshold should be LARGER than the low-vol one: a 3% move during a
+    crisis is less anomalous than the same move in calm markets, so it
+    should take a bigger z-score to get flagged when volatility is already high.
+    """
+    z = rolling_zscore(returns, window=window)
+    return flag(z, regime.map({0: thresholds[0], 1: thresholds[1]}))
+
+
+def regime_standardised_zscore(returns, regime, window_obs=252, min_obs=60):
+    """
+    z_t = (r_t - mean) / std over the last `window_obs` returns before t that fall in
+    the same regime as day t; undefined with fewer than `min_obs` of them. `regime`
+    must be known before day t, so pass the one-step predicted regime.
+    """
+    z = pd.Series(np.nan, index=returns.index)
+    for k in regime.dropna().unique():
+        r = returns[(regime == k) & returns.notna()]
+        past = r.shift(1)                   # earlier same-regime returns only, never r_t
+        mean = past.rolling(window_obs, min_periods=min_obs).mean()
+        std = past.rolling(window_obs, min_periods=min_obs).std()
+        z.loc[r.index] = ((r - mean) / std).to_numpy()
+    return z
+
+
+def regime_standardised_label(returns, regime, window_obs=252, min_obs=60, threshold=2.5):
+    """Flag a day anomalous if |regime-standardised z-score| exceeds one `threshold`."""
+    return flag(regime_standardised_zscore(returns, regime, window_obs, min_obs), threshold)
+
+
+def fullsample_regimes(vol_series, n_states=2, random_state=42):
+    """
+    The original regime labels: an HMM fit on 2000-2024 and decoded with the Viterbi
+    path over the whole sample, which uses future observations. Kept only as the
+    sensitivity analysis; 0 = low-volatility, 1 = high-volatility.
     """
     from hmmlearn.hmm import GaussianHMM
 
@@ -71,22 +120,8 @@ def fit_hmm_regimes(vol_series, n_states=2, random_state=42):
     return regime.reindex(vol_series.index)  # NaN during the vol series' own warm-up window
 
 
-def regime_conditioned_label(returns, regime, window=252, thresholds=(2.5, 3.0)):
-    """
-    thresholds = (low_vol_threshold, high_vol_threshold). The high-vol
-    threshold should be LARGER than the low-vol one: a 3% move during a
-    crisis is less anomalous than the same move in calm markets, so it
-    should take a bigger z-score to get flagged when volatility is already high.
-    """
-    z = rolling_zscore(returns, window=window)
-    label = pd.Series(0, index=returns.index)
-    label[(regime == 0) & (z.abs() > thresholds[0])] = 1
-    label[(regime == 1) & (z.abs() > thresholds[1])] = 1
-    return label
-
-
 def mean_run_length(label):
-    """Average length of consecutive-day runs where label == 1."""
+    """Average length of consecutive-day runs where label == 1 (undefined days end a run)."""
     label = label.fillna(0).astype(int)
     if label.sum() == 0:
         return 0.0
@@ -96,70 +131,107 @@ def mean_run_length(label):
     return float(run_lengths.mean())
 
 
-def concordance(label, event_dates, window_days=5):
-    """
-    Fraction of named events for which at least one day within
-    +/- window_days is flagged anomalous.
-    """
-    idx = label.index
-    hits = 0
-    for event in event_dates:
-        event = pd.Timestamp(event)
-        mask = (idx >= event - pd.Timedelta(days=window_days)) & (idx <= event + pd.Timedelta(days=window_days))
-        if label[mask].sum() > 0:
-            hits += 1
-    return hits / len(event_dates)
+def concordance(label, events):
+    """Fraction of events with at least one flagged day inside the event window, and per-event hits."""
+    hits = [bool(label.loc[pd.Timestamp(e["window"][0]):pd.Timestamp(e["window"][1])].fillna(0).sum() > 0)
+            for e in events]
+    return float(np.mean(hits)), hits
 
 
-def build_evaluation_table(
-    returns, vol_series, window=252, baseline_threshold=2.5,
-    regime_thresholds=(2.5, 3.0), crisis_events=None,
-):
-    crisis_events = crisis_events or CRISIS_EVENTS
-    baseline = baseline_label(returns, window=window, threshold=baseline_threshold)
-    regime = fit_hmm_regimes(vol_series)
-    hmm_label = regime_conditioned_label(returns, regime, window=window, thresholds=regime_thresholds)
+def build_labels(panel, target, cfg):
+    r = panel[f"{target}_logret"]
+    vol = panel[f"{target}_{cfg['hmm']['observation']}"]
+    h, rt, rs = cfg["hmm"], cfg["regime_threshold"], cfg["regime_standardised"]
+    w = cfg["zscore_window"]
 
+    params, info = fit_hmm(vol, h["fit_window"], h["n_states"], h["covariance_type"],
+                           h["n_iter"], h["random_state"])
+    check_filter_causality(vol, params, n_checks=h["causality_checks"])
+    filt, pred, _ = forward_filter(vol, params)
+    regime_filt, regime_pred = most_probable(filt), most_probable(pred)
+    regime_full = fullsample_regimes(vol, h["n_states"], h["random_state"])
+
+    labels = pd.DataFrame({
+        "baseline": baseline_label(r, w, cfg["baseline"]["threshold"]),
+        "hmm": regime_conditioned_label(r, regime_filt, w, tuple(rt["thresholds"])),
+        "regime_std": regime_standardised_label(r, regime_pred, rs["window_obs"], rs["min_obs"],
+                                                rs["threshold"]),
+        "hmm_fullsample": regime_conditioned_label(r, regime_full, w, tuple(rt["thresholds"])),
+        "p_high_filtered": filt.iloc[:, -1],
+        "regime_filtered": regime_filt,
+        "p_high_predicted": pred.iloc[:, -1],
+        "regime_predicted": regime_pred,
+        "regime_fullsample": regime_full,
+    })
+    return labels, params, info
+
+
+def label_summary(lab, events):
+    conc, hits = concordance(lab, events)
+    return {
+        "anomaly_days": int(lab.sum()),
+        "prevalence_pct": round(100 * lab.mean(), 2),
+        "mean_run_length_days": round(mean_run_length(lab), 2),
+        "concordance_pct": round(100 * conc, 1),
+        "events_missed": "; ".join(e["name"] for e, hit in zip(events, hits) if not hit) or "none",
+    }
+
+
+def evaluation_table(labels, events):
+    """The three schemes, each on the same days: those where all three are defined."""
+    common = labels[list(SCHEMES)].notna().all(axis=1)
+    days = labels.index[common]
+    return pd.DataFrame([
+        {"scheme": name, "label": col, "days": len(days), "from": days.min().date(), "to": days.max().date(),
+         **label_summary(labels.loc[common, col], events)}
+        for col, name in SCHEMES.items()
+    ])
+
+
+def sensitivity_table(labels, events):
+    """Regime-dependent threshold labels from the causal HMM vs the full-sample HMM, on the same days."""
+    common = labels[["hmm", "hmm_fullsample"]].notna().all(axis=1)
+    sub = labels.loc[common]
+    regime_agree = 100 * (sub["regime_filtered"] == sub["regime_fullsample"]).mean()
+    label_agree = 100 * (sub["hmm"] == sub["hmm_fullsample"]).mean()
     rows = []
-    for name, label in [("Baseline (rolling z-score)", baseline), ("Regime-conditioned (HMM)", hmm_label)]:
-        rows.append({
-            "method": name,
-            "prevalence_pct": round(100 * label.mean(), 2),
-            "mean_run_length_days": round(mean_run_length(label), 2),
-            "concordance_pct": round(100 * concordance(label, list(crisis_events.values())), 1),
-        })
-    return pd.DataFrame(rows), baseline, hmm_label, regime
+    for col, regime_col, name in [
+        ("hmm", "regime_filtered", "Causal HMM (fit 2000-2015, filtered)"),
+        ("hmm_fullsample", "regime_fullsample", "Full-sample HMM (fit 2000-2024, Viterbi)"),
+    ]:
+        rows.append({"hmm_fit": name, "label": col, "days": int(common.sum()),
+                     "high_vol_days_pct": round(100 * sub[regime_col].mean(), 1),
+                     **label_summary(sub[col], events),
+                     "regime_agreement_pct": round(regime_agree, 1),
+                     "label_agreement_pct": round(label_agree, 2)})
+    return pd.DataFrame(rows)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--panel", default="data/processed/panel_full.csv")
     parser.add_argument("--index", default="GSPC", choices=["GSPC", "N225", "FTSE"])
-    parser.add_argument("--window", type=int, default=252)
-    parser.add_argument("--baseline-threshold", type=float, default=2.5)
-    parser.add_argument(
-        "--regime-thresholds", type=float, nargs=2, default=(2.5, 3.0),
-        metavar=("LOW_VOL", "HIGH_VOL"),
-        help="z-score thresholds for the low-vol and high-vol regimes (default: 2.5 3.0)",
-    )
+    parser.add_argument("--config", default=CONFIG_PATH)
     args = parser.parse_args()
 
-    panel = pd.read_csv(args.panel, index_col=0, parse_dates=True)
-    returns = panel[f"{args.index}_logret"]
-    vol = panel[f"{args.index}_rv21"]
+    cfg = load_config(args.config)
+    panel = pd.read_csv(cfg["panel_path"], index_col=0, parse_dates=True)
+    labels, params, info = build_labels(panel, args.index, cfg)
+    events = cfg["crisis_events"]
 
-    table, baseline, hmm_label, regime = build_evaluation_table(
-        returns, vol, window=args.window, baseline_threshold=args.baseline_threshold,
-        regime_thresholds=tuple(args.regime_thresholds),
-    )
-    print(table.to_string(index=False))
+    print(f"HMM fit {info['fit_start']} to {info['fit_end']} ({info['fit_days']} days), "
+          f"converged={info['converged']} after {info['iterations']} iterations")
+    print(f"State means (rv21): {np.round(params['means'], 5)}, "
+          f"P(stay): {np.round(np.diag(params['transmat']), 4)}")
+    table = evaluation_table(labels, events)
+    sens = sensitivity_table(labels, events)
+    print("\n" + table.drop(columns=["label"]).to_string(index=False))
+    print("\nSensitivity, causal vs full-sample HMM:\n" + sens.drop(columns=["label"]).to_string(index=False))
 
-    import os
     os.makedirs("results", exist_ok=True)
-    out_path = f"results/labelling_evaluation_{args.index}.csv"
-    table.to_csv(out_path, index=False)
-    print(f"Saved evaluation table to {out_path}")
-
-    labels_out = f"results/labels_{args.index}.csv"
-    pd.DataFrame({"baseline": baseline, "hmm": hmm_label, "regime": regime}).to_csv(labels_out)
-    print(f"Saved per-day labels and regimes to {labels_out}")
+    labels.to_csv(f"results/labels_{args.index}.csv")
+    table.to_csv(f"results/labelling_evaluation_{args.index}.csv", index=False)
+    sens.to_csv(f"results/hmm_sensitivity_{args.index}.csv", index=False)
+    with open(f"results/hmm_params_{args.index}.json", "w") as f:
+        json.dump({**{k: np.asarray(v).tolist() for k, v in params.items()}, **info}, f, indent=2)
+    print(f"\nSaved results/labels_{args.index}.csv, labelling_evaluation_{args.index}.csv, "
+          f"hmm_sensitivity_{args.index}.csv and hmm_params_{args.index}.json")

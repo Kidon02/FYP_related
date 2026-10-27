@@ -1,0 +1,4 @@
+scheme,label,days,from,to,anomaly_days,prevalence_pct,mean_run_length_days,concordance_pct,events_missed
+Baseline (rolling z-score),baseline,6035,2001-01-03,2024-12-30,183,3.03,1.24,83.3,2022 rate-hike cycle
+Regime-dependent threshold (causal HMM),hmm,6035,2001-01-03,2024-12-30,146,2.42,1.23,83.3,2022 rate-hike cycle
+Regime-standardised (causal HMM),regime_std,6035,2001-01-03,2024-12-30,164,2.72,1.23,83.3,Flash Crash 2010

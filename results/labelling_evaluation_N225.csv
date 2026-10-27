@@ -1,0 +1,4 @@
+scheme,label,days,from,to,anomaly_days,prevalence_pct,mean_run_length_days,concordance_pct,events_missed
+Baseline (rolling z-score),baseline,6013,2001-01-03,2024-12-30,145,2.41,1.2,66.7,Dot-com bust; 2022 rate-hike cycle
+Regime-dependent threshold (causal HMM),hmm,6013,2001-01-03,2024-12-30,125,2.08,1.18,66.7,Dot-com bust; 2022 rate-hike cycle
+Regime-standardised (causal HMM),regime_std,6013,2001-01-03,2024-12-30,147,2.44,1.19,66.7,Dot-com bust; Flash Crash 2010

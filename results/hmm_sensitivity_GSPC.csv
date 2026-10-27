@@ -1,0 +1,3 @@
+hmm_fit,label,days,high_vol_days_pct,anomaly_days,prevalence_pct,mean_run_length_days,concordance_pct,events_missed,regime_agreement_pct,label_agreement_pct
+"Causal HMM (fit 2000-2015, filtered)",hmm,6036,23.3,150,2.49,1.24,100.0,none,95.4,99.82
+"Full-sample HMM (fit 2000-2024, Viterbi)",hmm_fullsample,6036,26.7,139,2.3,1.25,100.0,none,95.4,99.82

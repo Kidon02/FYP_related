@@ -1,0 +1,61 @@
+# Labelling configuration for code/labelling.py.
+# Rule: no future information may enter any label, threshold or standardisation
+# statistic. Statistics use data up to 2015 (the HMM fit) or trailing data only.
+
+# 2026-10-27 panel: EPU_US fixed. panel_full.csv (2026-09-16) is kept unchanged.
+panel_path: data/processed/panel_full_2026-10-27.csv
+
+# Rolling z-score of the target log-return, as in the brief. The 252-day window ends
+# on day t. Days where it is undefined (the first 252) get no label, not 0.
+zscore_window: 252
+
+baseline:
+  threshold: 2.5
+
+hmm:
+  observation: rv21                     # target's 21-day realised volatility
+  n_states: 2                           # state 0 = low volatility, 1 = high (ordered by mean)
+  covariance_type: diag
+  n_iter: 200
+  random_state: 42
+  fit_window: [2000-01-01, 2015-12-31]  # parameters estimated here only, then frozen
+  # Regime = most probable state. Filtered: P(s_t | y_1..y_t). Predicted (one step
+  # ahead): P(s_t | y_1..y_{t-1}). Both come from the explicit forward recursion in
+  # code/regimes.py, never from hmmlearn predict/predict_proba on the full sequence.
+  causality_checks: 3                   # dates at which code/regimes.py tests the filter
+
+# Scheme 2: baseline z-score, threshold set by the filtered regime on day t.
+regime_threshold:
+  thresholds: [2.5, 3.0]                # [low-vol, high-vol]
+
+# Scheme 3 (core novelty): standardise each return within its own regime using
+# trailing same-regime returns only, then apply one threshold. The regime for day t
+# is the one predicted from information up to t-1, so r_t influences neither its
+# own regime nor its own standardisation statistics.
+regime_standardised:
+  window_obs: 252                       # the last 252 returns before t in the same regime
+  min_obs: 60                           # fewer same-regime returns before t: no label
+  threshold: 2.5
+
+# Event list: supervisor (reply to the October update). Date windows: the student's
+# choice, proposed 2026-10-27, to be confirmed. An event counts as detected if at
+# least one day inside its window (inclusive) is flagged.
+crisis_events:
+  - name: Dot-com bust
+    window: [2002-07-01, 2002-10-31]
+    why: final leg of the 2000-02 bear market (WorldCom bankruptcy 21 Jul 2002, July and October lows); 2000 falls in the z-score warm-up
+  - name: Lehman 2008
+    window: [2008-09-15, 2008-10-31]
+    why: Lehman bankruptcy (15 Sep 2008) to the end of the October 2008 crash
+  - name: European Debt Crisis
+    window: [2011-08-01, 2011-08-31]
+    why: contagion to Italy and Spain, ECB bond purchases (7 Aug) and the US downgrade (5 Aug 2011)
+  - name: Flash Crash 2010
+    window: [2010-05-06, 2010-05-07]
+    why: US intraday crash on 6 May 2010; 7 May covers the Tokyo and London sessions that traded after it
+  - name: COVID March 2020
+    window: [2020-02-24, 2020-03-31]
+    why: first COVID sell-off day in Europe and the US (24 Feb 2020) to the end of March
+  - name: 2022 rate-hike cycle
+    window: [2022-09-01, 2022-10-14]
+    why: US CPI shock (13 Sep), 75 bp Fed hike (21 Sep), BoJ yen intervention (22 Sep) and the UK gilt crisis to the end of BoE purchases (14 Oct 2022)

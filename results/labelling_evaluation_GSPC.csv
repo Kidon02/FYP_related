@@ -1,0 +1,4 @@
+scheme,label,days,from,to,anomaly_days,prevalence_pct,mean_run_length_days,concordance_pct,events_missed
+Baseline (rolling z-score),baseline,6036,2001-01-02,2024-12-30,196,3.25,1.24,100.0,none
+Regime-dependent threshold (causal HMM),hmm,6036,2001-01-02,2024-12-30,150,2.49,1.24,100.0,none
+Regime-standardised (causal HMM),regime_std,6036,2001-01-02,2024-12-30,167,2.77,1.23,100.0,none
