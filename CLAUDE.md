@@ -39,8 +39,8 @@ foreign features plotted against VIX (2019-2024).
   Sunday 21:00 SGT (a missed run starts after the next sign-in). It commits all changes,
   rebases onto origin/main and pushes. Log: ~/fyp_weekly_commit.log.
 - Cloud sessions (claude.ai web/app): the Stop hook .claude/hooks/cloud_autocommit.sh
-  commits and pushes the session's claude/ branch after every turn, since idle cloud VMs
-  are reclaimed.
+  commits after every turn, since idle cloud VMs are reclaimed, and pushes to the session's
+  claude/ branch (claude/autosave-<session> when on another branch). It never pushes to main.
 - Routine "FYP weekly cloud commit" (claude.ai/code/routines) merges unmerged claude/*
   branches into main every Sunday 22:07 SGT. Delete a cloud branch on GitHub before then
   to keep it out of main.

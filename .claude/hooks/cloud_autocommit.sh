@@ -32,7 +32,13 @@ if ! git diff --cached --quiet; then
     -m "$(printf '%s\n' "${FILES[@]:0:20}")" || exit 1
 fi
 
-# Push anything not on GitHub yet, including commits Claude made itself.
+# Push anything not on GitHub yet, including commits Claude made itself. Never push to
+# main: off a claude/ branch, push to claude/autosave-<session> for the weekly merge.
 if [ -n "$(git rev-list -1 HEAD --not --remotes=origin)" ]; then
-  git push -q -u origin HEAD || { echo "Auto-commit: push failed; the commit exists only in this session." >&2; exit 1; }
+  BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  SID=${CLAUDE_CODE_REMOTE_SESSION_ID:-session}
+  case "$BRANCH" in
+    claude/*) git push -q -u origin HEAD ;;
+    *) git push -q origin "HEAD:refs/heads/claude/autosave-${SID##*_}" ;;
+  esac || { echo "Auto-commit: push failed; the commit exists only in this session." >&2; exit 1; }
 fi
