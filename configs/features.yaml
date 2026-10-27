@@ -1,8 +1,11 @@
 # Feature configuration for code/features.py
-# Every feature for day t uses only data dated t-1 or earlier.
+# Every feature for day t uses only information available before the target's close
+# on day t: data dated t-1 or earlier, plus same-day (lag-0) foreign returns and
+# volatility when that foreign session closes before the target's (see sessions).
 # Labels are never read by features.py.
 
-panel_path: data/processed/panel_full.csv
+# 2026-10-27 panel: EPU_US fixed. panel_full.csv (2026-09-16) is kept unchanged.
+panel_path: data/processed/panel_full_2026-10-27.csv
 universe: [GSPC, N225, FTSE]   # target is chosen with --index; the others are foreign
 
 # Excluded inputs. TED: FRED discontinued TEDRATE on 2022-01-21 and the
@@ -49,15 +52,45 @@ technical:
   # Deviation from the brief (approved, same reasoning): MACD signal divided by close.
   macd_normalise_by_close: true
 
+# Exchange closing times (local). A foreign session counts as lag-0 for a target only
+# if it closes before the target's close on the same date, on every date in the panel;
+# otherwise the latest foreign session known at the target's close is the previous
+# one, which lag 1 already covers. UTC times, including DST, come from the IANA time
+# zone database. code/features.py checks the ordering date by date.
+sessions:
+  GSPC:
+    exchange: NYSE
+    timezone: America/New_York
+    close: "16:00"
+    dst: "EDT: second Sunday of March to first Sunday of November from 2007; first Sunday of April to last Sunday of October before"
+  N225:
+    exchange: Tokyo Stock Exchange
+    timezone: Asia/Tokyo
+    close: "15:00"
+    close_from: {2024-11-05: "15:30"}   # TSE extended the afternoon session on 5 Nov 2024
+    dst: "none (Japan has no daylight saving time)"
+  FTSE:
+    exchange: London Stock Exchange
+    timezone: Europe/London
+    close: "16:35"                      # closing auction (16:30 to 16:35) sets the FTSE 100 close
+    dst: "BST: last Sunday of March to last Sunday of October"
+lag0_features: [logret, rv21]           # per foreign index whose session closes first
+
 groups:
   domestic: "target log-return, realised vol, log volume, VIX"
-  foreign: "other two indices: log-return and realised vol"
+  foreign: "other two indices: log-return and realised vol, lags 1+"
+  foreign_lag0: "other indices whose session closes before the target's: same-day log-return and realised vol"
   macro: "USDJPY, DGS10, EPU_US, EPU_JP"
   technical: "RSI, Bollinger width, MACD signal"
 
+# Each entry is a group name or a feature-name pattern (fnmatch).
 feature_sets:
   domestic_only: [domestic, technical]
-  cross_market: [domestic, foreign, macro, technical]
+  cross_market: [domestic, foreign, macro, technical]                  # lag-1 foreign only
+  cross_market_lag0: [domestic, foreign, foreign_lag0, macro, technical]
+  ablation_foreign: [domestic, foreign, technical]                     # cross-market minus macro
+  ablation_macro: [domestic, macro, technical]                         # cross-market minus foreign
+  rv_only: ["dom_rv21_lag*"]                                           # realised-volatility benchmark
 
 # Columns whose train vs test ranges are printed after building features.
 range_report: [dom_vix_lag1, mac_dgs10_lag1, mac_epu_us_lag1, mac_epu_jp_lag1, dom_logvol_dev_lag1]

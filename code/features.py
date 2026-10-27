@@ -7,14 +7,21 @@ Usage:
 Reads data/processed/panel_full.csv and configs/features.yaml, and writes:
     data/processed/features_{IDX}.csv         wide: one column per feature
     data/processed/feature_groups_{IDX}.csv   feature -> group
+    results/session_close_times.csv           exchange closing times in UTC, with DST
+    results/lag0_ordering_{IDX}.csv           which foreign sessions close before the target's
 
-Every feature for day t uses only data dated t-1 or earlier. Labels are never
-read here. Rows where the rolling z-score is undefined, or any feature is
-undefined, are dropped.
+Every feature for day t uses only information available before the target's close
+on day t: data dated t-1 or earlier, plus the same-day (lag-0) log-return and
+realised volatility of a foreign index whose session closes before the target's on
+every date. Labels are never read here. Rows where the rolling z-score is undefined,
+or any feature is undefined, are dropped.
 """
 
 import argparse
 import os
+from datetime import datetime
+from fnmatch import fnmatchcase
+from zoneinfo import ZoneInfo
 
 import numpy as np
 import pandas as pd
@@ -27,6 +34,66 @@ LABEL_TOKENS = {"baseline", "hmm", "regime"}
 def load_config(path=CONFIG_PATH):
     with open(path, "r") as f:
         return yaml.safe_load(f)
+
+
+def resolve_feature_set(spec, groups):
+    """Columns of a feature set, in file order. Entries are group names or fnmatch patterns."""
+    return [c for c in groups.index if any(groups[c] == e or fnmatchcase(c, e) for e in spec)]
+
+
+# ---------- session timing (decides which foreign data is known at the target's close) ----------
+
+def session_close_utc(dates, session):
+    """UTC closing time of an exchange's session on each local trading date."""
+    tz = ZoneInfo(session["timezone"])
+    changes = sorted((pd.Timestamp(d), t) for d, t in (session.get("close_from") or {}).items())
+    closes = []
+    for d in dates:
+        close = session["close"]
+        for start, t in changes:
+            if d >= start:
+                close = t
+        hour, minute = map(int, close.split(":"))
+        closes.append(pd.Timestamp(datetime(d.year, d.month, d.day, hour, minute, tzinfo=tz)).tz_convert("UTC"))
+    return pd.Series(closes, index=dates)
+
+
+def lag0_ordering(target, cfg, dates):
+    """
+    For each foreign index, whether its session closes before the target's on the
+    same date. The answer must be the same on every date, through every DST change,
+    otherwise this fails. Returns ({index: bool}, table).
+    """
+    target_close = session_close_utc(dates, cfg["sessions"][target])
+    allowed, rows = {}, []
+    for idx in cfg["universe"]:
+        if idx == target:
+            continue
+        gap = (target_close - session_close_utc(dates, cfg["sessions"][idx])).dt.total_seconds() / 3600
+        first = int((gap > 0).sum())
+        assert first in (0, len(dates)), f"{idx} closes before {target} on only {first} of {len(dates)} dates"
+        allowed[idx] = first == len(dates)
+        rows.append({
+            "target": target, "foreign": idx, "days": len(dates), "foreign_closes_first_days": first,
+            "gap_hours_min": round(float(gap.min()), 2), "gap_hours_max": round(float(gap.max()), 2),
+            "latest_foreign_session_at_target_close": "same date (lag 0)" if allowed[idx] else "previous date (lag 1)",
+        })
+    return allowed, pd.DataFrame(rows)
+
+
+def session_close_table(cfg, dates):
+    """Each exchange's closing time in local time and the UTC times it maps to over the panel's dates."""
+    rows = []
+    for idx, s in cfg["sessions"].items():
+        counts = session_close_utc(dates, s).dt.strftime("%H:%M").value_counts().sort_index()
+        changes = "; ".join(f"{t} from {d}" for d, t in (s.get("close_from") or {}).items()) or "none"
+        rows.append({
+            "index": idx, "exchange": s["exchange"], "local_close": s["close"], "local_close_changes": changes,
+            "time_zone": s["timezone"],
+            "utc_close": "; ".join(f"{t} UTC ({n} days)" for t, n in counts.items()),
+            "daylight_saving": s["dst"],
+        })
+    return pd.DataFrame(rows)
 
 
 # ---------- technical indicators (all computed on close, unshifted) ----------
@@ -69,10 +136,11 @@ def lagged_epu(s, publication_lag_months, day_lag):
 
 # ---------- feature construction ----------
 
-def build_raw_features(panel, target, cfg):
+def build_raw_features(panel, target, cfg, lag0):
     """
     Return (features, groups) with features unfiltered (warm-up NaNs kept).
-    Every series is shifted by at least one day before use.
+    Every series is shifted by at least one day before use, except the lag-0
+    series of foreign indices whose session closes before the target's (lag0[idx]).
     """
     L = cfg["lags"]
     feats, groups = {}, {}
@@ -115,6 +183,9 @@ def build_raw_features(panel, target, cfg):
             add(f"for_{idx}_logret_lag{k}", "foreign", panel[f"{idx}_logret"].shift(k))
         for k in L["foreign_rv21"]:
             add(f"for_{idx}_rv21_lag{k}", "foreign", panel[f"{idx}_rv21"].shift(k))
+        if lag0[idx]:  # this session closes before the target's on the same date
+            for col in cfg["lag0_features"]:
+                add(f"for_{idx}_{col}_lag0", "foreign_lag0", panel[f"{idx}_{col}"])
 
     # Macro
     lm = L["usdjpy"]
@@ -158,39 +229,60 @@ def assert_no_label_or_excluded(features, cfg):
             assert ex.lower() not in name.lower(), f"excluded input {ex} in feature {name}"
 
 
-def check_no_lookahead(panel, target, cfg, n_checks=3, seed=0):
+def _with_noise(panel, rows, cols, rng):
+    """Copy of the panel with the given rows of the given columns replaced by positive noise."""
+    pert = panel.copy()
+    for col in cols:
+        if pd.api.types.is_numeric_dtype(pert[col]):
+            pert[col] = pert[col].astype(float)
+            mu, sd = panel[col].mean(), panel[col].std()
+            pert.loc[rows, col] = np.abs(rng.normal(mu, sd, size=int(rows.sum())))  # keeps volume positive
+    return pert
+
+
+def check_no_lookahead(panel, target, cfg, lag0, n_checks=3, seed=0):
     """
-    Overwrite every panel row dated T or later with noise, rebuild, and check
-    that features dated T or earlier are unchanged. Also check that features
-    after T do change, so the test is not vacuous.
+    At several dates T:
+      (a) overwrite every row after T with noise: features dated T or earlier must not
+          change, and later ones must, so the test is not vacuous;
+      (b) overwrite day T of the target's own columns and of every non-index column
+          (VIX, macro, EPU): features at T must not change;
+      (c) overwrite day T of each foreign index: features at T must change if that index
+          is lag-0 for the target, and must not change if it is not.
     """
-    base, _ = build_raw_features(panel, target, cfg)
+    base, _ = build_raw_features(panel, target, cfg, lag0)
     rng = np.random.default_rng(seed)
+    own = {idx: [c for c in panel.columns if c.startswith(f"{idx}_")] for idx in cfg["universe"]}
+    shared = [c for c in panel.columns if not any(c in cols for cols in own.values())]
+
+    def same(a, b):
+        return np.isclose(a.to_numpy(float), b.to_numpy(float), equal_nan=True).all()
+
     n = len(panel)
     positions = [int(n * q) for q in np.linspace(0.3, 0.85, n_checks)]
     for pos in positions:
         T = panel.index[pos]
-        pert = panel.copy()
-        for col in pert.columns:
-            if pd.api.types.is_numeric_dtype(pert[col]):
-                pert[col] = pert[col].astype(float)
-                mu, sd = panel[col].mean(), panel[col].std()
-                noise = np.abs(rng.normal(mu, sd, size=(pert.index >= T).sum()))  # keeps volume positive
-                pert.loc[pert.index >= T, col] = noise
-        new, _ = build_raw_features(pert, target, cfg)
-        before = base.loc[:T]
-        after = new.loc[:T]
-        same = np.isclose(before.to_numpy(float), after.to_numpy(float), equal_nan=True)
-        assert same.all(), f"look-ahead: features at or before {T.date()} changed"
-        changed_after = not np.isclose(base.loc[T:].iloc[1:].to_numpy(float),
-                                       new.loc[T:].iloc[1:].to_numpy(float),
-                                       equal_nan=True).all()
-        assert changed_after, f"look-ahead test vacuous at {T.date()}"
-    print(f"No-lookahead check passed at {len(positions)} dates.")
+        new, _ = build_raw_features(_with_noise(panel, panel.index > T, panel.columns, rng), target, cfg, lag0)
+        assert same(base.loc[:T], new.loc[:T]), f"look-ahead: features at or before {T.date()} changed"
+        assert not same(base.loc[T:].iloc[1:], new.loc[T:].iloc[1:]), f"look-ahead test vacuous at {T.date()}"
+
+        day = panel.index == T
+        new, _ = build_raw_features(_with_noise(panel, day, own[target] + shared, rng), target, cfg, lag0)
+        assert same(base.loc[[T]], new.loc[[T]]), f"same-day target or macro data used at {T.date()}"
+
+        for idx in cfg["universe"]:
+            if idx == target:
+                continue
+            new, _ = build_raw_features(_with_noise(panel, day, own[idx], rng), target, cfg, lag0)
+            used = not same(base.loc[[T]], new.loc[[T]])
+            assert used == lag0[idx], f"same-day {idx} data used={used} at {T.date()}, lag-0 allowed={lag0[idx]}"
+    lag0_from = [idx for idx, ok in lag0.items() if ok] or ["none"]
+    print(f"No-lookahead check passed at {len(positions)} dates "
+          f"(same-day foreign data used only from: {', '.join(lag0_from)}).")
 
 
-def build_feature_table(panel, target, cfg):
-    raw, groups = build_raw_features(panel, target, cfg)
+def build_feature_table(panel, target, cfg, lag0):
+    raw, groups = build_raw_features(panel, target, cfg, lag0)
     assert_no_label_or_excluded(raw, cfg)
 
     z = (panel[f"{target}_logret"] - panel[f"{target}_logret"].rolling(cfg["zscore_window"]).mean()) \
@@ -245,19 +337,25 @@ if __name__ == "__main__":
     cfg["_train_start"], cfg["_train_end"] = "2000-01-01", "2015-12-31"
     cfg["_test_start"], cfg["_test_end"] = "2019-01-01", "2024-12-31"
 
-    check_no_lookahead(panel, args.index, cfg)
-    features, groups = build_feature_table(panel, args.index, cfg)
+    lag0, ordering = lag0_ordering(args.index, cfg, panel.index)
+    print("Session ordering on the panel's dates (gap = target close minus foreign close):")
+    print(ordering.to_string(index=False))
+    check_no_lookahead(panel, args.index, cfg, lag0)
+    features, groups = build_feature_table(panel, args.index, cfg, lag0)
 
-    for name, members in cfg["feature_sets"].items():
-        n = int(groups.isin(members).sum())
-        print(f"Feature set {name}: {n} features")
+    for name, spec in cfg["feature_sets"].items():
+        print(f"Feature set {name}: {len(resolve_feature_set(spec, groups))} features")
     print(groups.value_counts().to_string())
     print(f"Final rows: {len(features)} ({features.index.min().date()} to {features.index.max().date()})")
 
     print_range_report(features, cfg)
 
     os.makedirs("data/processed", exist_ok=True)
+    os.makedirs("results", exist_ok=True)
     features.index.name = "date"
     features.to_csv(f"data/processed/features_{args.index}.csv")
     groups.rename("group").rename_axis("feature").to_csv(f"data/processed/feature_groups_{args.index}.csv")
-    print(f"\nSaved data/processed/features_{args.index}.csv and feature_groups_{args.index}.csv")
+    session_close_table(cfg, panel.index).to_csv("results/session_close_times.csv", index=False)
+    ordering.to_csv(f"results/lag0_ordering_{args.index}.csv", index=False)
+    print(f"\nSaved data/processed/features_{args.index}.csv, feature_groups_{args.index}.csv, "
+          f"results/session_close_times.csv and results/lag0_ordering_{args.index}.csv")

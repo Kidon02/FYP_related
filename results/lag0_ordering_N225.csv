@@ -1,0 +1,3 @@
+target,foreign,days,foreign_closes_first_days,gap_hours_min,gap_hours_max,latest_foreign_session_at_target_close
+N225,GSPC,6288,0,-15.0,-14.0,previous date (lag 1)
+N225,FTSE,6288,0,-10.58,-9.58,previous date (lag 1)
