@@ -1,0 +1,16 @@
+# Settings for code/figures.py: the data panel summary table and the regime figure.
+# Supervisor rules: no colour, no grids, at most 6 ticks per axis, caption instead of title.
+
+# 2026-10-27 panel: EPU_US fixed. panel_full.csv (2026-09-16) is kept unchanged.
+panel_path: data/processed/panel_full_2026-10-27.csv
+window: [2000-01-01, 2024-12-31]      # range the data panel table reports on
+
+regime_figure:
+  index: GSPC
+  windows:                            # one panel each
+    - [2007-07-01, 2009-06-30]        # around Lehman 2008
+    - [2019-10-01, 2020-12-31]        # around COVID March 2020
+  width_in: 6.5
+  height_in: 6.0
+  dpi: 300
+  max_ticks: 6

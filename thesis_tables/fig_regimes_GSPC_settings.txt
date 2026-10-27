@@ -1,0 +1,9 @@
+Dataset: GSPC (panel_full.csv), 2007-07-01 to 2009-06-30 and 2019-10-01 to 2020-12-31
+Feature set: n/a (labels only)
+Label strategy: baseline, hmm (regime-dependent threshold), regime_std; shading = regime_filtered
+Model: 2-state Gaussian HMM on rv21, fit 2000-2015 (results/hmm_params_GSPC.json)
+Seed: 42 (HMM random_state)
+Config file: configs/labelling.yaml, configs/figures.yaml
+Checkpoint: labels in results/labels_GSPC.csv; figure results/figures/fig_regimes_GSPC.png and .pdf
+Test window: n/a
+Notes: caption: S&P 500 daily log-returns around the 2008 financial crisis (top) and the COVID-19 crash (bottom). Grey shading marks days the causal HMM (fit on 2000-2015 realised volatility, filtered probabilities) places in the high-volatility regime. Markers show days flagged as anomalous by the baseline rolling z-score (circles), the regime-dependent threshold (triangles) and the regime-standardised scheme (crosses).

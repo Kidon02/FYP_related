@@ -1,0 +1,13 @@
+series,source,identifier,frequency,first_date,last_date,missing_pct
+S&P 500 close,Yahoo Finance (yfinance),^GSPC,daily,2000-01-03,2024-12-30,0.0
+S&P 500 volume,Yahoo Finance (yfinance),^GSPC,daily,2000-01-03,2024-12-30,0.0
+Nikkei 225 close,Yahoo Finance (yfinance),^N225,daily,2000-01-04,2024-12-30,5.9
+Nikkei 225 volume,Yahoo Finance (yfinance),^N225,daily,2002-06-10,2024-12-30,15.1
+FTSE 100 close,Yahoo Finance (yfinance),^FTSE,daily,2000-01-04,2024-12-30,1.9
+FTSE 100 volume,Yahoo Finance (yfinance),^FTSE,daily,2000-01-04,2024-12-30,1.9
+VIX,FRED,VIXCLS,daily,2000-01-03,2024-12-31,0.0
+USD/JPY,FRED,DEXJPUS,daily,2000-01-03,2024-12-31,0.9
+10-year Treasury yield,FRED,DGS10,daily,2000-01-03,2024-12-31,0.7
+TED spread (excluded from features),FRED,TEDRATE,daily,2000-01-04,2022-01-21,14.0
+EPU United States,"policyuncertainty.com (Baker, Bloom and Davis)",monthly news-based index,monthly,2000-01-01,2024-12-01,0.0
+EPU Japan,"policyuncertainty.com (Baker, Bloom and Davis)",monthly news-based index,monthly,2000-01-01,2024-12-01,0.0
