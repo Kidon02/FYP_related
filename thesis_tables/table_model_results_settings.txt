@@ -1,0 +1,9 @@
+Dataset: S&P 500, Nikkei 225, FTSE 100 (panel_full_2026-10-27.csv); rows where every label set is defined
+Feature set: domestic_only, cross_market (lag 1), cross_market_lag0, ablation_foreign, ablation_macro, rv_only
+Label strategy: baseline, hmm, regime_std; hmm_fullsample as sensitivity
+Model: xgboost and logistic_regression (grid on validation PR-AUC; F1 threshold on validation)
+Seed: 42-46 (5 seeds; mean and std over seeds), HMM random_state 42
+Config file: configs/baseline_models.yaml, configs/features.yaml, configs/labelling.yaml
+Checkpoint: not saved (models are refit inside code/baseline_models.py)
+Test window: 2019-01-01 to 2024-12-31
+Notes: mean (std) over seeds [block-bootstrap 95% CI of the seed mean: 2000 resamples, block 21 trading days, anomaly clusters (gaps <= 5 days) kept whole]. prevalence_baseline = PR-AUC of a random classifier. Macro group has no credit spread (TED excluded; HY OAS unavailable). Not run (identical columns): N225 cross_market_lag0 baseline xgboost; N225 cross_market_lag0 baseline logistic_regression; N225 cross_market_lag0 hmm xgboost; N225 cross_market_lag0 hmm logistic_regression; N225 cross_market_lag0 regime_std xgboost; N225 cross_market_lag0 regime_std logistic_regression

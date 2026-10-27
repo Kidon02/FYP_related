@@ -1,0 +1,9 @@
+Dataset: S&P 500, Nikkei 225, FTSE 100 (panel_full_2026-10-27.csv); days where all three schemes are defined
+Feature set: n/a (labels only)
+Label strategy: baseline (|z|>2.5), hmm (2.5/3.0 by filtered regime), regime_std (one threshold 2.5)
+Model: 2-state Gaussian HMM on rv21, fit 2000-2015, filtered/predicted probabilities
+Seed: HMM random_state 42 (labels are deterministic)
+Config file: configs/labelling.yaml
+Checkpoint: results/labels_{IDX}.csv, results/hmm_params_{IDX}.json
+Test window: n/a (whole labelled sample)
+Notes: concordance = share of the six events with a flagged day in its window. Windows (student's choice): Dot-com bust 2002-07-01 to 2002-10-31; Lehman 2008 2008-09-15 to 2008-10-31; European Debt Crisis 2011-08-01 to 2011-08-31; Flash Crash 2010 2010-05-06 to 2010-05-07; COVID March 2020 2020-02-24 to 2020-03-31; 2022 rate-hike cycle 2022-09-01 to 2022-10-14

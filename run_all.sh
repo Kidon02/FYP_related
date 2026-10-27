@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
-# Run the full pipeline in order: data -> labels -> features -> baseline models.
-# Stops at the first error. Run from the repo root: bash run_all.sh
+# Run the full pipeline in order: data -> labels -> features -> baseline models ->
+# DM tests -> figures -> report tables. Stops at the first error.
+# Run from the repo root: bash run_all.sh
 #
-# panel_full.csv is fixed (see CLAUDE.md), so the data step is skipped when it
-# already exists. Set REBUILD_PANEL=1 to rebuild it. The rebuild reads raw files
-# from the data/raw cache and never passes --refresh.
+# The panel is fixed (see CLAUDE.md), so the data step is skipped when it already
+# exists. Set REBUILD_PANEL=1 to rebuild it. The rebuild reads raw files from the
+# data/raw cache and never passes --refresh.
 set -euo pipefail
 
 cd "$(dirname "$0")"
@@ -39,5 +40,12 @@ for idx in "${INDICES[@]}"; do
     echo "=== baseline_models.py --index $idx ==="
     python code/baseline_models.py --index "$idx"
 done
+
+echo "=== dm_tests.py ==="
+python code/dm_tests.py
+echo "=== figures.py ==="
+python code/figures.py
+echo "=== report_tables.py ==="
+python code/report_tables.py
 
 echo "=== run_all.sh finished ==="

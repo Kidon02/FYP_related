@@ -1,0 +1,4 @@
+index,exchange,local_close,local_close_changes,time_zone,utc_close,daylight_saving
+GSPC,NYSE,16:00,none,America/New_York,20:00 UTC (3992 days); 21:00 UTC (2296 days),EDT: second Sunday of March to first Sunday of November from 2007; first Sunday of April to last Sunday of October before
+N225,Tokyo Stock Exchange,15:00,15:30 from 2024-11-05,Asia/Tokyo,06:00 UTC (6250 days); 06:30 UTC (38 days),none (Japan has no daylight saving time)
+FTSE,London Stock Exchange,16:35,none,Europe/London,15:35 UTC (3723 days); 16:35 UTC (2565 days),BST: last Sunday of March to last Sunday of October

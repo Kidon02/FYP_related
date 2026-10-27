@@ -1,0 +1,10 @@
+index,scheme,days,from,to,prevalence_pct,mean_run_length_days,concordance_pct,events_missed
+S&P 500,Baseline (rolling z-score),6036,2001-01-02,2024-12-30,3.25,1.24,100.0,none
+S&P 500,Regime-dependent threshold (causal HMM),6036,2001-01-02,2024-12-30,2.49,1.24,100.0,none
+S&P 500,Regime-standardised (causal HMM),6036,2001-01-02,2024-12-30,2.77,1.23,100.0,none
+Nikkei 225,Baseline (rolling z-score),6013,2001-01-03,2024-12-30,2.41,1.2,66.7,Dot-com bust; 2022 rate-hike cycle
+Nikkei 225,Regime-dependent threshold (causal HMM),6013,2001-01-03,2024-12-30,2.08,1.18,66.7,Dot-com bust; 2022 rate-hike cycle
+Nikkei 225,Regime-standardised (causal HMM),6013,2001-01-03,2024-12-30,2.44,1.19,66.7,Dot-com bust; Flash Crash 2010
+FTSE 100,Baseline (rolling z-score),6035,2001-01-03,2024-12-30,3.03,1.24,83.3,2022 rate-hike cycle
+FTSE 100,Regime-dependent threshold (causal HMM),6035,2001-01-03,2024-12-30,2.42,1.23,83.3,2022 rate-hike cycle
+FTSE 100,Regime-standardised (causal HMM),6035,2001-01-03,2024-12-30,2.72,1.23,83.3,Flash Crash 2010

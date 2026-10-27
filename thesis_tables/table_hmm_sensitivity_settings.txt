@@ -1,0 +1,9 @@
+Dataset: S&P 500, Nikkei 225, FTSE 100 (panel_full_2026-10-27.csv)
+Feature set: label statistics: none; PR-AUC: domestic_only and cross_market
+Label strategy: hmm (causal: fit 2000-2015, filtered) vs hmm_fullsample (fit 2000-2024, Viterbi path)
+Model: 2-state Gaussian HMM; xgboost and logistic_regression for PR-AUC
+Seed: 42-46 (5 seeds; mean and std over seeds), HMM random_state 42
+Config file: configs/labelling.yaml, configs/baseline_models.yaml
+Checkpoint: not saved (models are refit inside code/baseline_models.py)
+Test window: label statistics on all labelled days; PR-AUC on 2019-01-01 to 2024-12-31
+Notes: PR-AUC mean (std) over seeds. The full-sample fit uses future observations and is a sensitivity check only. regime_agreement_pct = days where both HMMs give the same regime.
