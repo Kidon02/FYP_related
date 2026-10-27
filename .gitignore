@@ -9,7 +9,9 @@ __pycache__/
 # Keep the final checkpoints and logs used for the submitted results —
 # unignore selectively near the end of the project rather than committing
 # every intermediate run.
-.claude/settings.local.json
-.claude/settings.local.json
 
-.claude/
+# Claude Code: share the project settings and hooks, which cloud sessions need;
+# keep the rest of .claude/ (settings.local.json etc.) out of git.
+.claude/*
+!.claude/settings.json
+!.claude/hooks/
