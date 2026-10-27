@@ -24,15 +24,16 @@ TOLERANCE = pd.Timedelta(days=10)
 def check(fred, series_id):
     info = fred.get_series_info(series_id)
     s = fred.get_series(series_id, observation_start=START, observation_end=END).dropna()
-    first = s.index.min() if len(s) else None
-    last = s.index.max() if len(s) else None
-    ok = (first is not None and first <= pd.Timestamp(START) + TOLERANCE
-          and last >= pd.Timestamp(END) - TOLERANCE)
+    if len(s):
+        first, last = s.index.min(), s.index.max()
+        ok = first <= pd.Timestamp(START) + TOLERANCE and last >= pd.Timestamp(END) - TOLERANCE
+        span = f"first {first.date()}, last {last.date()}"
+    else:
+        ok, span = False, "no observations"
     notes = " ".join((info.get("notes") or "").split())
     print(f"{series_id}: {info['title']}")
     print(f"  FRED metadata range: {info['observation_start']} to {info['observation_end']}")
-    print(f"  Returned for {START} to {END}: first {first.date() if first is not None else None}, "
-          f"last {last.date() if last is not None else None}, {len(s)} observations")
+    print(f"  Returned for {START} to {END}: {span}, {len(s)} observations")
     print(f"  Notes: {notes[:160]}")
     print(f"  {'PASS' if ok else 'FAIL'}: {'covers' if ok else 'does not cover'} {START} to {END}")
     return ok

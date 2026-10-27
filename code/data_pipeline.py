@@ -167,7 +167,13 @@ def load_epu(us_xlsx_path, japan_xlsx_path):
         date = pd.to_datetime(
             pd.DataFrame({"year": df["Year"], "month": df["Month"], "day": 1})
         )
-        return pd.Series(df[value_col].values, index=date)
+        s = pd.Series(df[value_col].values, index=date)
+        # The US file appends a historical block (1900-1984, newest first) after the
+        # 1985+ data. reindex(method="ffill") needs a sorted index; on an unsorted one
+        # it silently returns the wrong months, which corrupted EPU_US in the
+        # 2026-09-16 panel.
+        assert not s.index.duplicated().any(), f"{path}: duplicate months"
+        return s.sort_index()
 
     us = _parse(us_xlsx_path).rename("EPU_US")
     jp = _parse(japan_xlsx_path).rename("EPU_JP")
@@ -215,7 +221,7 @@ def compute_realized_vol(returns, window=21):
 
 
 def build_panel(start, end, epu_us_path=None, epu_japan_path=None, kaggle_path=None, base="GSPC",
-                refresh=False):
+                refresh=False, out_path=f"{PROCESSED_DIR}/panel_full.csv"):
     ensure_dirs()
 
     sources = {}
@@ -260,7 +266,6 @@ def build_panel(start, end, epu_us_path=None, epu_japan_path=None, kaggle_path=N
     else:
         print("Skipping Kaggle cross-check: pass --kaggle once downloaded.")
 
-    out_path = f"{PROCESSED_DIR}/panel_full.csv"
     panel.to_csv(out_path)
     print(f"Saved panel to {out_path} ({len(panel)} rows, {len(panel.columns)} columns)")
     return panel
@@ -279,6 +284,8 @@ if __name__ == "__main__":
         help="Re-download yfinance/FRED data and overwrite data/raw files. "
              "Without it, existing raw files are loaded from cache.",
     )
+    parser.add_argument("--out", default=f"{PROCESSED_DIR}/panel_full.csv",
+                        help="Output path for the panel (default: data/processed/panel_full.csv).")
     args = parser.parse_args()
     build_panel(args.start, args.end, args.epu_us, args.epu_japan, args.kaggle, args.base,
-                refresh=args.refresh)
+                refresh=args.refresh, out_path=args.out)
