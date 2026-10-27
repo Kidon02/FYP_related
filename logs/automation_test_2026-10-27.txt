@@ -1,0 +1,5 @@
+End-to-end test of the commit automation, 2026-10-27.
+1. Laptop job (Task Scheduler) pushed 9 local commits: LastTaskResult 0.
+2. This file was pushed on branch claude/automation-test-2026-10-27, as a cloud session would.
+3. The routine "FYP weekly cloud commit" (Haiku 5.5) should merge it into main.
+4. The laptop job should then bring the merge back to the laptop.
