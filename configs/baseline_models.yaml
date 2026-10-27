@@ -43,5 +43,26 @@ models:
     grid:
       C: [0.01, 0.1, 1, 10]
 
-label_sets: [baseline, hmm]
-feature_set_names: [domestic_only, cross_market]
+# Label sets are columns of results/labels_{IDX}.csv (code/labelling.py): baseline
+# z-score, regime-dependent threshold (causal HMM), regime-standardised (causal HMM).
+label_sets: [baseline, hmm, regime_std]
+# Feature sets are defined in configs/features.yaml.
+feature_set_names: [domestic_only, cross_market, cross_market_lag0, ablation_foreign, ablation_macro, rv_only]
+
+# Sensitivity analysis: regime-dependent threshold labels from the original
+# full-sample HMM (which uses future data), on the main comparison only.
+sensitivity:
+  label_sets: [hmm_fullsample]
+  feature_set_names: [domestic_only, cross_market]
+
+# 95% CIs for test PR-AUC, F1 and MCC (2019-2024): percentile intervals of the
+# seed-mean metric over moving-block bootstrap resamples of the test days. A block
+# never cuts an anomaly cluster (anomaly days at most cluster_gap trading days apart):
+# it may not start inside one, and is extended to the cluster's end if it would end
+# inside one.
+bootstrap:
+  n_resamples: 2000
+  block_length: 21      # trading days, about one month
+  cluster_gap: 5        # trading days
+  confidence: 0.95
+  seed: 2026

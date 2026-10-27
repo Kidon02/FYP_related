@@ -1,8 +1,10 @@
 """
 Baseline models: XGBoost and L2 logistic regression.
 
-Runs both models on both feature sets (domestic_only, cross_market) and both
-label sets (baseline, hmm), with 5 seeds each.
+For one target index, runs both models on every feature set in
+configs/baseline_models.yaml (defined in configs/features.yaml) and every label set
+(baseline, causal regime-dependent threshold, causal regime-standardised), with 5
+seeds each, plus the full-sample-HMM sensitivity labels on the main comparison.
 
 Usage:
     python code/baseline_models.py --index GSPC
@@ -13,10 +15,16 @@ Protocol per combination:
   3. For each grid point and seed, fit and score validation PR-AUC.
   4. Pick the grid point with the highest mean validation PR-AUC.
   5. For each seed, pick the F1-maximising threshold on validation.
-  6. Apply that threshold, unchanged, to test. Report mean and std.
+  6. Apply that threshold, unchanged, to test. Report mean and std over seeds, and a
+     block-bootstrap 95% CI of the seed-mean test metric (anomaly clusters kept whole).
+
+Every label set is evaluated on the same rows: feature rows where all label sets in
+the run are defined. The PR-AUC of a random classifier equals the test prevalence,
+reported as pr_auc_prevalence_baseline.
 
 Writes:
     results/baseline_models_{IDX}.csv
+    results/test_predictions_{IDX}.csv        seed-mean test probabilities (for DM tests)
     logs/baseline_models_{IDX}_grid.csv       all grid points, validation only
     thesis_tables/baseline_models_{IDX}_settings.txt
 """
@@ -35,10 +43,10 @@ from sklearn.metrics import average_precision_score, f1_score, matthews_corrcoef
 from sklearn.preprocessing import StandardScaler
 from xgboost import XGBClassifier
 
-from labelling import baseline_label, regime_conditioned_label, rolling_zscore
+from features import resolve_feature_set
+from labelling import baseline_label, regime_conditioned_label, regime_standardised_label
 
 LABEL_TOKENS = {"baseline", "hmm", "regime"}
-LABEL_FILE_COLUMN = {"baseline": "baseline", "hmm": "hmm"}
 
 
 def load_yaml(path):
@@ -70,6 +78,89 @@ def grid_points(grid):
         yield dict(zip(keys, values))
 
 
+# ---------- test metrics and the block bootstrap ----------
+
+def average_precision(y, p):
+    """PR-AUC, computed as sklearn's average_precision_score does (ties grouped)."""
+    order = np.argsort(-p, kind="mergesort")
+    y, p = y[order], p[order]
+    last = np.r_[np.flatnonzero(np.diff(p)), len(p) - 1]   # last position of each distinct score
+    tp = np.cumsum(y)[last]
+    if tp[-1] == 0:
+        return np.nan
+    return float(np.sum(np.diff(np.r_[0.0, tp / tp[-1]]) * tp / (last + 1)))
+
+
+def f1_mcc(y, pred):
+    """F1 and MCC from boolean labels and predictions (0 when undefined, as sklearn)."""
+    tp = int(np.sum(pred & y))
+    fp = int(np.sum(pred & ~y))
+    fn = int(np.sum(~pred & y))
+    tn = len(y) - tp - fp - fn
+    f1 = 2 * tp / (2 * tp + fp + fn) if tp + fp + fn else 0.0
+    denom = np.sqrt(float(tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
+    return f1, ((tp * tn - fp * fn) / denom if denom else 0.0)
+
+
+def cluster_spans(y, gap):
+    """[first, last] positions of anomaly clusters: anomaly days at most `gap` positions apart."""
+    spans = []
+    for p in np.flatnonzero(y):
+        if spans and p - spans[-1][1] <= gap:
+            spans[-1][1] = p
+        else:
+            spans.append([p, p])
+    return spans
+
+
+def block_bootstrap_samples(y, block_length, gap, n_resamples, rng):
+    """
+    Index arrays for a moving-block bootstrap that keeps anomaly clusters whole: a
+    block may not start inside a cluster, and a block that would end inside one is
+    extended to the cluster's last day. Blocks are drawn until a resample has at
+    least len(y) days.
+    """
+    n = len(y)
+    cluster_end = np.full(n, -1)
+    can_start = np.ones(n, bool)
+    for a, b in cluster_spans(y, gap):
+        cluster_end[a:b + 1] = b
+        can_start[a + 1:b + 1] = False
+    starts = np.flatnonzero(can_start)
+    samples = []
+    for _ in range(n_resamples):
+        parts, size = [], 0
+        while size < n:
+            for s in rng.choice(starts, size=n // block_length + 1):
+                e = min(s + block_length, n) - 1
+                if cluster_end[e] >= 0:
+                    e = cluster_end[e]
+                parts.append(np.arange(s, e + 1))
+                size += e - s + 1
+                if size >= n:
+                    break
+        samples.append(np.concatenate(parts))
+    return samples
+
+
+def bootstrap_ci(y, p_seeds, thresholds, samples, confidence):
+    """Percentile CIs of the seed-mean PR-AUC, F1 and MCC over the bootstrap resamples."""
+    y = y.astype(bool)
+    preds = [p >= t for p, t in zip(p_seeds, thresholds)]
+    stats = np.empty((len(samples), 3))
+    for i, idx in enumerate(samples):
+        ys = y[idx]
+        fm = [f1_mcc(ys, d[idx]) for d in preds]
+        stats[i] = [np.mean([average_precision(ys, p[idx]) for p in p_seeds]),
+                    np.mean([f for f, _ in fm]), np.mean([m for _, m in fm])]
+    tail = (1 - confidence) / 2
+    lo, hi = np.nanquantile(stats, [tail, 1 - tail], axis=0)
+    return {f"{m}_ci_low": float(lo[j]) for j, m in enumerate(["pr_auc", "f1", "mcc"])} | \
+           {f"{m}_ci_high": float(hi[j]) for j, m in enumerate(["pr_auc", "f1", "mcc"])}
+
+
+# ---------- inputs ----------
+
 def load_inputs(index, feat_cfg):
     features = pd.read_csv(f"data/processed/features_{index}.csv", index_col=0, parse_dates=True)
     groups = pd.read_csv(f"data/processed/feature_groups_{index}.csv", index_col=0)["group"]
@@ -78,24 +169,28 @@ def load_inputs(index, feat_cfg):
     return features, groups, labels, panel
 
 
-def check_inputs(index, features, groups, labels, panel):
+def check_inputs(index, features, groups, labels, panel, lab_cfg):
     assert list(features.columns) == list(groups.index), "feature file and group map disagree"
     for col in features.columns:
         assert not (set(col.lower().split("_")) & LABEL_TOKENS), f"label-derived feature: {col}"
     assert features.index.isin(labels.index).all(), "feature dates missing from labels"
     assert features.notna().all().all(), "features contain NaN"
 
-    r = panel[f"{index}_logret"]
-    # The saved labels must be reproducible from the panel with labelling.py's own functions.
-    recomputed_base = baseline_label(r)
-    assert (recomputed_base.loc[features.index] == labels.loc[features.index, "baseline"]).all(), \
-        "baseline labels do not match labelling.py"
-    recomputed_hmm = regime_conditioned_label(r, labels["regime"])
-    assert (recomputed_hmm.loc[features.index] == labels.loc[features.index, "hmm"]).all(), \
-        "hmm labels do not match labelling.py"
-    z = rolling_zscore(r)
-    assert z.loc[features.index].notna().all(), "z-score undefined on a kept row"
-    print("Input checks passed: no label-derived features, labels reproduce, z-scores defined.")
+    # The saved labels must be reproducible from the panel and the saved regimes
+    # with labelling.py's own functions.
+    r, w = panel[f"{index}_logret"], lab_cfg["zscore_window"]
+    thr, rs = tuple(lab_cfg["regime_threshold"]["thresholds"]), lab_cfg["regime_standardised"]
+    recomputed = {
+        "baseline": baseline_label(r, w, lab_cfg["baseline"]["threshold"]),
+        "hmm": regime_conditioned_label(r, labels["regime_filtered"], w, thr),
+        "regime_std": regime_standardised_label(r, labels["regime_predicted"], rs["window_obs"],
+                                                rs["min_obs"], rs["threshold"]),
+        "hmm_fullsample": regime_conditioned_label(r, labels["regime_fullsample"], w, thr),
+    }
+    for name, lab in recomputed.items():
+        a, b = lab.loc[features.index], labels.loc[features.index, name]
+        assert ((a == b) | (a.isna() & b.isna())).all(), f"{name} labels do not match labelling.py"
+    print("Input checks passed: no label-derived features, all four label sets reproduce.")
 
 
 def split_index(index, split):
@@ -104,6 +199,8 @@ def split_index(index, split):
         return (index >= lo) & (index <= hi)
     return within(split["train"]), within(split["validation"]), within(split["test"])
 
+
+# ---------- one combination ----------
 
 def run_combination(X, y, masks, model_name, model_cfg, seeds, cfg):
     tr, va, te = masks
@@ -137,7 +234,7 @@ def run_combination(X, y, masks, model_name, model_cfg, seeds, cfg):
     best = grid_df.loc[grid_df["params"] == best_key].iloc[0]
 
     # --- per-seed threshold on validation, then one test evaluation ---
-    pr, f1s, mccs, thrs = [], [], [], []
+    pr, f1s, mccs, thrs, p_tests = [], [], [], [], []
     for seed in seeds:
         model, p_val = fitted[(best_key, seed)]
         thr = f1_threshold(yva, p_val)
@@ -147,6 +244,11 @@ def run_combination(X, y, masks, model_name, model_cfg, seeds, cfg):
         f1s.append(f1_score(yte, pred, zero_division=0))
         mccs.append(matthews_corrcoef(yte, pred))
         thrs.append(thr)
+        p_tests.append(p_te)
+        # The bootstrap's fast metrics must agree with sklearn's.
+        f1_fast, mcc_fast = f1_mcc(yte.astype(bool), pred.astype(bool))
+        assert np.isclose(average_precision(yte, p_te), pr[-1]) and np.isclose(f1_fast, f1s[-1]) \
+            and np.isclose(mcc_fast, mccs[-1]), "fast test metrics disagree with sklearn"
 
     summary = {
         "best_params": best_key,
@@ -158,24 +260,29 @@ def run_combination(X, y, masks, model_name, model_cfg, seeds, cfg):
         "f1_mean": float(np.mean(f1s)), "f1_std": float(np.std(f1s, ddof=1)),
         "mcc_mean": float(np.mean(mccs)), "mcc_std": float(np.std(mccs, ddof=1)),
         "test_n": int(te.sum()), "test_positives": int(yte.sum()),
-        "test_prevalence": float(yte.mean()),
+        "pr_auc_prevalence_baseline": float(yte.mean()),
     }
-    return summary, grid_df
+    return summary, grid_df, p_tests, thrs
 
 
-def settings_text(index, summary_df, n_seeds, seed_base):
-    prev = summary_df["test_prevalence"].iloc[0]
+def settings_text(index, out, cfg, rows, n_seeds, seed_base, panel_path):
+    b = cfg["bootstrap"]
+    prev = out.groupby("label")["pr_auc_prevalence_baseline"].first()
     return "\n".join([
-        f"Dataset: {index} (panel_full.csv, 2000-01-01 to 2024-12-31)",
-        "Feature set: domestic_only and cross_market (both rows reported)",
-        "Label strategy: baseline and hmm (both rows reported)",
-        "Model: xgboost and logistic_regression (both rows reported)",
+        f"Dataset: {index} ({os.path.basename(panel_path)}, 2000-01-01 to 2024-12-31); "
+        f"{rows} rows where every label set is defined",
+        f"Feature set: {', '.join(cfg['feature_set_names'])} (configs/features.yaml)",
+        f"Label strategy: {', '.join(cfg['label_sets'])}; sensitivity {', '.join(cfg['sensitivity']['label_sets'])} "
+        f"on {', '.join(cfg['sensitivity']['feature_set_names'])}",
+        "Model: xgboost and logistic_regression (all rows reported)",
         f"Seed: {seed_base}-{seed_base + n_seeds - 1} ({n_seeds} seeds; mean and std reported)",
-        "Config file: configs/baseline_models.yaml, configs/features.yaml",
+        "Config file: configs/baseline_models.yaml, configs/features.yaml, configs/labelling.yaml",
         "Checkpoint: not saved (models are refit inside code/baseline_models.py)",
         "Test window: 2019-01-01 to 2024-12-31",
-        f"Notes: test anomaly prevalence {100 * prev:.2f}% (PR-AUC baseline). "
-        "Generated by code/baseline_models.py; grid search on validation only.",
+        f"Notes: 95% CIs = percentile intervals of the seed-mean metric over {b['n_resamples']} moving-block "
+        f"bootstrap resamples (block {b['block_length']} trading days, anomaly clusters with gaps of at most "
+        f"{b['cluster_gap']} days kept whole, seed {b['seed']}). Test prevalence (PR-AUC baseline): "
+        + ", ".join(f"{k} {100 * v:.2f}%" for k, v in prev.items()) + ". Grid search on validation only.",
     ]) + "\n"
 
 
@@ -184,31 +291,55 @@ def main():
     parser.add_argument("--index", required=True, choices=["GSPC", "N225", "FTSE"])
     parser.add_argument("--config", default="configs/baseline_models.yaml")
     parser.add_argument("--features-config", default="configs/features.yaml")
+    parser.add_argument("--labelling-config", default="configs/labelling.yaml")
     args = parser.parse_args()
 
     cfg = load_yaml(args.config)
     feat_cfg = load_yaml(args.features_config)
+    lab_cfg = load_yaml(args.labelling_config)
     seeds = [cfg["seeds"]["base"] + i for i in range(cfg["seeds"]["n"])]
 
     features, groups, labels, panel = load_inputs(args.index, feat_cfg)
-    check_inputs(args.index, features, groups, labels, panel)
+    check_inputs(args.index, features, groups, labels, panel, lab_cfg)
+    all_labels = cfg["label_sets"] + cfg["sensitivity"]["label_sets"]
+    defined = labels.loc[features.index, all_labels].notna().all(axis=1)
+    print(f"Rows: {len(features)} feature rows, {int(defined.sum())} with every label set defined "
+          f"(dropped {int((~defined).sum())})")
+    features = features.loc[defined]
     tr, va, te = split_index(features.index, cfg["split"])
     print(f"Rows: train {tr.sum()}, validation {va.sum()}, test {te.sum()}")
 
+    b = cfg["bootstrap"]
+    rng = np.random.default_rng(b["seed"])
+    y_all = {lab: labels.loc[features.index, lab].astype(int).to_numpy() for lab in all_labels}
+    samples = {lab: block_bootstrap_samples(y_all[lab][te].astype(bool), b["block_length"], b["cluster_gap"],
+                                            b["n_resamples"], rng) for lab in all_labels}
+
+    combos = [(fs, lab) for fs in cfg["feature_set_names"] for lab in cfg["label_sets"]]
+    combos += [(fs, lab) for fs in cfg["sensitivity"]["feature_set_names"] for lab in cfg["sensitivity"]["label_sets"]]
+    columns = {fs: resolve_feature_set(feat_cfg["feature_sets"][fs], groups) for fs, _ in combos}
     results, grid_all = [], []
-    for fs, label, model_name in itertools.product(
-        cfg["feature_set_names"], cfg["label_sets"], cfg["models"]
-    ):
-        cols = [c for c in features.columns if groups[c] in feat_cfg["feature_sets"][fs]]
+    predictions = pd.DataFrame({f"y__{lab}": y_all[lab][te] for lab in all_labels}, index=features.index[te])
+    for (fs, label), model_name in itertools.product(combos, cfg["models"]):
+        cols = columns[fs]
+        twin = next((other for other in cfg["feature_set_names"]
+                     if other != fs and columns.get(other) == cols
+                     and cfg["feature_set_names"].index(other) < cfg["feature_set_names"].index(fs)), None)
+        row = {"model": model_name, "feature_set": fs, "label": label, "n_features": len(cols)}
+        if twin:
+            print(f"Skipping {model_name} | {fs} | {label}: same columns as {twin}", flush=True)
+            results.append({**row, "note": f"same columns as {twin}: no foreign session closes before the target's"})
+            continue
         X = features[cols].to_numpy(float)
-        y = labels.loc[features.index, LABEL_FILE_COLUMN[label]].astype(int).to_numpy()
+        y = y_all[label]
         print(f"Running {model_name} | {fs} ({len(cols)} features) | {label} ...", flush=True)
 
-        summary, grid_df = run_combination(
+        summary, grid_df, p_tests, thrs = run_combination(
             X, y, (tr, va, te), model_name, cfg["models"][model_name], seeds, cfg
         )
-        results.append({"model": model_name, "feature_set": fs, "label": label,
-                        "n_features": len(cols), **summary})
+        ci = bootstrap_ci(y[te], p_tests, thrs, samples[label], b["confidence"])
+        results.append({**row, **summary, **ci, "note": ""})
+        predictions[f"p__{label}__{fs}__{model_name}"] = np.mean(p_tests, axis=0)
         grid_df.insert(0, "model", model_name)
         grid_df.insert(1, "feature_set", fs)
         grid_df.insert(2, "label", label)
@@ -220,14 +351,17 @@ def main():
     os.makedirs("thesis_tables", exist_ok=True)
 
     out.to_csv(f"results/baseline_models_{args.index}.csv", index=False)
+    predictions.rename_axis("date").to_csv(f"results/test_predictions_{args.index}.csv")
     pd.concat(grid_all).to_csv(f"logs/baseline_models_{args.index}_grid.csv", index=False)
     with open(f"thesis_tables/baseline_models_{args.index}_settings.txt", "w") as f:
-        f.write(settings_text(args.index, out, len(seeds), seeds[0]))
+        f.write(settings_text(args.index, out.dropna(subset=["pr_auc_mean"]), cfg, int(defined.sum()),
+                              len(seeds), seeds[0], feat_cfg["panel_path"]))
 
-    show = out[["model", "feature_set", "label", "pr_auc_mean", "pr_auc_std",
-                "f1_mean", "f1_std", "mcc_mean", "mcc_std", "test_prevalence"]]
+    show = out.dropna(subset=["pr_auc_mean"])[[
+        "model", "feature_set", "label", "pr_auc_mean", "pr_auc_ci_low", "pr_auc_ci_high",
+        "f1_mean", "mcc_mean", "pr_auc_prevalence_baseline"]]
     print("\n" + show.to_string(index=False, float_format=lambda v: f"{v:.4f}"))
-    print(f"\nSaved results/baseline_models_{args.index}.csv")
+    print(f"\nSaved results/baseline_models_{args.index}.csv and results/test_predictions_{args.index}.csv")
 
 
 if __name__ == "__main__":

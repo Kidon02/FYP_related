@@ -1,0 +1,9 @@
+Dataset: N225 (panel_full_2026-10-27.csv, 2000-01-01 to 2024-12-31); 5427 rows where every label set is defined
+Feature set: domestic_only, cross_market, cross_market_lag0, ablation_foreign, ablation_macro, rv_only (configs/features.yaml)
+Label strategy: baseline, hmm, regime_std; sensitivity hmm_fullsample on domestic_only, cross_market
+Model: xgboost and logistic_regression (all rows reported)
+Seed: 42-46 (5 seeds; mean and std reported)
+Config file: configs/baseline_models.yaml, configs/features.yaml, configs/labelling.yaml
+Checkpoint: not saved (models are refit inside code/baseline_models.py)
+Test window: 2019-01-01 to 2024-12-31
+Notes: 95% CIs = percentile intervals of the seed-mean metric over 2000 moving-block bootstrap resamples (block 21 trading days, anomaly clusters with gaps of at most 5 days kept whole, seed 2026). Test prevalence (PR-AUC baseline): baseline 2.19%, hmm 2.05%, hmm_fullsample 1.92%, regime_std 2.25%. Grid search on validation only.
