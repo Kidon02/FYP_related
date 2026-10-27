@@ -1,0 +1,27 @@
+# Diebold-Mariano tests for code/dm_tests.py, on the 2019-2024 test predictions
+# (seed-mean probabilities from code/baseline_models.py).
+
+indices: [GSPC, N225, FTSE]
+label_sets: [baseline, hmm, regime_std]
+models: [xgboost, logistic_regression]
+
+# Each pair is [A, B]; d_t = loss_A,t - loss_B,t, so a positive mean favours B.
+pairs:
+  - [domestic_only, cross_market]        # main comparison (lag-1 foreign features)
+  - [domestic_only, cross_market_lag0]   # with same-day foreign features
+  - [cross_market, cross_market_lag0]    # value of the same-day features alone
+
+loss: squared_error        # (p_t - y_t)^2, the daily Brier score
+# SMOTE trains on balanced classes, so raw probabilities are inflated (test mean about
+# 0.2 against a prevalence of about 0.03) and the Brier loss would mostly measure that.
+# Undo the resampling: odds x (train odds / resampled odds), with the training-set
+# prevalence (2000-2015) and the post-SMOTE prevalence implied by sampling_strategy.
+# Monotone, so rankings and PR-AUC do not change. Raw-probability results are kept in
+# results/dm_tests.csv as *_raw columns.
+probability: prior_corrected
+horizon: 1                 # one-step-ahead forecasts
+# Newey-West (Bartlett) long-run variance; lags = floor(4 (n/100)^(2/9)).
+nw_lag_rule: floor(4*(n/100)**(2/9))
+# Harvey, Leybourne and Newbold (1997): multiply by sqrt((n + 1 - 2h + h(h-1)/n) / n)
+# and use Student's t with n - 1 degrees of freedom; two-sided p-values.
+small_sample_correction: hln
