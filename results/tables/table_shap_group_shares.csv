@@ -1,25 +1,25 @@
 index,label,feature_set,best_on_validation,test_pr_auc,share_domestic,share_foreign,share_foreign_lag0,share_macro,share_technical,top5_features
-S&P 500,Rolling z-score baseline,Cross-Market (lag 1),False,0.096,0.322,0.189,0.0,0.209,0.281,tec_rsi14_lag1; mac_dgs10_lag1; tec_macdsig_lag1; mac_epu_us_lag1; dom_logvol_dev_lag1
-S&P 500,Regime-dependent threshold,Cross-Market (lag 1),False,0.074,0.284,0.176,0.0,0.182,0.358,tec_rsi14_lag1; tec_macdsig_lag1; mac_dgs10_lag1; dom_logvol_dev_lag1; mac_epu_us_lag1
-S&P 500,Regime-standardised,Cross-Market (lag 1),False,0.063,0.322,0.171,0.0,0.163,0.344,tec_rsi14_lag1; tec_macdsig_lag1; dom_logvol_dev_lag1; mac_dgs10_lag1; for_FTSE_rv21_lag1
-S&P 500,Rolling z-score baseline,Cross-Market (lag 0 + 1),True,0.159,0.157,0.097,0.187,0.155,0.404,tec_rsi14_lag1; tec_macdsig_lag1; for_FTSE_logret_lag0; mac_dgs10_lag1; dom_logvol_dev_lag1
-S&P 500,Regime-dependent threshold,Cross-Market (lag 0 + 1),True,0.205,0.156,0.133,0.173,0.104,0.434,tec_rsi14_lag1; for_FTSE_logret_lag0; tec_macdsig_lag1; dom_logvol_dev_lag1; for_N225_logret_lag2
-S&P 500,Regime-standardised,Cross-Market (lag 0 + 1),True,0.219,0.221,0.07,0.187,0.08,0.441,tec_rsi14_lag1; for_FTSE_logret_lag0; dom_logvol_dev_lag1; tec_macdsig_lag1; for_N225_logret_lag2
-S&P 500,Rolling z-score baseline,Domestic + foreign,False,0.218,0.392,0.288,0.0,0.0,0.32,tec_rsi14_lag1; for_FTSE_rv21_lag1; tec_macdsig_lag1; dom_logvol_dev_lag1; dom_rv21_lag5
-S&P 500,Regime-dependent threshold,Domestic + foreign,False,0.182,0.378,0.266,0.0,0.0,0.357,tec_rsi14_lag1; tec_macdsig_lag1; dom_logvol_dev_lag1; for_FTSE_rv21_lag1; dom_rv21_lag5
-S&P 500,Regime-standardised,Domestic + foreign,False,0.152,0.419,0.264,0.0,0.0,0.316,tec_rsi14_lag1; dom_logvol_dev_lag1; tec_macdsig_lag1; for_FTSE_rv21_lag1; dom_rv21_lag5
-Nikkei 225,Rolling z-score baseline,Cross-Market (lag 1),True,0.092,0.396,0.246,0.0,0.167,0.191,dom_logvol_dev_lag1; mac_dgs10_lag1; tec_bbwidth20_lag1; tec_rsi14_lag1; for_GSPC_logret_lag1
-Nikkei 225,Regime-dependent threshold,Cross-Market (lag 1),True,0.094,0.374,0.264,0.0,0.205,0.157,mac_dgs10_lag1; dom_logvol_dev_lag1; tec_bbwidth20_lag1; mac_epu_jp_lag1; for_GSPC_logret_lag1
-Nikkei 225,Regime-standardised,Cross-Market (lag 1),True,0.103,0.394,0.259,0.0,0.17,0.177,mac_dgs10_lag1; dom_logvol_dev_lag1; tec_bbwidth20_lag1; for_GSPC_logret_lag1; tec_macdsig_lag1
-Nikkei 225,Rolling z-score baseline,Domestic + foreign,False,0.178,0.459,0.274,0.0,0.0,0.266,dom_logvol_dev_lag1; tec_bbwidth20_lag1; tec_rsi14_lag1; for_GSPC_logret_lag1; tec_macdsig_lag1
-Nikkei 225,Regime-dependent threshold,Domestic + foreign,False,0.154,0.507,0.308,0.0,0.0,0.185,dom_logvol_dev_lag1; for_GSPC_logret_lag2; tec_bbwidth20_lag1; tec_rsi14_lag1; dom_logret_lag5
-Nikkei 225,Regime-standardised,Domestic + foreign,False,0.124,0.461,0.305,0.0,0.0,0.234,tec_bbwidth20_lag1; dom_logvol_dev_lag1; for_GSPC_logret_lag1; tec_macdsig_lag1; tec_rsi14_lag1
-FTSE 100,Rolling z-score baseline,Cross-Market (lag 1),False,0.17,0.215,0.154,0.0,0.201,0.43,tec_rsi14_lag1; tec_bbwidth20_lag1; mac_epu_jp_lag1; mac_dgs10_lag1; dom_logvol_dev_lag1
-FTSE 100,Regime-dependent threshold,Cross-Market (lag 1),False,0.063,0.253,0.223,0.0,0.246,0.277,tec_rsi14_lag1; mac_dgs10_lag1; mac_epu_us_lag1; dom_logvol_dev_lag1; tec_bbwidth20_lag1
-FTSE 100,Regime-standardised,Cross-Market (lag 1),False,0.072,0.236,0.166,0.0,0.323,0.276,mac_dgs10_lag1; tec_rsi14_lag1; tec_bbwidth20_lag1; mac_epu_jp_lag1; mac_epu_us_lag1
-FTSE 100,Rolling z-score baseline,Cross-Market (lag 0 + 1),True,0.113,0.284,0.186,0.04,0.25,0.239,tec_rsi14_lag1; mac_dgs10_lag1; mac_epu_us_lag1; tec_bbwidth20_lag1; dom_logvol_dev_lag1
-FTSE 100,Regime-dependent threshold,Cross-Market (lag 0 + 1),True,0.077,0.312,0.213,0.069,0.207,0.198,tec_rsi14_lag1; mac_dgs10_lag1; for_GSPC_logret_lag2; mac_epu_us_lag1; dom_logvol_dev_lag1
-FTSE 100,Regime-standardised,Cross-Market (lag 0 + 1),True,0.063,0.252,0.177,0.064,0.278,0.229,mac_dgs10_lag1; tec_rsi14_lag1; tec_bbwidth20_lag1; mac_epu_us_lag1; mac_epu_jp_lag1
-FTSE 100,Rolling z-score baseline,Domestic + foreign,False,0.17,0.281,0.218,0.0,0.0,0.5,tec_rsi14_lag1; tec_bbwidth20_lag1; dom_logvol_dev_lag1; tec_macdsig_lag1; for_GSPC_logret_lag2
-FTSE 100,Regime-dependent threshold,Domestic + foreign,False,0.18,0.294,0.291,0.0,0.0,0.416,tec_rsi14_lag1; dom_logvol_dev_lag1; tec_bbwidth20_lag1; for_GSPC_logret_lag2; for_N225_logret_lag2
-FTSE 100,Regime-standardised,Domestic + foreign,False,0.101,0.361,0.222,0.0,0.0,0.418,tec_rsi14_lag1; tec_bbwidth20_lag1; dom_logvol_dev_lag1; dom_vix_chg_lag1; for_GSPC_logret_lag2
+S&P 500,Rolling z-score baseline,Cross-Market (lag 1),False,0.096,0.316,0.185,0.0,0.215,0.284,tec_rsi14_lag1; mac_dgs10_lag1; tec_macdsig_lag1; mac_epu_us_lag1; dom_logvol_dev_lag1
+S&P 500,Regime-dependent threshold,Cross-Market (lag 1),False,0.074,0.273,0.175,0.0,0.197,0.354,tec_rsi14_lag1; tec_macdsig_lag1; mac_dgs10_lag1; dom_logvol_dev_lag1; mac_epu_us_lag1
+S&P 500,Regime-standardised,Cross-Market (lag 1),False,0.063,0.321,0.173,0.0,0.164,0.342,tec_rsi14_lag1; tec_macdsig_lag1; dom_logvol_dev_lag1; mac_dgs10_lag1; for_FTSE_rv21_lag1
+S&P 500,Rolling z-score baseline,Cross-Market (lag 0 + 1),True,0.159,0.156,0.097,0.192,0.149,0.406,tec_rsi14_lag1; for_FTSE_logret_lag0; tec_macdsig_lag1; mac_dgs10_lag1; dom_logvol_dev_lag1
+S&P 500,Regime-dependent threshold,Cross-Market (lag 0 + 1),True,0.205,0.16,0.129,0.173,0.106,0.432,tec_rsi14_lag1; for_FTSE_logret_lag0; tec_macdsig_lag1; dom_logvol_dev_lag1; for_N225_logret_lag2
+S&P 500,Regime-standardised,Cross-Market (lag 0 + 1),True,0.219,0.215,0.074,0.188,0.075,0.448,tec_rsi14_lag1; for_FTSE_logret_lag0; dom_logvol_dev_lag1; tec_macdsig_lag1; for_N225_logret_lag2
+S&P 500,Rolling z-score baseline,Domestic + foreign,False,0.218,0.388,0.288,0.0,0.0,0.324,tec_rsi14_lag1; for_FTSE_rv21_lag1; tec_macdsig_lag1; dom_logvol_dev_lag1; dom_rv21_lag5
+S&P 500,Regime-dependent threshold,Domestic + foreign,False,0.182,0.376,0.262,0.0,0.0,0.361,tec_rsi14_lag1; tec_macdsig_lag1; dom_logvol_dev_lag1; for_FTSE_rv21_lag1; dom_rv21_lag5
+S&P 500,Regime-standardised,Domestic + foreign,False,0.152,0.427,0.26,0.0,0.0,0.313,tec_rsi14_lag1; dom_logvol_dev_lag1; tec_macdsig_lag1; for_FTSE_rv21_lag1; dom_rv21_lag5
+Nikkei 225,Rolling z-score baseline,Cross-Market (lag 1),True,0.092,0.396,0.243,0.0,0.168,0.193,dom_logvol_dev_lag1; mac_dgs10_lag1; tec_bbwidth20_lag1; tec_rsi14_lag1; for_GSPC_logret_lag1
+Nikkei 225,Regime-dependent threshold,Cross-Market (lag 1),True,0.094,0.371,0.266,0.0,0.209,0.154,mac_dgs10_lag1; dom_logvol_dev_lag1; mac_epu_jp_lag1; tec_bbwidth20_lag1; for_GSPC_logret_lag1
+Nikkei 225,Regime-standardised,Cross-Market (lag 1),True,0.103,0.385,0.259,0.0,0.173,0.183,mac_dgs10_lag1; dom_logvol_dev_lag1; tec_bbwidth20_lag1; for_GSPC_logret_lag1; tec_macdsig_lag1
+Nikkei 225,Rolling z-score baseline,Domestic + foreign,False,0.178,0.458,0.272,0.0,0.0,0.27,dom_logvol_dev_lag1; tec_rsi14_lag1; tec_bbwidth20_lag1; for_GSPC_logret_lag1; tec_macdsig_lag1
+Nikkei 225,Regime-dependent threshold,Domestic + foreign,False,0.154,0.507,0.304,0.0,0.0,0.189,dom_logvol_dev_lag1; tec_bbwidth20_lag1; for_GSPC_logret_lag2; for_GSPC_logret_lag1; dom_logret_lag5
+Nikkei 225,Regime-standardised,Domestic + foreign,False,0.124,0.461,0.304,0.0,0.0,0.235,tec_bbwidth20_lag1; dom_logvol_dev_lag1; for_GSPC_logret_lag1; tec_rsi14_lag1; tec_macdsig_lag1
+FTSE 100,Rolling z-score baseline,Cross-Market (lag 1),False,0.17,0.213,0.156,0.0,0.2,0.432,tec_rsi14_lag1; tec_bbwidth20_lag1; mac_dgs10_lag1; mac_epu_jp_lag1; dom_logvol_dev_lag1
+FTSE 100,Regime-dependent threshold,Cross-Market (lag 1),False,0.063,0.255,0.215,0.0,0.247,0.283,tec_rsi14_lag1; mac_dgs10_lag1; mac_epu_us_lag1; dom_logvol_dev_lag1; tec_bbwidth20_lag1
+FTSE 100,Regime-standardised,Cross-Market (lag 1),False,0.072,0.234,0.167,0.0,0.319,0.281,tec_rsi14_lag1; mac_dgs10_lag1; tec_bbwidth20_lag1; mac_epu_jp_lag1; mac_epu_us_lag1
+FTSE 100,Rolling z-score baseline,Cross-Market (lag 0 + 1),True,0.113,0.283,0.18,0.039,0.252,0.245,tec_rsi14_lag1; mac_dgs10_lag1; tec_bbwidth20_lag1; mac_epu_us_lag1; dom_logvol_dev_lag1
+FTSE 100,Regime-dependent threshold,Cross-Market (lag 0 + 1),True,0.077,0.314,0.205,0.068,0.212,0.201,tec_rsi14_lag1; mac_dgs10_lag1; mac_epu_us_lag1; for_GSPC_logret_lag2; dom_logvol_dev_lag1
+FTSE 100,Regime-standardised,Cross-Market (lag 0 + 1),True,0.063,0.246,0.181,0.062,0.282,0.23,mac_dgs10_lag1; tec_rsi14_lag1; tec_bbwidth20_lag1; mac_epu_us_lag1; mac_epu_jp_lag1
+FTSE 100,Rolling z-score baseline,Domestic + foreign,False,0.17,0.283,0.221,0.0,0.0,0.496,tec_rsi14_lag1; tec_bbwidth20_lag1; dom_logvol_dev_lag1; tec_macdsig_lag1; for_N225_logret_lag2
+FTSE 100,Regime-dependent threshold,Domestic + foreign,False,0.18,0.303,0.287,0.0,0.0,0.41,tec_rsi14_lag1; dom_logvol_dev_lag1; tec_bbwidth20_lag1; for_GSPC_logret_lag2; for_N225_logret_lag2
+FTSE 100,Regime-standardised,Domestic + foreign,False,0.101,0.353,0.219,0.0,0.0,0.428,tec_rsi14_lag1; tec_bbwidth20_lag1; dom_logvol_dev_lag1; for_GSPC_logret_lag2; dom_vix_chg_lag1
