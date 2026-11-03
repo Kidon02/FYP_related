@@ -1,0 +1,18 @@
+# Isolation Forest: unsupervised anomaly-detection benchmark (as in the brief).
+# Run with: python code/isolation_forest.py --index GSPC
+# Split, seeds, row selection and the block bootstrap are taken from
+# configs/baseline_models.yaml, so results are directly comparable.
+# The forest never sees labels: it is fit on training features only. Labels are used
+# to choose the grid point (validation PR-AUC) and the F1 threshold (validation), and
+# to score the test window.
+
+feature_set_names: [domestic_only, cross_market, cross_market_lag0]
+label_sets: [baseline, hmm, regime_std]
+
+model:
+  fixed:
+    contamination: auto
+    max_samples: auto
+  grid:
+    n_estimators: [100, 300]
+    max_features: [0.5, 1.0]

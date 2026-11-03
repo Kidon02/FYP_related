@@ -1,0 +1,9 @@
+Dataset: GSPC (panel_full_2026-10-27.csv); same rows as baseline_models.py
+Feature set: domestic_only, cross_market, cross_market_lag0 (configs/features.yaml)
+Label strategy: baseline, hmm, regime_std (labels used only for selection and scoring)
+Model: isolation_forest (sklearn IsolationForest, unsupervised, fit on 2000-2015 features only)
+Seed: 42-46 (5 seeds; mean and std reported)
+Config file: configs/isolation_forest.yaml, configs/baseline_models.yaml (split, seeds, bootstrap)
+Checkpoint: not saved (forests are refit inside code/isolation_forest.py)
+Test window: 2019-01-01 to 2024-12-31
+Notes: anomaly score = -score_samples; grid on validation PR-AUC; 95% CIs from the same 2000 block-bootstrap resamples as baseline_models.py (bootstrap seed 2026).
