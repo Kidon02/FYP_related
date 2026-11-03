@@ -86,6 +86,8 @@ def fetch_yfinance(start, end, refresh=False, sources=None):
             print(f"[cache] {path}")
             source = "cache"
         else:
+            if not refresh:
+                raise FileNotFoundError(f"Missing raw file {path}. Downloads only happen with --refresh.")
             import yfinance as yf
 
             print(f"[download] {name} ({ticker}) from yfinance...")
@@ -122,6 +124,8 @@ def fetch_fred(start, end, refresh=False, sources=None):
             print(f"[cache] {path}")
             source = "cache"
         else:
+            if not refresh:
+                raise FileNotFoundError(f"Missing raw file {path}. Downloads only happen with --refresh.")
             if fred is None:
                 from fredapi import Fred
 

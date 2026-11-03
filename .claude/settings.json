@@ -13,6 +13,17 @@
           }
         ]
       }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "[ \"$CLAUDE_CODE_REMOTE\" = \"true\" ] && pip install -r \"$CLAUDE_PROJECT_DIR/requirements.txt\" || true",
+            "timeout": 600
+          }
+        ]
+      }
     ]
   }
 }

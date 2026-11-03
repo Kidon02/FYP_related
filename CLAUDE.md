@@ -49,9 +49,8 @@ foreign features plotted against VIX (2019-2024).
 - Cloud sessions (claude.ai web/app): the Stop hook .claude/hooks/cloud_autocommit.sh
   commits after every turn, since idle cloud VMs are reclaimed, and pushes to the session's
   claude/ branch (claude/autosave-<session> when on another branch). It never pushes to main.
-- Routine "FYP weekly cloud commit" (claude.ai/code/routines) merges unmerged claude/*
-  branches into main every Sunday 22:07 SGT. Delete a cloud branch on GitHub before then
-  to keep it out of main.
+- Routine "FYP weekly cloud commit" is disabled (2026-11-03). Cloud branches reach main
+  only after the user reviews them and merges them as a pull request.
 - Cloud sessions have no data: data/raw/ and data/processed/*.csv are gitignored.
 
 ## Layout
