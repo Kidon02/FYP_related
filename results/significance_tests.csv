@@ -1,0 +1,19 @@
+test,model,comparison,n_blocks,statistic,p_value,median_diff,wins,losses,p_holm,mean_ranks
+Wilcoxon signed-rank,xgboost,cross_market vs domestic_only,9,2.0,0.01171875,-0.026305012669833108,1.0,8.0,0.03515625,
+Wilcoxon signed-rank,xgboost,cross_market_lag0 vs domestic_only,9,6.0,0.0546875,-0.0243685623482503,1.0,8.0,0.109375,
+Wilcoxon signed-rank,xgboost,ablation_foreign vs domestic_only,9,9.0,0.12890625,0.0197903111500555,8.0,1.0,0.12890625,
+Wilcoxon signed-rank,xgboost,ablation_macro vs domestic_only,9,0.0,0.00390625,-0.051237973136797,0.0,9.0,0.01953125,
+Wilcoxon signed-rank,xgboost,rv_only vs domestic_only,9,0.0,0.00390625,-0.0757652416386292,0.0,9.0,0.01953125,
+Friedman,xgboost,6 feature sets,9,30.16025641025641,1.3715105294189378e-05,,,,,domestic_only 2.11; cross_market 3.94; cross_market_lag0 3.28; ablation_foreign 1.44; ablation_macro 5.00; rv_only 5.22
+Wilcoxon signed-rank,logistic_regression,cross_market vs domestic_only,9,14.0,0.359375,0.009683876767359018,6.0,3.0,0.71875,
+Wilcoxon signed-rank,logistic_regression,cross_market_lag0 vs domestic_only,9,5.0,0.0390625,0.033969225235150696,7.0,2.0,0.15625,
+Wilcoxon signed-rank,logistic_regression,ablation_foreign vs domestic_only,9,21.0,0.91015625,0.01227928768454381,5.0,4.0,0.91015625,
+Wilcoxon signed-rank,logistic_regression,ablation_macro vs domestic_only,9,3.0,0.01953125,0.02232310085584402,7.0,2.0,0.09765625,
+Wilcoxon signed-rank,logistic_regression,rv_only vs domestic_only,9,10.0,0.1640625,-0.021359793651102993,3.0,6.0,0.4921875,
+Friedman,logistic_regression,6 feature sets,9,16.891025641025617,0.004711174652091718,,,,,domestic_only 4.11; cross_market 3.39; cross_market_lag0 1.83; ablation_foreign 4.22; ablation_macro 2.56; rv_only 4.89
+Wilcoxon signed-rank,isolation_forest,cross_market vs domestic_only,9,7.0,0.07421875,0.006643768050120805,7.0,2.0,0.07421875,
+Wilcoxon signed-rank,isolation_forest,cross_market_lag0 vs domestic_only,9,0.0,0.00390625,0.009554144028063705,9.0,0.0,0.0078125,
+Friedman,isolation_forest,3 feature sets,9,11.090909090909081,0.0039051677242732466,,,,,domestic_only 2.78; cross_market 1.94; cross_market_lag0 1.28
+Friedman,all three models,models on domestic_only,9,11.555555555555543,0.00309558685236526,,,,,xgboost 2.22; logistic_regression 1.11; isolation_forest 2.67
+Friedman,all three models,models on cross_market,9,16.222222222222214,0.0003001851487690379,,,,,xgboost 2.89; logistic_regression 1.00; isolation_forest 2.11
+Friedman,all three models,models on cross_market_lag0,9,14.888888888888886,0.0005846808328765162,,,,,xgboost 2.78; logistic_regression 1.00; isolation_forest 2.22

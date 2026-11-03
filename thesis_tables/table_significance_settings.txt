@@ -1,0 +1,9 @@
+Dataset: S&P 500, Nikkei 225, FTSE 100; blocks = 3 indices x 3 label sets (baseline, hmm, regime_std)
+Feature set: all sets in results/baseline_models_{IDX}.csv and results/isolation_forest_{IDX}.csv
+Label strategy: baseline, hmm, regime_std (hmm_fullsample excluded)
+Model: XGBoost (2016), L2 logistic regression (1958), Isolation Forest (2008)
+Seed: 42-46; score per block = seed-mean test PR-AUC
+Config file: none (reads result files); code/significance.py
+Checkpoint: n/a
+Test window: 2019-01-01 to 2024-12-31
+Notes: Wilcoxon signed-rank, exact two-sided, Holm-corrected within each model; Friedman chi-square with mean ranks (1 = best). Blocks share the test period and are not fully independent; with 9 blocks the smallest attainable Wilcoxon p is 0.0039. Twins (identical columns) take the twin's score.

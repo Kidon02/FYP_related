@@ -1,0 +1,19 @@
+test,model,comparison,n_blocks,statistic,p_value,median_diff,wins,losses,p_holm,mean_ranks
+Wilcoxon signed-rank,"XGBoost, 2016",Cross-Market (lag 1) vs Domestic-Only,9,2.0,0.0117,-0.026,1.0,8.0,0.0352,
+Wilcoxon signed-rank,"XGBoost, 2016",Cross-Market (lag 0 + 1) vs Domestic-Only,9,6.0,0.0547,-0.024,1.0,8.0,0.1094,
+Wilcoxon signed-rank,"XGBoost, 2016",Domestic + foreign vs Domestic-Only,9,9.0,0.1289,0.02,8.0,1.0,0.1289,
+Wilcoxon signed-rank,"XGBoost, 2016",Domestic + macro vs Domestic-Only,9,0.0,0.0039,-0.051,0.0,9.0,0.0195,
+Wilcoxon signed-rank,"XGBoost, 2016",Realised volatility only vs Domestic-Only,9,0.0,0.0039,-0.076,0.0,9.0,0.0195,
+Friedman,"XGBoost, 2016",6 feature sets,9,30.16,0.0,,,,,Domestic-Only 2.11; Cross-Market (lag 1) 3.94; Cross-Market (lag 0 + 1) 3.28; Domestic + foreign 1.44; Domestic + macro 5.00; Realised volatility only 5.22
+Wilcoxon signed-rank,"LR, 1958",Cross-Market (lag 1) vs Domestic-Only,9,14.0,0.3594,0.01,6.0,3.0,0.7188,
+Wilcoxon signed-rank,"LR, 1958",Cross-Market (lag 0 + 1) vs Domestic-Only,9,5.0,0.0391,0.034,7.0,2.0,0.1562,
+Wilcoxon signed-rank,"LR, 1958",Domestic + foreign vs Domestic-Only,9,21.0,0.9102,0.012,5.0,4.0,0.9102,
+Wilcoxon signed-rank,"LR, 1958",Domestic + macro vs Domestic-Only,9,3.0,0.0195,0.022,7.0,2.0,0.0977,
+Wilcoxon signed-rank,"LR, 1958",Realised volatility only vs Domestic-Only,9,10.0,0.1641,-0.021,3.0,6.0,0.4922,
+Friedman,"LR, 1958",6 feature sets,9,16.891,0.0047,,,,,Domestic-Only 4.11; Cross-Market (lag 1) 3.39; Cross-Market (lag 0 + 1) 1.83; Domestic + foreign 4.22; Domestic + macro 2.56; Realised volatility only 4.89
+Wilcoxon signed-rank,"iForest, 2008",Cross-Market (lag 1) vs Domestic-Only,9,7.0,0.0742,0.007,7.0,2.0,0.0742,
+Wilcoxon signed-rank,"iForest, 2008",Cross-Market (lag 0 + 1) vs Domestic-Only,9,0.0,0.0039,0.01,9.0,0.0,0.0078,
+Friedman,"iForest, 2008",3 feature sets,9,11.091,0.0039,,,,,Domestic-Only 2.78; Cross-Market (lag 1) 1.94; Cross-Market (lag 0 + 1) 1.28
+Friedman,all three models,models on Domestic-Only,9,11.556,0.0031,,,,,"XGBoost, 2016 2.22; LR, 1958 1.11; iForest, 2008 2.67"
+Friedman,all three models,models on Cross-Market (lag 1),9,16.222,0.0003,,,,,"XGBoost, 2016 2.89; LR, 1958 1.00; iForest, 2008 2.11"
+Friedman,all three models,models on Cross-Market (lag 0 + 1),9,14.889,0.0006,,,,,"XGBoost, 2016 2.78; LR, 1958 1.00; iForest, 2008 2.22"
