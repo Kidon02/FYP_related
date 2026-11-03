@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Run the full pipeline in order: data -> labels -> features -> baseline models ->
-# DM tests -> figures -> report tables. Stops at the first error.
+# Isolation Forest -> DM tests -> Wilcoxon/Friedman -> SHAP -> figures -> report tables. Stops at the first error.
 # Run from the repo root: bash run_all.sh
 #
 # The panel is fixed (see CLAUDE.md), so the data step is skipped when it already
@@ -41,8 +41,17 @@ for idx in "${INDICES[@]}"; do
     python code/baseline_models.py --index "$idx"
 done
 
+for idx in "${INDICES[@]}"; do
+    echo "=== isolation_forest.py --index $idx ==="
+    python code/isolation_forest.py --index "$idx"
+done
+
 echo "=== dm_tests.py ==="
 python code/dm_tests.py
+echo "=== significance.py ==="
+python code/significance.py
+echo "=== shap_analysis.py ==="
+python code/shap_analysis.py
 echo "=== figures.py ==="
 python code/figures.py
 echo "=== report_tables.py ==="

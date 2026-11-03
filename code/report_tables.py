@@ -25,6 +25,8 @@ LABEL_NAMES = {"baseline": "Rolling z-score baseline", "hmm": "Regime-dependent 
 SET_NAMES = {"domestic_only": "Domestic-Only", "cross_market": "Cross-Market (lag 1)",
              "cross_market_lag0": "Cross-Market (lag 0 + 1)", "ablation_foreign": "Domestic + foreign",
              "ablation_macro": "Domestic + macro", "rv_only": "Realised volatility only"}
+# Method name and year of publication, as the supervisor requires in every table.
+MODEL_NAMES = {"xgboost": "XGBoost, 2016", "logistic_regression": "LR, 1958", "isolation_forest": "iForest, 2008"}
 COMMON = [
     "Seed: 42-46 (5 seeds; mean and std over seeds), HMM random_state 42",
     "Checkpoint: not saved (models are refit inside code/baseline_models.py)",
@@ -55,6 +57,8 @@ def main():
         b = yaml.safe_load(f)["bootstrap"]
     events = "; ".join(f"{e['name']} {e['window'][0]} to {e['window'][1]}" for e in lab_cfg["crisis_events"])
     models = pd.concat([pd.read_csv(f"results/baseline_models_{i}.csv").assign(index=i) for i in INDICES])
+    forests = [f"results/isolation_forest_{i}.csv" for i in INDICES if os.path.exists(f"results/isolation_forest_{i}.csv")]
+    all_runs = pd.concat([models] + [pd.read_csv(f).assign(index=f.split("_")[-1][:-4]) for f in forests])
 
     # Item 4: three labelling schemes per index.
     ev = pd.concat([pd.read_csv(f"results/labelling_evaluation_{i}.csv").assign(index=INDEX_NAMES[i])
@@ -98,21 +102,22 @@ def main():
     ])
 
     # Item 6: every model run.
-    ran = models.dropna(subset=["pr_auc_mean"])
+    ran = all_runs.dropna(subset=["pr_auc_mean"])
     res = pd.DataFrame({
         "index": ran["index"].map(INDEX_NAMES), "label": ran["label"].map(LABEL_NAMES),
-        "feature_set": ran["feature_set"].map(SET_NAMES), "model": ran["model"], "n_features": ran["n_features"],
+        "feature_set": ran["feature_set"].map(SET_NAMES), "model": ran["model"].map(MODEL_NAMES), "n_features": ran["n_features"],
         "prevalence_baseline": ran["pr_auc_prevalence_baseline"].round(4),
         "pr_auc": [fmt(*v) for v in ran[["pr_auc_mean", "pr_auc_std", "pr_auc_ci_low", "pr_auc_ci_high"]].to_numpy()],
         "f1": [fmt(*v) for v in ran[["f1_mean", "f1_std", "f1_ci_low", "f1_ci_high"]].to_numpy()],
         "mcc": [fmt(*v) for v in ran[["mcc_mean", "mcc_std", "mcc_ci_low", "mcc_ci_high"]].to_numpy()],
     })
-    skipped = models[models["pr_auc_mean"].isna()]
+    skipped = all_runs[all_runs["pr_auc_mean"].isna()]
     write(res, "table_model_results", [
         "Dataset: S&P 500, Nikkei 225, FTSE 100 (panel_full_2026-10-27.csv); rows where every label set is defined",
         "Feature set: domestic_only, cross_market (lag 1), cross_market_lag0, ablation_foreign, ablation_macro, rv_only",
         "Label strategy: baseline, hmm, regime_std; hmm_fullsample as sensitivity",
-        "Model: xgboost and logistic_regression (grid on validation PR-AUC; F1 threshold on validation)",
+        "Model: XGBoost (2016), L2 logistic regression (LR, 1958), Isolation Forest (iForest, 2008; unsupervised, "
+        "domestic_only/cross_market/cross_market_lag0 only); grid on validation PR-AUC; F1 threshold on validation",
         COMMON[0], "Config file: configs/baseline_models.yaml, configs/features.yaml, configs/labelling.yaml",
         COMMON[1], "Test window: 2019-01-01 to 2024-12-31",
         f"Notes: mean (std) over seeds [block-bootstrap 95% CI of the seed mean: {b['n_resamples']} resamples, "
@@ -144,7 +149,7 @@ def main():
     # Item 7: DM tests.
     dm = pd.read_csv("results/dm_tests.csv").dropna(subset=["dm_stat"])
     dm_out = pd.DataFrame({
-        "index": dm["index"].map(INDEX_NAMES), "label": dm["label"].map(LABEL_NAMES), "model": dm["model"],
+        "index": dm["index"].map(INDEX_NAMES), "label": dm["label"].map(LABEL_NAMES), "model": dm["model"].map(MODEL_NAMES),
         "comparison": dm["a"].map(SET_NAMES) + " vs " + dm["b"].map(SET_NAMES), "n": dm["n"],
         "mean_brier_a": dm["mean_loss_a"].round(5), "mean_brier_b": dm["mean_loss_b"].round(5),
         "dm_stat": dm["dm_stat"].round(3), "p_value": dm["p_value"].round(4), "lower_loss": dm["favours"].map(SET_NAMES),

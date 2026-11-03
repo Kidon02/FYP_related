@@ -40,7 +40,7 @@ foreign features plotted against VIX (2019-2024).
 - Windows with Git Bash. Quote any path containing spaces; use forward slashes.
 - Run scripts from the repo root, e.g. `python code/labelling.py --index GSPC`.
 - `FRED_API_KEY` env var is needed only by data_pipeline.py. Never commit keys.
-- The repo is public on GitHub.
+- The repo must be private on GitHub: it contains the input data (Yahoo, FRED, EPU files).
 
 ## Commits (automated)
 - Laptop: Task Scheduler task "FYP weekly commit" runs scripts/weekly_commit.sh every
@@ -51,7 +51,8 @@ foreign features plotted against VIX (2019-2024).
   claude/ branch (claude/autosave-<session> when on another branch). It never pushes to main.
 - Routine "FYP weekly cloud commit" is disabled (2026-11-03). Cloud branches reach main
   only after the user reviews them and merges them as a pull request.
-- Cloud sessions have no data: data/raw/ and data/processed/*.csv are gitignored.
+- Input data are tracked (force-added despite .gitignore): data/raw/ (except the Kaggle file) and
+  data/processed/panel_full_2026-10-27.csv, so cloud sessions can run the pipeline from cache.
 
 ## Layout
 code/, configs/, data/raw, data/processed, results/, logs/, thesis_tables/, data_readme.txt
@@ -83,8 +84,18 @@ code/, configs/, data/raw, data/processed, results/, logs/, thesis_tables/, data
   code/figures.py (configs/figures.yaml; data panel table, S&P 500 regime figure),
   code/report_tables.py (results/tables/, one settings file each in thesis_tables/).
   Earlier results are in results/archive/, logs/archive/, thesis_tables/archive/.
-- code/train.py and code/test.py are stubs that import modules not yet written
-  (data_utils, model_factory, metrics, explain).
+- code/train.py (labels, features, baseline models, Isolation Forest) and code/test.py (DM tests,
+  significance, SHAP, figures, report tables) are the two entry points; run_all.sh runs both.
+- code/isolation_forest.py (configs/isolation_forest.yaml): unsupervised benchmark from the brief, fit
+  on 2000-2015 features only; same rows, seeds, selection rules and bootstrap resamples as the
+  supervised models. results/isolation_forest_{IDX}.csv.
+- code/significance.py: Wilcoxon signed-rank (Holm) and Friedman tests over 9 blocks (3 targets x 3
+  label sets) of seed-mean test PR-AUC, as the supervisor requires. results/tables/table_significance.csv.
+- code/shap_analysis.py (configs/shap.yaml): global TreeSHAP for XGBoost on the foreign-containing
+  feature sets, with validation-chosen hyperparameters; checked against XGBoost pred_contribs.
+  results/shap_group_shares.csv, results/figures/fig_shap_top_GSPC.*.
+- Cross-machine reproducibility: labels and logistic regression identical (Linux vs Windows);
+  XGBoost PR-AUC differs by about 0.004 (multithreaded hist summation order).
 - Known input issues, not yet addressed: N225 volume is zero on 615 days, mostly
   2000-2002; N225 and FTSE forward-filled holidays create zero-return rows (5.9% and
   2.0% of N225/FTSE days). Test-period EPU_US and DGS10 are outside the train range

@@ -1,68 +1,59 @@
 # Deciphering International Market Connections: Explainable AI for Cross-Border Stock Anomaly Detection
 
-Final year project. Detects abnormal return activity in the S&P 500, Nikkei 225,
-and FTSE 100, tests whether cross-market lagged features improve detection versus
-domestic-only features, and applies SHAP/LIME to interpret the results.
+Final year project. Labels abnormal daily returns in the S&P 500, Nikkei 225 and FTSE 100
+(2000-2024), tests whether foreign-market features improve anomaly detection compared with
+domestic-only features, and explains the models with SHAP.
 
 ## Environment
 
-- Python 3.10+
-- Key libraries: `yfinance`, `fredapi`, `pandas`, `numpy`, `scikit-learn`, `xgboost`,
-  `hmmlearn`, `imbalanced-learn` (SMOTE), `shap`, `lime`, `matplotlib`
-- No GPU required — all models (XGBoost, Logistic Regression, Isolation Forest) run
-  on CPU. A modern laptop is sufficient; full walk-forward training on ~24 years of
-  daily data across 3 indices should take well under an hour.
-
-Install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-You will need a free FRED API key (https://fred.stlouisfed.org/docs/api/api_key.html)
-set as an environment variable:
-
-```bash
-export FRED_API_KEY=your_key_here
-```
+- Python 3.12; packages pinned in `requirements.txt` (`pip install -r requirements.txt`).
+- CPU only. No GPU and no API keys are needed: all inputs are in `data/` and nothing is downloaded
+  (`code/data_pipeline.py` downloads only with `--refresh`, which needs `FRED_API_KEY`).
+- Tested on Windows 11 (Git Bash) and Ubuntu 24.04.
 
 ## Data
 
-See `data_readme.txt` for dataset sources and expected file locations. Datasets are
-not redistributed in this repo — the pipeline retrieves them directly from
-yfinance/FRED, or you can download the Kaggle CSVs and place them as described there.
+See `data_readme.txt` for sources, identifiers and file locations. The panel used by every
+step is `data/processed/panel_full_2026-10-27.csv` (6,288 trading days, 2000-01-03 to 2024-12-30).
 
 ## How to train
 
 ```bash
-python code/train.py --config configs/xgboost_crossmarket.yaml
+python code/train.py              # all three targets
+python code/train.py --index GSPC # one target
 ```
 
-Swap `--config` to any file in `configs/` to train a different model / feature-set
-combination (e.g. `logreg_domestic_only.yaml`, `isolation_forest_crossmarket.yaml`).
-Each config specifies the model type, feature set (`domestic_only` or
-`cross_market`), labelling strategy (`baseline` or `regime_hmm`), and hyperparameters.
-Trained models are written to `results/checkpoints/`.
+Runs, in order: labels (`labelling.py`, causal HMM fit on 2000-2015), features (`features.py`,
+with a no-lookahead test), supervised models (`baseline_models.py`: XGBoost and L2 logistic
+regression, 5 seeds, block-bootstrap CIs) and the unsupervised benchmark (`isolation_forest.py`).
+Split: train 2000-2015, validation 2016-2018 (grid search and thresholds), test 2019-2024 (scored once).
 
 ## How to test / evaluate
 
 ```bash
-python code/test.py --config configs/xgboost_crossmarket.yaml --checkpoint results/checkpoints/<name>.pkl
+python code/test.py
 ```
 
-This runs the held-out 2019–2024 test window and writes PR-AUC, F1, and MCC to
-`logs/`, plus (for XGBoost) triggers the SHAP explainability outputs used in the
-XAI notebook.
+Runs Diebold-Mariano tests (`dm_tests.py`), Wilcoxon and Friedman tests (`significance.py`),
+global SHAP (`shap_analysis.py`), figures (`figures.py`) and the report tables (`report_tables.py`).
+Tables are written to `results/tables/`, figures to `results/figures/`, and one settings file per
+table or figure to `thesis_tables/`.
 
-## Approximate runtime
+`bash run_all.sh` runs training and evaluation end to end.
 
-- Data retrieval + preprocessing: ~5–10 minutes (network-bound)
-- Training one model/feature-set combination: 1–5 minutes on CPU
-- Full SHAP analysis (global + local + rolling): ~10–20 minutes
+## Configuration
 
-## Reproducibility notes
+Every setting is in `configs/`: `labelling.yaml`, `features.yaml`, `baseline_models.yaml`,
+`isolation_forest.yaml`, `dm_tests.yaml`, `shap.yaml`, `figures.yaml`.
 
-Every table/figure in the dissertation has a matching settings file in
-`thesis_tables/` recording the exact config, seed, and checkpoint used, so any
-result can be regenerated. See `Project-Code and Reproducibility Requirements`
-from the supervisor's brief for the full standard this repo follows.
+## Approximate runtime (single CPU core)
+
+Labels and features: about 1 minute. Supervised models: about 5-10 minutes per target.
+Isolation Forest: under 1 minute per target. Evaluation (`test.py`): about 2 minutes.
+
+## Reproducibility
+
+Seeds 42-46 throughout. Re-running on the same machine reproduces every result file exactly.
+Across machines, labels and logistic-regression results are identical; XGBoost results can
+differ slightly (about 0.004 in PR-AUC) because of floating-point summation order in its
+multithreaded histogram method.
