@@ -1,0 +1,17 @@
+# Global SHAP analysis for XGBoost (code/shap_analysis.py).
+# Hyperparameters come from results/baseline_models_{IDX}.csv (chosen on validation),
+# so no new tuning happens here. Split, seeds, SMOTE and scaling follow
+# configs/baseline_models.yaml exactly.
+
+label_sets: [baseline, hmm, regime_std]
+# Feature sets that contain foreign features (research question 2).
+feature_set_names: [cross_market, cross_market_lag0, ablation_foreign]
+
+figure:
+  index: GSPC
+  label: regime_std          # the core labelling scheme
+  top_n: 10
+  width_in: 6.0
+  height_in: 4.0
+  dpi: 300
+  max_ticks: 6

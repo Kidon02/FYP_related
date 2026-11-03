@@ -1,0 +1,9 @@
+Dataset: S&P 500 test window 2019-2024
+Feature set: cross_market_lag0
+Label strategy: regime_std
+Model: XGBoost (2016), hyperparameters from results/baseline_models_GSPC.csv
+Seed: 42-46 (mean |SHAP| averaged over seeds)
+Config file: configs/shap.yaml
+Checkpoint: not saved (refit in code/shap_analysis.py)
+Test window: 2019-01-01 to 2024-12-31
+Notes: Figure: the 10 features with the largest mean absolute SHAP value for XGBoost on the S&P 500 test window (2019-2024), Regime-standardised labels, Cross-Market (lag 0 + 1) feature set, averaged over 5 seeds. Hatching shows the feature group.

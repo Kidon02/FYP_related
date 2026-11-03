@@ -1,0 +1,9 @@
+Dataset: S&P 500, Nikkei 225, FTSE 100 test windows 2019-2024 (same rows as baseline_models.py)
+Feature set: cross_market, cross_market_lag0, ablation_foreign (N225 lag 0 = lag 1, not repeated)
+Label strategy: baseline, hmm, regime_std
+Model: XGBoost (2016) with validation-chosen hyperparameters; TreeSHAP (Lundberg & Lee, 2017)
+Seed: 42-46 (mean |SHAP| averaged over seeds)
+Config file: configs/shap.yaml, configs/baseline_models.yaml
+Checkpoint: not saved (refit in code/shap_analysis.py)
+Test window: 2019-01-01 to 2024-12-31
+Notes: share_g = group's share of total mean |SHAP| on test days (log-odds scale, standardised inputs). best_on_validation marks the feature set with the highest validation PR-AUC per index and label; test results are not used for that choice. SHAP explains the fitted model, so attributions for weak models (low test PR-AUC) should not be read as evidence about markets.
