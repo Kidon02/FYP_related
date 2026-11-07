@@ -1,19 +1,26 @@
 # Project status (updated 2026-11-07, after Part A)
 
-## State
+## Deadlines
+- Interim report: 10 Nov 2026.
+- Part A (supervisor's reply, steps A1-A8): done 7 Nov 2026; see docs/tasks/TASK_part_A.md.
+- Part B: after the interim report (no date set yet).
+
+## Pipeline state
 - Panel: data/processed/panel_full_2026-11-07.csv (6288 days x 19 columns) = the 2026-10-27 panel plus
-  BAA10Y. Its 18 old columns are exactly identical to the 2026-10-27 panel.
+  BAA10Y. Its 18 old columns are exactly identical to the 2026-10-27 panel. panel_full.csv and
+  panel_full_2026-10-27.csv are kept unchanged.
 - Macro features are stationary (configs/features.yaml `macro.transform: stationary`): DGS10 and BAA10Y
   daily change, USDJPY log change, EPU US/JP log of the previous-month value standardised over a trailing
   252-day window. The level definitions are kept as `transform: levels`.
 - Feature rows: GSPC 6016, FTSE 6016 (20 and 19 fewer, from the EPU standardisation warm-up), N225 5427.
   The no-lookahead test passes for all three indices.
 - Full rerun of code/train.py and code/test.py finished on 2026-11-07 (18 minutes, CPU, exit 0;
-  logs/partA_rerun_2026-11-07.log). All results and tables in results/ are from this run.
+  logs/partA_rerun_2026-11-07.log). All results and tables in results/ are from this run; none are
+  provisional.
 - New tables: results/tables/table_macro_range.csv, table_event_matrix.csv, table_matched_control.csv,
   each with a settings file in thesis_tables/ (code/macro_range.py, code/event_tables.py, run by test.py).
 
-## Findings
+## Key findings
 - Out-of-range: share of 2019-2024 test days outside the 2000-2015 training range, levels -> stationary:
   DGS10 20.9% -> 0.1%, EPU_US 12.3% -> 1.3%, BAA10Y 4.8% -> 0.07%, EPU_JP 0% -> 0%.
 - Feature sets vs Domestic-Only (Wilcoxon signed-rank over 9 blocks, Holm), new run:
@@ -33,14 +40,14 @@
   scheme puts 35-51% of its flags in the high-volatility regime, against 24-33% for the hmm and
   regime_std schemes (the regime covers 17-23% of days). The regime schemes move flags out of the
   high-volatility regime rather than just changing how many days are flagged.
+- Decisions already made: BAA10Y replaces TED (supervisor approved; HY OAS rejected, FRED serves only a
+  rolling 3-year window); macro features stationary; reference [16] is Mostafavi and Hooman (2025);
+  same-day foreign features are nowcasting inputs, not a next-day early warning.
 
-## Decisions
-- BAA10Y replaces TED as the credit spread (supervisor approved, Nov 2026). HY OAS rejected (FRED serves
-  only a rolling 3-year window).
-- Macro features made stationary (supervisor request).
-- Reference [16] confirmed: Mostafavi and Hooman (2025).
-- Same-day foreign features are nowcasting inputs, not a next-day early warning.
-- Attachments to the supervisor always get a distinct dated or versioned file name.
+## Open decisions
+- Confirm the six crisis date windows (configs/labelling.yaml).
+- How to present the negative macro result (LR worse with stationary macro features) in the interim report.
+- Whether the levels variant is reported as a sensitivity analysis.
 
 ## Next steps (Part B)
 1. Decision Tree model.
@@ -49,4 +56,10 @@
 4. RF-LSTM benchmark (Pandey & Sharma), in the consolidated table.
 5. SHAP and LIME explanations.
 6. Rolling 60-day SHAP share of foreign features against VIX (2019-2024).
-- Still open: confirm the six crisis date windows; interim report due 10 Nov.
+
+## How to resume
+- Read this file, then CLAUDE.md (rules), then the progress log at the bottom of the current task file
+  in docs/tasks/.
+- Rerun everything from the committed cache: `python code/train.py` then `python code/test.py`
+  (about 18 minutes on the laptop CPU). Never run data_pipeline.py --refresh.
+- Attachments to the supervisor get a distinct dated or versioned file name.

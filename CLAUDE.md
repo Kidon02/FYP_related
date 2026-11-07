@@ -1,5 +1,7 @@
 # FYP: Explainable AI for Cross-Border Stock Anomaly Detection
 
+Read STATUS.md first.
+
 ## Goal
 Test whether lagged cross-market features (S&P 500, Nikkei 225, FTSE 100) improve
 anomaly detection compared with domestic-only features, and use SHAP/LIME to show

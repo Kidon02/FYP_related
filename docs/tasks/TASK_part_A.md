@@ -106,3 +106,11 @@ Notes:
   better with the level features, which drift out of range in the test period). See STATUS.md.
 - The 0.170 (causal) vs 0.268 (full-sample) S&P 500 XGBoost Domestic-Only PR-AUC is from the 3 Nov run;
   after the rerun (20 fewer rows) it is 0.157 vs 0.268.
+- Change request received 7 Nov 23:40, after all steps A1-A8 had already been done and committed:
+  (1) order A6, A7, then A1-A5, A8; (2) tick, commit and push to main after each step; (3) skip A5 if it
+  cannot finish by Sun 8 Nov 12:00; (4) STATUS.md with sections deadlines, pipeline state, key findings,
+  open decisions, next steps, how to resume, and "Read STATUS.md first" in CLAUDE.md.
+  Outcome: (1) and (3) no longer apply; A5 had already finished (18 min, 7 Nov 23:21-23:39), so the DM
+  and significance tables are from the full rerun. (4) done. (2) each step was committed separately, but
+  `git push origin main` was blocked by the session's permission check, so the commits are local only
+  until the user pushes (or the Sunday 21:00 weekly job does).
