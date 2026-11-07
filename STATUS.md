@@ -53,7 +53,7 @@
 1. Decision Tree model.
 2. Hyperparameter tuning.
 3. Expanding-window evaluation.
-4. RF-LSTM benchmark (Pandey & Sharma), in the consolidated table.
+4. RF-LSTM benchmark (Mostafavi and Hooman (2025)), in the consolidated table.
 5. SHAP and LIME explanations.
 6. Rolling 60-day SHAP share of foreign features against VIX (2019-2024).
 

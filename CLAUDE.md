@@ -141,7 +141,7 @@ code/, configs/, data/raw, data/processed, results/, logs/, thesis_tables/, data
 Walk-forward split: train 2000-2015, validation 2016-2018, test 2019-2024.
 Models: XGBoost, L2 Logistic Regression, Isolation Forest. SMOTE on train only.
 Metrics: PR-AUC, F1, MCC. Diebold-Mariano tests with exact statistics and p-values.
-Benchmark against Pandey & Sharma RF-LSTM in one consolidated table.
+Benchmark against the Mostafavi and Hooman (2025) RF-LSTM in one consolidated table.
 
 ## Supervisor rules
 - Commit to git at least weekly. Hyperparameters in YAML configs, not hard-coded.
