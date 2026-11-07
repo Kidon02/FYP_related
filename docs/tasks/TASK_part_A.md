@@ -93,7 +93,7 @@ it in the progress log, and ask.
 
 ## Progress log (update after every step; this is the resume point)
 - [x] A1 BAA10Y fetched and documented (2000-01-03 to 2024-12-31; 0.78% of panel days missing, longest gap 1 day)
-- [ ] A2 new panel built; old columns identical
+- [x] A2 new panel built; old columns identical (panel_full_2026-11-07.csv, 6288 x 19; 18 old columns exactly equal)
 - [ ] A3 stationary macro features; no-lookahead test passes (GSPC, N225, FTSE)
 - [ ] A4 out-of-range table
 - [ ] A5 full rerun of train.py and test.py; comparison reported

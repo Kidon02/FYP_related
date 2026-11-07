@@ -11,9 +11,9 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 INDICES=(GSPC N225 FTSE)
-# The 2026-10-27 panel fixes EPU_US (see CLAUDE.md); panel_full.csv is the unchanged
+# The 2026-11-07 panel = 2026-10-27 panel (EPU_US fixed) plus BAA10Y; panel_full.csv is the unchanged
 # 2026-09-16 original. The path must match panel_path in configs/*.yaml.
-PANEL="data/processed/panel_full_2026-10-27.csv"
+PANEL="data/processed/panel_full_2026-11-07.csv"
 
 if [[ -f "$PANEL" && "${REBUILD_PANEL:-0}" != "1" ]]; then
     echo "=== data_pipeline.py: skipped, $PANEL exists (REBUILD_PANEL=1 to rebuild) ==="

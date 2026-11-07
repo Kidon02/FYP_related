@@ -5,7 +5,7 @@
 # Labels are never read by features.py.
 
 # 2026-10-27 panel: EPU_US fixed. panel_full.csv (2026-09-16) is kept unchanged.
-panel_path: data/processed/panel_full_2026-10-27.csv
+panel_path: data/processed/panel_full_2026-11-07.csv
 universe: [GSPC, N225, FTSE]   # target is chosen with --index; the others are foreign
 
 # Excluded inputs. TED: FRED discontinued TEDRATE on 2022-01-21 and the

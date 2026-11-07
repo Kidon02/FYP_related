@@ -14,7 +14,7 @@ domestic-only features, and explains the models with SHAP.
 ## Data
 
 See `data_readme.txt` for sources, identifiers and file locations. The panel used by every
-step is `data/processed/panel_full_2026-10-27.csv` (6,288 trading days, 2000-01-03 to 2024-12-30).
+step is `data/processed/panel_full_2026-11-07.csv` (6,288 trading days, 2000-01-03 to 2024-12-30).
 
 ## How to train
 

@@ -3,7 +3,7 @@
 # statistic. Statistics use data up to 2015 (the HMM fit) or trailing data only.
 
 # 2026-10-27 panel: EPU_US fixed. panel_full.csv (2026-09-16) is kept unchanged.
-panel_path: data/processed/panel_full_2026-10-27.csv
+panel_path: data/processed/panel_full_2026-11-07.csv
 
 # Rolling z-score of the target log-return, as in the brief. The 252-day window ends
 # on day t. Days where it is undefined (the first 252) get no label, not 0.

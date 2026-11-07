@@ -65,7 +65,7 @@ def main():
                     for i in INDICES])
     write(ev[["index", "scheme", "days", "from", "to", "prevalence_pct", "mean_run_length_days",
               "concordance_pct", "events_missed"]], "table_labelling_evaluation", [
-        "Dataset: S&P 500, Nikkei 225, FTSE 100 (panel_full_2026-10-27.csv); days where all three schemes are defined",
+        "Dataset: S&P 500, Nikkei 225, FTSE 100 (panel_full_2026-11-07.csv); days where all three schemes are defined",
         "Feature set: n/a (labels only)",
         "Label strategy: baseline (|z|>2.5), hmm (2.5/3.0 by filtered regime), regime_std (one threshold 2.5)",
         "Model: 2-state Gaussian HMM on rv21, fit 2000-2015, filtered/predicted probabilities",
@@ -91,7 +91,7 @@ def main():
                     r[f"pr_auc_{model}_{fs}"] = fmt(m["pr_auc_mean"], m["pr_auc_std"])
             rows.append(r)
     write(pd.DataFrame(rows), "table_hmm_sensitivity", [
-        "Dataset: S&P 500, Nikkei 225, FTSE 100 (panel_full_2026-10-27.csv)",
+        "Dataset: S&P 500, Nikkei 225, FTSE 100 (panel_full_2026-11-07.csv)",
         "Feature set: label statistics: none; PR-AUC: domestic_only and cross_market",
         "Label strategy: hmm (causal: fit 2000-2015, filtered) vs hmm_fullsample (fit 2000-2024, Viterbi path)",
         "Model: 2-state Gaussian HMM; xgboost and logistic_regression for PR-AUC",
@@ -113,7 +113,7 @@ def main():
     })
     skipped = all_runs[all_runs["pr_auc_mean"].isna()]
     write(res, "table_model_results", [
-        "Dataset: S&P 500, Nikkei 225, FTSE 100 (panel_full_2026-10-27.csv); rows where every label set is defined",
+        "Dataset: S&P 500, Nikkei 225, FTSE 100 (panel_full_2026-11-07.csv); rows where every label set is defined",
         "Feature set: domestic_only, cross_market (lag 1), cross_market_lag0, ablation_foreign, ablation_macro, rv_only",
         "Label strategy: baseline, hmm, regime_std; hmm_fullsample as sensitivity",
         "Model: XGBoost (2016), L2 logistic regression (LR, 1958), Isolation Forest (iForest, 2008; unsupervised, "

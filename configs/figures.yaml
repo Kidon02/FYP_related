@@ -2,7 +2,7 @@
 # Supervisor rules: no colour, no grids, at most 6 ticks per axis, caption instead of title.
 
 # 2026-10-27 panel: EPU_US fixed. panel_full.csv (2026-09-16) is kept unchanged.
-panel_path: data/processed/panel_full_2026-10-27.csv
+panel_path: data/processed/panel_full_2026-11-07.csv
 window: [2000-01-01, 2024-12-31]      # range the data panel table reports on
 
 regime_figure:
