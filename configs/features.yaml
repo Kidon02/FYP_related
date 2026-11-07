@@ -25,6 +25,7 @@ lags:
   vix: 1                           # VIX level and change lag
   usdjpy: 1                        # USDJPY log change lag
   dgs10: 1                         # DGS10 lag
+  credit_spread: 1                 # BAA10Y lag
   epu_day: 1                       # day lag applied after EPU publication lag
   technical: 1                     # technical indicators computed on close, then lagged
 
@@ -33,6 +34,17 @@ volume:
   # Deviation from the brief (approved): lag-1 log volume minus its trailing mean
   # over this many days, computed from data up to t-1. Set to null for raw log volume.
   normalise_trailing_window: 252
+
+macro:
+  # Supervisor (Nov 2026): DGS10 and EPU_US leave their training range in the test
+  # period, so macro features are made stationary.
+  #   stationary: DGS10 and BAA10Y daily change; USDJPY log change; EPU US/JP log of the
+  #               previous-month value, standardised by its trailing mean and std
+  #               (window below; the window ends at t and contains only data known at t-1).
+  #   levels:     previous definitions (DGS10 level, EPU level; BAA10Y level if set).
+  transform: stationary
+  credit_spread: BAA10Y            # replaces TED (approved Nov 2026); null to leave it out
+  epu_standardise_window: 252
 
 epu:
   # Deviation from the brief (approved): EPU for month M is published in early
@@ -80,7 +92,7 @@ groups:
   domestic: "target log-return, realised vol, log volume, VIX"
   foreign: "other two indices: log-return and realised vol, lags 1+"
   foreign_lag0: "other indices whose session closes before the target's: same-day log-return and realised vol"
-  macro: "USDJPY, DGS10, EPU_US, EPU_JP"
+  macro: "USDJPY, DGS10, BAA10Y, EPU_US, EPU_JP"
   technical: "RSI, Bollinger width, MACD signal"
 
 # Each entry is a group name or a feature-name pattern (fnmatch).
@@ -93,4 +105,5 @@ feature_sets:
   rv_only: ["dom_rv21_lag*"]                                           # realised-volatility benchmark
 
 # Columns whose train vs test ranges are printed after building features.
-range_report: [dom_vix_lag1, mac_dgs10_lag1, mac_epu_us_lag1, mac_epu_jp_lag1, dom_logvol_dev_lag1]
+range_report: [dom_vix_lag1, mac_usdjpy_logchg_lag1, mac_dgs10_chg_lag1, mac_baa10y_chg_lag1,
+               mac_epu_us_logz_lag1, mac_epu_jp_logz_lag1, dom_logvol_dev_lag1]

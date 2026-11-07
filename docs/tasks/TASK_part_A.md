@@ -94,7 +94,7 @@ it in the progress log, and ask.
 ## Progress log (update after every step; this is the resume point)
 - [x] A1 BAA10Y fetched and documented (2000-01-03 to 2024-12-31; 0.78% of panel days missing, longest gap 1 day)
 - [x] A2 new panel built; old columns identical (panel_full_2026-11-07.csv, 6288 x 19; 18 old columns exactly equal)
-- [ ] A3 stationary macro features; no-lookahead test passes (GSPC, N225, FTSE)
+- [x] A3 stationary macro features; no-lookahead test passes (GSPC, N225, FTSE). macro.transform: stationary (levels kept as option). Rows: GSPC 6036->6016 (-20), FTSE 6035->6016 (-19), N225 5427 unchanged (volume start binds). Cross-Market now 29 features (BAA10Y added). Row set changed, so all feature sets are rerun in A5.
 - [ ] A4 out-of-range table
 - [ ] A5 full rerun of train.py and test.py; comparison reported
 - [ ] A6 event-by-scheme matrix

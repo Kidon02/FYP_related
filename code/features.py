@@ -187,17 +187,32 @@ def build_raw_features(panel, target, cfg, lag0):
             for col in cfg["lag0_features"]:
                 add(f"for_{idx}_{col}_lag0", "foreign_lag0", panel[f"{idx}_{col}"])
 
-    # Macro
+    # Macro. macro.transform "stationary" (default since Nov 2026, supervisor request):
+    # daily changes of DGS10 and BAA10Y, and EPU as log of the published value
+    # standardised by a trailing window. "levels" keeps the earlier definitions.
+    mcfg = cfg.get("macro", {"transform": "levels", "credit_spread": None})
     lm = L["usdjpy"]
     usd = panel["USDJPY"]
     add(f"mac_usdjpy_logchg_lag{lm}", "macro", np.log(usd.shift(lm) / usd.shift(lm + 1)))
-    add(f"mac_dgs10_lag{L['dgs10']}", "macro", panel["DGS10"].shift(L["dgs10"]))
+    rate_cols = [("DGS10", L["dgs10"])]
+    if mcfg.get("credit_spread"):
+        rate_cols.append((mcfg["credit_spread"], L["credit_spread"]))
+    for col, k in rate_cols:
+        if mcfg["transform"] == "stationary":
+            add(f"mac_{col.lower()}_chg_lag{k}", "macro", panel[col].shift(k) - panel[col].shift(k + 1))
+        else:
+            add(f"mac_{col.lower()}_lag{k}", "macro", panel[col].shift(k))
     for col in ["EPU_US", "EPU_JP"]:
-        add(
-            f"mac_{col.lower()}_lag{L['epu_day']}",
-            "macro",
-            lagged_epu(panel[col], cfg["epu"]["publication_lag_months"], L["epu_day"]),
-        )
+        epu = lagged_epu(panel[col], cfg["epu"]["publication_lag_months"], L["epu_day"])
+        if mcfg["transform"] == "stationary":
+            # epu at t is already known at t-1 (month M-1 value, lagged one day), so the
+            # trailing window ending at t uses information up to t-1 only.
+            w = mcfg["epu_standardise_window"]
+            x = np.log(epu)
+            z = (x - x.rolling(w).mean()) / x.rolling(w).std()
+            add(f"mac_{col.lower()}_logz_lag{L['epu_day']}", "macro", z)
+        else:
+            add(f"mac_{col.lower()}_lag{L['epu_day']}", "macro", epu)
 
     # Technical (on target close, then lagged)
     t = cfg["technical"]
