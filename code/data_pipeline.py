@@ -7,7 +7,8 @@ Implements the "Semester One, Month 1" section of the supervisor's brief:
       via yfinance, Jan 2000 - Dec 2024, cross-checked against the Kaggle
       Global Stock Indices dataset.
     - FRED series: VIX (VIXCLS), USD/JPY (DEXJPUS), 10-year yield (DGS10),
-      TED spread (TEDRATE).
+      TED spread (TEDRATE), and BAA10Y (Moody's Baa yield minus 10-year Treasury), which
+      replaces TED as the credit spread (TEDRATE was discontinued on 2022-01-21).
     - US and Japan EPU indices, forward-filled monthly -> daily.
     - Alignment to a common trading calendar (last-observed-carried-forward
       for local holidays), daily log-returns, and rolling 21-day realised
@@ -19,6 +20,7 @@ they exist. Pass --refresh to re-download them (this overwrites the raw files).
 Usage:
     python code/data_pipeline.py
     python code/data_pipeline.py --refresh
+    python code/data_pipeline.py --fetch-series BAA10Y   # downloads only that FRED series
     python code/data_pipeline.py --epu-us data/raw/US_Policy_Uncertainty_Data.xlsx \\
         --epu-japan data/raw/Japan_Policy_Uncertainty_Data.xlsx \\
         --kaggle data/raw/kaggle_global_indices.csv
@@ -31,7 +33,8 @@ import numpy as np
 import pandas as pd
 
 TICKERS = {"GSPC": "^GSPC", "N225": "^N225", "FTSE": "^FTSE"}
-FRED_SERIES = {"VIX": "VIXCLS", "USDJPY": "DEXJPUS", "DGS10": "DGS10", "TED": "TEDRATE"}
+FRED_SERIES = {"VIX": "VIXCLS", "USDJPY": "DEXJPUS", "DGS10": "DGS10", "TED": "TEDRATE",
+               "BAA10Y": "BAA10Y"}
 
 RAW_DIR = "data/raw"
 PROCESSED_DIR = "data/processed"
@@ -142,6 +145,31 @@ def fetch_fred(start, end, refresh=False, sources=None):
             sources[path] = source
         frames[name] = s
     return frames
+
+
+def fetch_single_fred_series(name, start, end):
+    """
+    Download one FRED series to data/raw/fred_{name}.csv and touch nothing else.
+    Refuses to overwrite an existing raw file.
+    """
+    if name not in FRED_SERIES:
+        raise ValueError(f"Unknown series {name}; known: {', '.join(FRED_SERIES)}")
+    ensure_dirs()
+    path = f"{RAW_DIR}/fred_{name}.csv"
+    if os.path.exists(path):
+        raise FileExistsError(f"{path} already exists; delete it manually to re-download.")
+    api_key = os.environ.get("FRED_API_KEY")
+    if not api_key:
+        raise EnvironmentError("Set FRED_API_KEY before fetching FRED series.")
+    from fredapi import Fred
+
+    print(f"[download] {name} ({FRED_SERIES[name]}) from FRED...")
+    s = Fred(api_key=api_key).get_series(FRED_SERIES[name], observation_start=start, observation_end=end)
+    s.name = name
+    s.to_csv(path)
+    print(f"Saved {path}: {len(s)} rows, {s.index.min().date()} to {s.index.max().date()}, "
+          f"{s.isna().sum()} missing values")
+    return s
 
 
 def load_epu(us_xlsx_path, japan_xlsx_path):
@@ -290,6 +318,11 @@ if __name__ == "__main__":
     )
     parser.add_argument("--out", default=f"{PROCESSED_DIR}/panel_full.csv",
                         help="Output path for the panel (default: data/processed/panel_full.csv).")
+    parser.add_argument("--fetch-series", default=None,
+                        help="Download only this FRED series (e.g. BAA10Y) to data/raw and exit.")
     args = parser.parse_args()
+    if args.fetch_series:
+        fetch_single_fred_series(args.fetch_series, args.start, args.end)
+        raise SystemExit(0)
     build_panel(args.start, args.end, args.epu_us, args.epu_japan, args.kaggle, args.base,
                 refresh=args.refresh, out_path=args.out)

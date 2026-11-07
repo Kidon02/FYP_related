@@ -92,7 +92,7 @@ it in the progress log, and ask.
 5. Anything that failed, with its root cause.
 
 ## Progress log (update after every step; this is the resume point)
-- [ ] A1 BAA10Y fetched and documented
+- [x] A1 BAA10Y fetched and documented (2000-01-03 to 2024-12-31; 0.78% of panel days missing, longest gap 1 day)
 - [ ] A2 new panel built; old columns identical
 - [ ] A3 stationary macro features; no-lookahead test passes (GSPC, N225, FTSE)
 - [ ] A4 out-of-range table

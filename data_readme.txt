@@ -24,16 +24,20 @@ to regenerate everything from source.
    Series used in features: VIXCLS (VIX), DEXJPUS (USDJPY), DGS10 (DGS10)
    Retrieved but excluded: TEDRATE (TED). FRED discontinued it on 2022-01-21, so the
    forward-fill would leave it stale at 0.09 for the last 738 rows.
-   Planned replacement for TED (supervisor, Oct 2026): BAMLH0A0HYM2, ICE BofA US High
-   Yield Index Option-Adjusted Spread. NOT USABLE: since April 2026 FRED serves only a
-   rolling 3-year window of this series. On 2026-10-27 its first observation was
-   2023-10-27 (309 observations in 2000-2024). It has not been backfilled,
-   interpolated or forward-filled, and is not in the panel. Waiting for the
-   supervisor's choice of an alternative. Candidate: BAA10Y (Moody's Baa corporate
-   yield minus the 10-year Treasury yield), on FRED from 1986-01-02 (2000-01-03 to
-   2024-12-31: 6248 observations). Evidence: logs/fred_coverage_check_2026-10-27.txt,
-   from code/check_fred_coverage.py, which any new series should pass first.
-   Expected path: data/raw/fred_{VIX,USDJPY,DGS10,TED}.csv
+   Replacement for TED (approved by the supervisor, Nov 2026): BAA10Y, Moody's Baa
+   corporate yield minus the 10-year Treasury yield (FRED series BAA10Y).
+   Why not HY OAS (BAMLH0A0HYM2, the first choice): since April 2026 FRED serves only a
+   rolling 3-year window of it (first observation 2023-10-27 on 2026-10-27; 309
+   observations in 2000-2024). Missing years are never backfilled, interpolated or
+   forward-filled. Evidence: logs/fred_coverage_check_2026-10-27.txt
+   (code/check_fred_coverage.py, which any new series should pass first).
+   BAA10Y fetched 2026-11-07 with `python code/data_pipeline.py --fetch-series BAA10Y`
+   (downloads only this series; no other raw file touched). Raw file: 6522 rows,
+   2000-01-03 to 2024-12-31, 6248 valid observations (274 NaN = US bond-market
+   holidays, 4.2%). On the 6288 panel (S&P 500) trading days, 49 are missing (0.78%),
+   all single days (Columbus Day, Veterans Day, etc.); longest gap 1 trading day.
+   These single days are forward-filled from the previous day, like the other FRED series.
+   Expected path: data/raw/fred_{VIX,USDJPY,DGS10,TED,BAA10Y}.csv
    Retrieved by: code/data_pipeline.py (loaded from the data/raw cache; --refresh
    re-downloads)
 
