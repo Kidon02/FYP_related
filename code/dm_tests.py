@@ -11,7 +11,8 @@ d_t = loss_A,t - loss_B,t, so a positive mean favours B. The long-run variance o
 a Newey-West (Bartlett) estimate with floor(4 (n/100)^(2/9)) lags. The statistic is
 multiplied by the Harvey-Leybourne-Newbold (1997) small-sample factor
 sqrt((n + 1 - 2h + h(h-1)/n) / n), h = 1, and compared with Student's t with n - 1
-degrees of freedom (two-sided p-value). Settings: configs/dm_tests.yaml.
+degrees of freedom (two-sided p-value). p_holm is the Holm-adjusted p-value across all
+tests that were run (one family); p_value is left unadjusted. Settings: configs/dm_tests.yaml.
 
 Usage:
     python code/dm_tests.py
@@ -27,6 +28,8 @@ import numpy as np
 import pandas as pd
 import yaml
 from scipy import stats
+
+from significance import holm
 
 
 def newey_west_variance(d, lags):
@@ -113,9 +116,13 @@ def main():
     out = pd.DataFrame(rows)
     out["favours"] = np.where(out["mean_loss_diff"] > 0, out["b"], out["a"])
     out.loc[out["mean_loss_diff"].isna(), "favours"] = ""
+    ran = out["p_value"].notna()
+    out["p_holm"] = np.nan
+    out.loc[ran, "p_holm"] = holm(out.loc[ran, "p_value"])
+    print(f"Holm adjustment over {int(ran.sum())} tests")
     out.to_csv("results/dm_tests.csv", index=False)
     show = out.dropna(subset=["dm_stat"])[["index", "label", "model", "a", "b", "mean_loss_a", "mean_loss_b",
-                                           "dm_stat", "p_value"]]
+                                           "dm_stat", "p_value", "p_holm"]]
     print(show.to_string(index=False, float_format=lambda v: f"{v:.4g}"))
     print("\nSaved results/dm_tests.csv")
 

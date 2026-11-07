@@ -152,7 +152,8 @@ def main():
         "index": dm["index"].map(INDEX_NAMES), "label": dm["label"].map(LABEL_NAMES), "model": dm["model"].map(MODEL_NAMES),
         "comparison": dm["a"].map(SET_NAMES) + " vs " + dm["b"].map(SET_NAMES), "n": dm["n"],
         "mean_brier_a": dm["mean_loss_a"].round(5), "mean_brier_b": dm["mean_loss_b"].round(5),
-        "dm_stat": dm["dm_stat"].round(3), "p_value": dm["p_value"].round(4), "lower_loss": dm["favours"].map(SET_NAMES),
+        "dm_stat": dm["dm_stat"].round(3), "p_value": dm["p_value"].round(4),
+        "p_holm": dm["p_holm"].round(4), "lower_loss": dm["favours"].map(SET_NAMES),
     })
     write(dm_out, "table_dm_tests", [
         "Dataset: S&P 500, Nikkei 225, FTSE 100 test predictions (results/test_predictions_{IDX}.csv)",
@@ -164,7 +165,8 @@ def main():
         "Notes: loss = squared error (daily Brier score) of the seed-mean probability after undoing SMOTE's class "
         "balance with the 2000-2015 training prevalence (monotone; PR-AUC unchanged); d = loss_a - loss_b. "
         "Newey-West long-run variance (Bartlett, lags floor(4(n/100)^(2/9)) = 7), Harvey-Leybourne-Newbold factor "
-        "for h=1, Student t(n-1), two-sided p-values; no multiple-comparison correction. After the correction, mean "
+        "for h=1, Student t(n-1), two-sided p-values; p_holm = Holm adjustment across all " + str(len(dm)) + " tests in the "
+        "table (one family), p_value unadjusted. After the correction, mean "
         "probabilities are 0.4-1.3x the test prevalence for logistic regression but 0.05-0.8x for XGBoost, so "
         "XGBoost Brier differences partly reflect calibration. Raw-probability tests: results/dm_tests.csv (*_raw).",
     ])
