@@ -97,7 +97,7 @@ it in the progress log, and ask.
 - [x] A3 stationary macro features; no-lookahead test passes (GSPC, N225, FTSE). macro.transform: stationary (levels kept as option). Rows: GSPC 6036->6016 (-20), FTSE 6035->6016 (-19), N225 5427 unchanged (volume start binds). Cross-Market now 29 features (BAA10Y added). Row set changed, so all feature sets are rerun in A5.
 - [x] A4 out-of-range table (code/macro_range.py, run by test.py). Share of test days outside train range, before -> after: DGS10 20.9% -> 0.1%, EPU_US 12.3% -> 1.3%, BAA10Y 4.8% -> 0.07%, EPU_JP 0% -> 0%, USDJPY level 36.3% (log change 0%, unchanged)
 - [ ] A5 full rerun of train.py and test.py; comparison reported
-- [ ] A6 event-by-scheme matrix
-- [ ] A7 matched control table
+- [x] A6 event-by-scheme matrix (code/event_tables.py, run by test.py). Missed: N225 Dot-com (all schemes, nearest flag 83 days before); N225 and FTSE 2022 (baseline, hmm; regime_std detects both); regime_std misses Flash Crash on N225 (20 days) and FTSE (1 day). All others detected.
+- [x] A7 matched control table. Matched |z| threshold 2.49-2.71; its share of flags in high-vol regime 35-51% vs scheme 24-33%, regime share of days 17-23% (in the expected range; N225 regime_std 35.4%, slightly below 37%).
 - [ ] A8 CLAUDE.md and STATUS.md updated
 Notes:

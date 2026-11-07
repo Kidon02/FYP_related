@@ -13,7 +13,7 @@ Usage (from the repo root):
 import subprocess
 import sys
 
-STAGES = ["dm_tests.py", "significance.py", "shap_analysis.py", "figures.py", "macro_range.py", "report_tables.py"]
+STAGES = ["dm_tests.py", "significance.py", "shap_analysis.py", "figures.py", "macro_range.py", "event_tables.py", "report_tables.py"]
 
 
 def main():

@@ -1,0 +1,9 @@
+Dataset: S&P 500, Nikkei 225, FTSE 100 (panel_full_2026-11-07.csv); rows where the 252-day z-score, regime_filtered and the scheme are defined
+Feature set: none
+Label strategy: hmm and regime_std, each against a single |z| threshold flagging the same number of days
+Model: none (labels only)
+Seed: none (deterministic; HMM random_state 42 in configs/labelling.yaml)
+Config file: configs/labelling.yaml
+Checkpoint: none (code/event_tables.py, from results/labels_{IDX}.csv)
+Test window: full labelled sample 2000-2024 (not only 2019-2024)
+Notes: matched threshold = k-th largest |z| (k = scheme flags; ties can add flags, see control_flags). High-vol regime = regime_filtered = 1 (causal HMM fit on 2000-2015, filtered probability on day t).

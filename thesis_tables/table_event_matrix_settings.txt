@@ -1,0 +1,9 @@
+Dataset: S&P 500, Nikkei 225, FTSE 100 (panel_full_2026-11-07.csv); days where all three schemes are defined
+Feature set: none
+Label strategy: baseline, hmm, regime_std
+Model: none (labels only)
+Seed: none (deterministic; HMM random_state 42 in configs/labelling.yaml)
+Config file: configs/labelling.yaml
+Checkpoint: none (code/event_tables.py, from results/labels_{IDX}.csv)
+Test window: full labelled sample 2000-2024 (not only 2019-2024)
+Notes: crisis windows from configs/labelling.yaml (inclusive, still to be confirmed). Detected = at least one flagged day inside the window. Distance = trading days (on the common days) from the nearest window edge to the nearest flagged day; 0 if a day inside is flagged.
