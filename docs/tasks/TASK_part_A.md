@@ -95,7 +95,7 @@ it in the progress log, and ask.
 - [x] A1 BAA10Y fetched and documented (2000-01-03 to 2024-12-31; 0.78% of panel days missing, longest gap 1 day)
 - [x] A2 new panel built; old columns identical (panel_full_2026-11-07.csv, 6288 x 19; 18 old columns exactly equal)
 - [x] A3 stationary macro features; no-lookahead test passes (GSPC, N225, FTSE). macro.transform: stationary (levels kept as option). Rows: GSPC 6036->6016 (-20), FTSE 6035->6016 (-19), N225 5427 unchanged (volume start binds). Cross-Market now 29 features (BAA10Y added). Row set changed, so all feature sets are rerun in A5.
-- [ ] A4 out-of-range table
+- [x] A4 out-of-range table (code/macro_range.py, run by test.py). Share of test days outside train range, before -> after: DGS10 20.9% -> 0.1%, EPU_US 12.3% -> 1.3%, BAA10Y 4.8% -> 0.07%, EPU_JP 0% -> 0%, USDJPY level 36.3% (log change 0%, unchanged)
 - [ ] A5 full rerun of train.py and test.py; comparison reported
 - [ ] A6 event-by-scheme matrix
 - [ ] A7 matched control table

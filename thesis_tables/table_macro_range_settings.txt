@@ -1,0 +1,9 @@
+Dataset: panel_full_2026-11-07.csv, S&P 500 trading calendar; days where each feature is defined
+Feature set: macro group (configs/features.yaml), under macro.transform levels (before) and stationary (after)
+Label strategy: none (input ranges only)
+Model: none
+Seed: none (deterministic)
+Config file: configs/features.yaml
+Checkpoint: none (code/macro_range.py)
+Test window: 2019-01-01 to 2024-12-31; training window 2000-01-01 to 2015-12-31
+Notes: stationary = DGS10 and BAA10Y daily change, USDJPY log change, EPU log of previous-month value standardised by trailing 252-day mean and std (data up to t-1). Share outside = share of test days below the training minimum or above the training maximum.

@@ -1,0 +1,12 @@
+variable,stage,feature,train_min,train_max,test_min,test_max,test_days,test_share_below_train_min,test_share_above_train_max,test_share_outside_train_range
+USDJPY,"before (raw level, lag 1)",USDJPY_lag1,75.72,134.77,102.52,161.73,1509,0.0,0.3625,0.3625
+USDJPY,before (levels),mac_usdjpy_logchg_lag1,-0.0522,0.0334,-0.0432,0.0262,1509,0.0,0.0,0.0
+USDJPY,after (stationary),mac_usdjpy_logchg_lag1,-0.0522,0.0334,-0.0432,0.0262,1509,0.0,0.0,0.0
+DGS10,before (levels),mac_dgs10_lag1,1.43,6.79,0.52,4.98,1509,0.2087,0.0,0.2087
+DGS10,after (stationary),mac_dgs10_chg_lag1,-0.51,0.25,-0.3,0.29,1509,0.0,0.0013,0.0013
+BAA10Y,before (levels),mac_baa10y_lag1,1.48,6.16,1.36,4.31,1509,0.0484,0.0,0.0484
+BAA10Y,after (stationary),mac_baa10y_chg_lag1,-0.16,0.46,-0.2,0.38,1509,0.0007,0.0,0.0007
+EPU_US,before (levels),mac_epu_us_lag1,44.7828,283.6656,76.8442,503.9633,1509,0.0,0.1233,0.1233
+EPU_US,after (stationary),mac_epu_us_logz_lag1,-3.2282,4.0812,-5.2839,4.8397,1509,0.0093,0.0033,0.0126
+EPU_JP,before (levels),mac_epu_jp_lag1,50.1204,239.8144,77.7913,193.8147,1509,0.0,0.0,0.0
+EPU_JP,after (stationary),mac_epu_jp_logz_lag1,-3.7461,4.9904,-2.0839,3.3989,1509,0.0,0.0,0.0
