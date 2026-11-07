@@ -7,14 +7,17 @@ Usage:
 Writes:
     results/data_panel_summary.csv               series, source, first/last date, frequency, missing %
     results/figures/fig_regimes_{IDX}.png, .pdf  regime shading and flagged anomalies
+    results/figures/fig_prauc_{IDX}.png, .pdf    test PR-AUC by method and feature set, 95% CIs
     thesis_tables/table_data_panel_settings.txt
     thesis_tables/fig_regimes_{IDX}_settings.txt (includes the caption)
+    thesis_tables/fig_prauc_{IDX}_settings.txt
 Figure rules (supervisor): no colour, no grids, at most 6 ticks per axis, caption not title.
 Settings: configs/figures.yaml.
 """
 
 import argparse
 import os
+import textwrap
 
 import numpy as np
 import pandas as pd
@@ -141,6 +144,73 @@ def regime_figure(cfg, out_base):
     return flagged
 
 
+def prauc_figure(cfg, out_base):
+    """
+    Grouped bars of seed-mean test PR-AUC (one label set, one index): feature sets on the x axis, one
+    hatched bar per method, block-bootstrap 95% CIs as error bars, dashed line at the test prevalence.
+    Feature sets a method was not run on are left empty and labelled "not run".
+    """
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    from matplotlib.patches import Patch
+    from matplotlib.lines import Line2D
+    from matplotlib.ticker import MaxNLocator
+
+    from report_tables import MODEL_NAMES, SET_NAMES
+
+    fc = cfg["prauc_figure"]
+    idx, label = fc["index"], fc["label"]
+    res = pd.concat([pd.read_csv(f"results/baseline_models_{idx}.csv"),
+                     pd.read_csv(f"results/isolation_forest_{idx}.csv")])
+    res = res[res["label"] == label].set_index(["model", "feature_set"])
+    prevalence = res["pr_auc_prevalence_baseline"].unique()
+    assert len(prevalence) == 1, "test prevalence differs between rows"
+    prevalence = float(prevalence[0])
+
+    sets, models = fc["feature_sets"], fc["models"]
+    width = 0.8 / len(models)
+    x = np.arange(len(sets))
+    fig, ax = plt.subplots(figsize=(fc["width_in"], fc["height_in"]))
+    used, missing = [], []
+    for j, (model, hatch) in enumerate(zip(models, fc["hatches"])):
+        pos = x + (j - (len(models) - 1) / 2) * width
+        for p, fs in zip(pos, sets):
+            if (model, fs) not in res.index:
+                missing.append((model, fs))
+                ax.text(p, prevalence + 0.01, "not run", rotation=90, ha="center", va="bottom", fontsize=6)
+                continue
+            r = res.loc[(model, fs)]
+            m = r["pr_auc_mean"]
+            ax.bar(p, m, width, facecolor="white", edgecolor="black", hatch=hatch, lw=0.7, zorder=2)
+            ax.errorbar(p, m, yerr=[[m - r["pr_auc_ci_low"]], [r["pr_auc_ci_high"] - m]], fmt="none",
+                        ecolor="black", elinewidth=0.7, capsize=2, zorder=3)
+            used.append({"model": model, "feature_set": fs, "pr_auc_mean": m, "pr_auc_std": r["pr_auc_std"],
+                         "ci_low": r["pr_auc_ci_low"], "ci_high": r["pr_auc_ci_high"]})
+    ax.axhline(prevalence, color="black", ls="--", lw=0.8, zorder=1)
+    ax.set_xticks(x)
+    ax.set_xticklabels([textwrap.fill(SET_NAMES[s], 13) for s in sets], fontsize=7)
+    ax.set_ylabel("Test PR-AUC (2019-2024)")
+    ax.set_ylim(0, None)
+    ax.yaxis.set_major_locator(MaxNLocator(nbins=fc["max_ticks"] - 1))
+    ax.spines[["top", "right"]].set_visible(False)
+    ax.grid(False)
+    handles = [Patch(facecolor="white", edgecolor="black", hatch=h, label=MODEL_NAMES[m])
+               for m, h in zip(models, fc["hatches"])]
+    handles.append(Line2D([], [], color="black", ls="--", lw=0.8, label=f"Prevalence ({prevalence:.3f})"))
+    fig.legend(handles=handles, loc="lower center", frameon=False, fontsize=7, ncol=4)
+    fig.tight_layout(rect=(0, 0.07, 1, 1))
+    fig.canvas.draw()
+    for axis, lim in [(ax.xaxis, ax.get_xlim()), (ax.yaxis, ax.get_ylim())]:
+        shown = [t for t in axis.get_majorticklocs() if lim[0] <= t <= lim[1]]
+        assert len(shown) <= fc["max_ticks"], "too many ticks"
+    for ext in ("png", "pdf"):
+        fig.savefig(f"{out_base}.{ext}", dpi=fc["dpi"])
+    plt.close(fig)
+    return pd.DataFrame(used), missing, prevalence
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default="configs/figures.yaml")
@@ -190,6 +260,35 @@ def main():
             f"Notes: caption: {caption}",
         ]) + "\n")
     print(f"\nSaved results/data_panel_summary.csv and {out_base}.png/.pdf\nCaption: {caption}")
+
+    fc = cfg["prauc_figure"]
+    from report_tables import INDEX_NAMES, LABEL_NAMES, MODEL_NAMES, SET_NAMES
+
+    idx = fc["index"]
+    out_base = f"results/figures/fig_prauc_{idx}"
+    used, missing, prevalence = prauc_figure(cfg, out_base)
+    print(used.to_string(index=False, float_format=lambda v: f"{v:.3f}"))
+    not_run = "; ".join(f"{MODEL_NAMES[m]} on {SET_NAMES[fs]}" for m, fs in missing) or "none"
+    caption = (f"Test PR-AUC (2019-2024) for the {INDEX_NAMES[idx]} with regime-dependent threshold labels "
+               "(causal HMM), by feature set and method. Bars show the mean over five seeds; error bars show "
+               "block-bootstrap 95% intervals (2000 resamples, 21-day blocks, anomaly clusters kept whole). The "
+               f"dashed line is the test prevalence ({prevalence:.3f}), the PR-AUC of a random classifier. "
+               "Isolation Forest was run only on the Domestic-Only and Cross-Market feature sets.")
+    with open(f"thesis_tables/fig_prauc_{idx}_settings.txt", "w") as f:
+        f.write("\n".join([
+            f"Dataset: {idx} ({os.path.basename(cfg['panel_path'])}), test rows 2019-2024",
+            "Feature set: " + ", ".join(fc["feature_sets"]) + " (configs/features.yaml)",
+            f"Label strategy: {fc['label']} ({LABEL_NAMES[fc['label']]}, causal HMM)",
+            "Model: " + ", ".join(fc["models"]),
+            "Seed: 42-46 (5 seeds; bar = seed mean)",
+            "Config file: configs/figures.yaml (prauc_figure), configs/baseline_models.yaml, "
+            "configs/isolation_forest.yaml",
+            f"Checkpoint: results/baseline_models_{idx}.csv, results/isolation_forest_{idx}.csv; "
+            f"figure {out_base}.png and .pdf",
+            "Test window: 2019-01-01 to 2024-12-31",
+            f"Notes: not run: {not_run}. Caption: {caption}",
+        ]) + "\n")
+    print(f"Saved {out_base}.png/.pdf\nCaption: {caption}")
 
 
 if __name__ == "__main__":

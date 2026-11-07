@@ -14,3 +14,16 @@ regime_figure:
   height_in: 6.0
   dpi: 300
   max_ticks: 6
+
+# Test PR-AUC bar chart: one label set, three methods x six feature sets, block-bootstrap
+# 95% intervals as error bars, dashed line at the test prevalence (the PR-AUC baseline).
+prauc_figure:
+  index: GSPC
+  label: hmm                          # regime-dependent threshold (causal HMM)
+  models: [xgboost, logistic_regression, isolation_forest]
+  hatches: ["", "////", "...."]       # one per model, black and white
+  feature_sets: [domestic_only, cross_market, cross_market_lag0, ablation_foreign, ablation_macro, rv_only]
+  width_in: 6.5
+  height_in: 4.2
+  dpi: 300
+  max_ticks: 6

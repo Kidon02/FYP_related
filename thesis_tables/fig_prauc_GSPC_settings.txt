@@ -1,0 +1,9 @@
+Dataset: GSPC (panel_full_2026-11-07.csv), test rows 2019-2024
+Feature set: domestic_only, cross_market, cross_market_lag0, ablation_foreign, ablation_macro, rv_only (configs/features.yaml)
+Label strategy: hmm (Regime-dependent threshold, causal HMM)
+Model: xgboost, logistic_regression, isolation_forest
+Seed: 42-46 (5 seeds; bar = seed mean)
+Config file: configs/figures.yaml (prauc_figure), configs/baseline_models.yaml, configs/isolation_forest.yaml
+Checkpoint: results/baseline_models_GSPC.csv, results/isolation_forest_GSPC.csv; figure results/figures/fig_prauc_GSPC.png and .pdf
+Test window: 2019-01-01 to 2024-12-31
+Notes: not run: iForest, 2008 on Domestic + foreign; iForest, 2008 on Domestic + macro; iForest, 2008 on Realised volatility only. Caption: Test PR-AUC (2019-2024) for the S&P 500 with regime-dependent threshold labels (causal HMM), by feature set and method. Bars show the mean over five seeds; error bars show block-bootstrap 95% intervals (2000 resamples, 21-day blocks, anomaly clusters kept whole). The dashed line is the test prevalence (0.030), the PR-AUC of a random classifier. Isolation Forest was run only on the Domestic-Only and Cross-Market feature sets.
