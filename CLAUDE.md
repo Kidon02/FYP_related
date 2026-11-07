@@ -14,16 +14,22 @@ foreign features plotted against VIX (2019-2024).
 - The data date range (2000-01-01 to 2024-12-31) must never be changed.
 - No future information may enter any label, feature, threshold or standardisation
   statistic. Fits and calibration use data up to 2015, or trailing data only.
-- Do not re-run data_pipeline.py unless explicitly asked. The panel in use is
-  data/processed/panel_full_2026-10-27.csv: identical to panel_full.csv (2026-09-16,
-  kept unchanged) except EPU_US, which is misaligned there (load_epu did not sort the
-  US file; wrong on 6094 of 6288 days). All configs and run_all.sh use the new file.
+- Do not re-run data_pipeline.py unless explicitly asked (never with --refresh). The panel
+  in use is data/processed/panel_full_2026-11-07.csv: panel_full_2026-10-27.csv plus BAA10Y
+  (its 18 columns verified identical). The 2026-10-27 panel equals panel_full.csv
+  (2026-09-16, kept unchanged) except EPU_US, which is misaligned there (load_epu did not
+  sort the US file; wrong on 6094 of 6288 days). All configs and run_all.sh use the
+  2026-11-07 file. `--fetch-series NAME` downloads one FRED series only.
 - TED is excluded from all features. FRED discontinued TEDRATE on 2022-01-21 and
   the forward-fill leaves it stale at 0.09 for the remaining 738 rows. The exclusion
   is listed in configs/features.yaml and asserted in code/features.py. Its planned
-  replacement, HY OAS (BAMLH0A0HYM2), is on hold: since April 2026 FRED serves only a
-  rolling 3-year window (first observation 2023-10-27). Never backfill, interpolate or
-  forward-fill missing years. Check any candidate with code/check_fred_coverage.py.
+  replacement is BAA10Y (approved by the supervisor, Nov 2026; fetched 2026-11-07, full
+  2000-2024 coverage). HY OAS (BAMLH0A0HYM2) was rejected: since April 2026 FRED serves only
+  a rolling 3-year window. Never backfill, interpolate or forward-fill missing years. Check
+  any candidate with code/check_fred_coverage.py.
+- Macro features are stationary (`macro.transform: stationary`, Nov 2026, supervisor):
+  DGS10 and BAA10Y daily change, USDJPY log change, EPU log z-score over a trailing 252-day
+  window. `levels` keeps the old definitions. Rows: GSPC 6016, FTSE 6016, N225 5427.
 - Deviations from the brief, approved by the user when the feature build was planned:
   1. EPU lag: EPU for month M is published in early month M+1, so features use the
      value for month M-1, then lag 1 day (`epu.publication_lag_months: 1`). The brief
@@ -102,6 +108,15 @@ code/, configs/, data/raw, data/processed, results/, logs/, thesis_tables/, data
   (EPU_US max 504 vs 284 in train; DGS10 min 0.52 vs 1.43). The panel ends 2024-12-30
   (yfinance's end date is exclusive).
 
+## Interpretation notes
+- Same-day foreign features (cross_market_lag0) are nowcasting inputs, available a few
+  hours before the target's close; they are not a next-day early warning.
+- Causal vs full-sample HMM matters: S&P 500 XGBoost Domestic-Only PR-AUC is 0.170 with
+  the causal HMM vs 0.268 with the full-sample HMM (3 Nov 2026 run, regime-dependent
+  threshold labels). After the Part A rerun (7 Nov, 6016 rows) it is 0.157 vs 0.268.
+- Reference [16] is Mostafavi and Hooman (2025).
+- Attachments sent to the supervisor always get a distinct dated or versioned file name.
+
 ## Supervisor decisions (reply to the October update)
 - TED excluded (agreed). A credit spread replaces it once a series covering 2000-2024
   is chosen (HY OAS fails the coverage check; see Data rules).
@@ -117,10 +132,7 @@ code/, configs/, data/raw, data/processed, results/, logs/, thesis_tables/, data
   baseline for PR-AUC, and DM tests with the loss and small-sample correction stated.
 
 ## Open items
-- Credit spread for the macro group: supervisor to choose (candidate BAA10Y, on FRED
-  1986-2026); then rerun the feature sets that contain macro features.
 - Confirm the six crisis date windows.
-- Decide whether panel_full_2026-10-27.csv replaces panel_full.csv.
 - Results to the supervisor by about 3 Nov; interim report due 10 Nov.
 
 ## Planned modelling

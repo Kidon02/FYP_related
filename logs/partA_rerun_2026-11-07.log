@@ -1,0 +1,908 @@
+Sat Nov  7 23:21:05 MPST 2026
+=== labelling.py --index GSPC ===
+Causality check passed at 3 dates: probabilities up to T are unchanged when every observation after T is replaced.
+HMM fit 2000-02-02 to 2015-12-31 (4004 days), converged=True after 20 iterations
+State means (rv21): [0.00785 0.01898], P(stay): [0.9962 0.9886]
+
+                                 scheme  days       from         to  anomaly_days  prevalence_pct  mean_run_length_days  concordance_pct events_missed
+             Baseline (rolling z-score)  6036 2001-01-02 2024-12-30           196            3.25                  1.24            100.0          none
+Regime-dependent threshold (causal HMM)  6036 2001-01-02 2024-12-30           150            2.49                  1.24            100.0          none
+       Regime-standardised (causal HMM)  6036 2001-01-02 2024-12-30           167            2.77                  1.23            100.0          none
+
+Sensitivity, causal vs full-sample HMM:
+                                 hmm_fit  days  high_vol_days_pct  anomaly_days  prevalence_pct  mean_run_length_days  concordance_pct events_missed  regime_agreement_pct  label_agreement_pct
+    Causal HMM (fit 2000-2015, filtered)  6036               23.3           150            2.49                  1.24            100.0          none                  95.4                99.82
+Full-sample HMM (fit 2000-2024, Viterbi)  6036               26.7           139            2.30                  1.25            100.0          none                  95.4                99.82
+
+Saved results/labels_GSPC.csv, labelling_evaluation_GSPC.csv, hmm_sensitivity_GSPC.csv and hmm_params_GSPC.json
+=== labelling.py --index N225 ===
+Causality check passed at 3 dates: probabilities up to T are unchanged when every observation after T is replaced.
+HMM fit 2000-02-03 to 2015-12-31 (4003 days), converged=True after 28 iterations
+State means (rv21): [0.01145 0.02268], P(stay): [0.9938 0.9765]
+
+                                 scheme  days       from         to  anomaly_days  prevalence_pct  mean_run_length_days  concordance_pct                      events_missed
+             Baseline (rolling z-score)  6013 2001-01-03 2024-12-30           145            2.41                  1.20             66.7 Dot-com bust; 2022 rate-hike cycle
+Regime-dependent threshold (causal HMM)  6013 2001-01-03 2024-12-30           125            2.08                  1.18             66.7 Dot-com bust; 2022 rate-hike cycle
+       Regime-standardised (causal HMM)  6013 2001-01-03 2024-12-30           147            2.44                  1.19             66.7     Dot-com bust; Flash Crash 2010
+
+Sensitivity, causal vs full-sample HMM:
+                                 hmm_fit  days  high_vol_days_pct  anomaly_days  prevalence_pct  mean_run_length_days  concordance_pct                      events_missed  regime_agreement_pct  label_agreement_pct
+    Causal HMM (fit 2000-2015, filtered)  6035               17.2           127            2.10                  1.18             66.7 Dot-com bust; 2022 rate-hike cycle                  92.5                 99.8
+Full-sample HMM (fit 2000-2024, Viterbi)  6035               23.8           115            1.91                  1.16             66.7 Dot-com bust; 2022 rate-hike cycle                  92.5                 99.8
+
+Saved results/labels_N225.csv, labelling_evaluation_N225.csv, hmm_sensitivity_N225.csv and hmm_params_N225.json
+=== labelling.py --index FTSE ===
+Causality check passed at 3 dates: probabilities up to T are unchanged when every observation after T is replaced.
+HMM fit 2000-02-03 to 2015-12-31 (4003 days), converged=True after 38 iterations
+State means (rv21): [0.00804 0.01899], P(stay): [0.9955 0.9848]
+
+                                 scheme  days       from         to  anomaly_days  prevalence_pct  mean_run_length_days  concordance_pct        events_missed
+             Baseline (rolling z-score)  6035 2001-01-03 2024-12-30           183            3.03                  1.24             83.3 2022 rate-hike cycle
+Regime-dependent threshold (causal HMM)  6035 2001-01-03 2024-12-30           146            2.42                  1.23             83.3 2022 rate-hike cycle
+       Regime-standardised (causal HMM)  6035 2001-01-03 2024-12-30           164            2.72                  1.23             83.3     Flash Crash 2010
+
+Sensitivity, causal vs full-sample HMM:
+                                 hmm_fit  days  high_vol_days_pct  anomaly_days  prevalence_pct  mean_run_length_days  concordance_pct                          events_missed  regime_agreement_pct  label_agreement_pct
+    Causal HMM (fit 2000-2015, filtered)  6035               18.5           146            2.42                  1.23             83.3                   2022 rate-hike cycle                  93.7                99.72
+Full-sample HMM (fit 2000-2024, Viterbi)  6035               24.1           129            2.14                  1.19             66.7 Flash Crash 2010; 2022 rate-hike cycle                  93.7                99.72
+
+Saved results/labels_FTSE.csv, labelling_evaluation_FTSE.csv, hmm_sensitivity_FTSE.csv and hmm_params_FTSE.json
+=== features.py --index GSPC ===
+Session ordering on the panel's dates (gap = target close minus foreign close):
+target foreign  days  foreign_closes_first_days  gap_hours_min  gap_hours_max latest_foreign_session_at_target_close
+  GSPC    N225  6288                       6288          14.00          15.00                      same date (lag 0)
+  GSPC    FTSE  6288                       6288           3.42           5.42                      same date (lag 0)
+No-lookahead check passed at 3 dates (same-day foreign data used only from: N225, FTSE).
+Rows total: 6288
+Dropped, z-score undefined: 252
+Dropped, z defined but a feature undefined: 20
+No constant features.
+Feature set domestic_only: 16 features
+Feature set cross_market: 29 features
+Feature set cross_market_lag0: 33 features
+Feature set ablation_foreign: 24 features
+Feature set ablation_macro: 21 features
+Feature set rv_only: 5 features
+domestic        13
+foreign          8
+macro            5
+foreign_lag0     4
+technical        3
+Final rows: 6016 (2001-01-31 to 2024-12-30)
+
+Range check, train (2000-2015) vs test (2019-2024):
+               feature  train_min  train_max  test_min  test_max
+          dom_vix_lag1     9.8900    80.8600   11.5400   82.6900
+mac_usdjpy_logchg_lag1    -0.0522     0.0334   -0.0432    0.0262
+    mac_dgs10_chg_lag1    -0.5100     0.2500   -0.3000    0.2900
+   mac_baa10y_chg_lag1    -0.1400     0.4600   -0.2000    0.3800
+  mac_epu_us_logz_lag1    -3.2282     4.0812   -5.2839    4.8397
+  mac_epu_jp_logz_lag1    -3.7461     4.9904   -2.0839    3.3989
+   dom_logvol_dev_lag1    -1.4543     0.9640   -1.0033    0.8998
+
+Saved data/processed/features_GSPC.csv, feature_groups_GSPC.csv, results/session_close_times.csv and results/lag0_ordering_GSPC.csv
+=== features.py --index N225 ===
+Session ordering on the panel's dates (gap = target close minus foreign close):
+target foreign  days  foreign_closes_first_days  gap_hours_min  gap_hours_max latest_foreign_session_at_target_close
+  N225    GSPC  6288                          0         -15.00         -14.00                  previous date (lag 1)
+  N225    FTSE  6288                          0         -10.58          -9.58                  previous date (lag 1)
+No-lookahead check passed at 3 dates (same-day foreign data used only from: none).
+Rows total: 6288
+Dropped, z-score undefined: 253
+Dropped, z defined but a feature undefined: 608
+No constant features.
+Feature set domestic_only: 16 features
+Feature set cross_market: 29 features
+Feature set cross_market_lag0: 29 features
+Feature set ablation_foreign: 24 features
+Feature set ablation_macro: 21 features
+Feature set rv_only: 5 features
+domestic     13
+foreign       8
+macro         5
+technical     3
+Final rows: 5427 (2003-06-10 to 2024-12-30)
+
+Range check, train (2000-2015) vs test (2019-2024):
+               feature  train_min  train_max  test_min  test_max
+          dom_vix_lag1     9.8900    80.8600   11.5400   82.6900
+mac_usdjpy_logchg_lag1    -0.0522     0.0334   -0.0432    0.0262
+    mac_dgs10_chg_lag1    -0.5100     0.2400   -0.3000    0.2900
+   mac_baa10y_chg_lag1    -0.1400     0.3800   -0.2000    0.3800
+  mac_epu_us_logz_lag1    -3.2282     4.0812   -5.2839    4.8397
+  mac_epu_jp_logz_lag1    -3.7461     4.9904   -2.0839    3.3989
+   dom_logvol_dev_lag1    -0.9734     1.2726   -0.6081    1.2602
+
+Saved data/processed/features_N225.csv, feature_groups_N225.csv, results/session_close_times.csv and results/lag0_ordering_N225.csv
+=== features.py --index FTSE ===
+Session ordering on the panel's dates (gap = target close minus foreign close):
+target foreign  days  foreign_closes_first_days  gap_hours_min  gap_hours_max latest_foreign_session_at_target_close
+  FTSE    GSPC  6288                          0          -5.42          -3.42                  previous date (lag 1)
+  FTSE    N225  6288                       6288           9.58          10.58                      same date (lag 0)
+No-lookahead check passed at 3 dates (same-day foreign data used only from: N225).
+Rows total: 6288
+Dropped, z-score undefined: 253
+Dropped, z defined but a feature undefined: 19
+No constant features.
+Feature set domestic_only: 16 features
+Feature set cross_market: 29 features
+Feature set cross_market_lag0: 31 features
+Feature set ablation_foreign: 24 features
+Feature set ablation_macro: 21 features
+Feature set rv_only: 5 features
+domestic        13
+foreign          8
+macro            5
+technical        3
+foreign_lag0     2
+Final rows: 6016 (2001-01-31 to 2024-12-30)
+
+Range check, train (2000-2015) vs test (2019-2024):
+               feature  train_min  train_max  test_min  test_max
+          dom_vix_lag1     9.8900    80.8600   11.5400   82.6900
+mac_usdjpy_logchg_lag1    -0.0522     0.0334   -0.0432    0.0262
+    mac_dgs10_chg_lag1    -0.5100     0.2500   -0.3000    0.2900
+   mac_baa10y_chg_lag1    -0.1400     0.4600   -0.2000    0.3800
+  mac_epu_us_logz_lag1    -3.2282     4.0812   -5.2839    4.8397
+  mac_epu_jp_logz_lag1    -3.7461     4.9904   -2.0839    3.3989
+   dom_logvol_dev_lag1    -2.5550     1.1635   -4.6055    1.2987
+
+Saved data/processed/features_FTSE.csv, feature_groups_FTSE.csv, results/session_close_times.csv and results/lag0_ordering_FTSE.csv
+=== baseline_models.py --index GSPC ===
+Input checks passed: no label-derived features, all four label sets reproduce.
+Rows: 6016 feature rows, 6016 with every label set defined (dropped 0)
+Rows: train 3753, validation 754, test 1509
+Running xgboost | domestic_only (16 features) | baseline ...
+Running logistic_regression | domestic_only (16 features) | baseline ...
+Running xgboost | domestic_only (16 features) | hmm ...
+Running logistic_regression | domestic_only (16 features) | hmm ...
+Running xgboost | domestic_only (16 features) | regime_std ...
+Running logistic_regression | domestic_only (16 features) | regime_std ...
+Running xgboost | cross_market (29 features) | baseline ...
+Running logistic_regression | cross_market (29 features) | baseline ...
+Running xgboost | cross_market (29 features) | hmm ...
+Running logistic_regression | cross_market (29 features) | hmm ...
+Running xgboost | cross_market (29 features) | regime_std ...
+Running logistic_regression | cross_market (29 features) | regime_std ...
+Running xgboost | cross_market_lag0 (33 features) | baseline ...
+Running logistic_regression | cross_market_lag0 (33 features) | baseline ...
+Running xgboost | cross_market_lag0 (33 features) | hmm ...
+Running logistic_regression | cross_market_lag0 (33 features) | hmm ...
+Running xgboost | cross_market_lag0 (33 features) | regime_std ...
+Running logistic_regression | cross_market_lag0 (33 features) | regime_std ...
+Running xgboost | ablation_foreign (24 features) | baseline ...
+Running logistic_regression | ablation_foreign (24 features) | baseline ...
+Running xgboost | ablation_foreign (24 features) | hmm ...
+Running logistic_regression | ablation_foreign (24 features) | hmm ...
+Running xgboost | ablation_foreign (24 features) | regime_std ...
+Running logistic_regression | ablation_foreign (24 features) | regime_std ...
+Running xgboost | ablation_macro (21 features) | baseline ...
+Running logistic_regression | ablation_macro (21 features) | baseline ...
+Running xgboost | ablation_macro (21 features) | hmm ...
+Running logistic_regression | ablation_macro (21 features) | hmm ...
+Running xgboost | ablation_macro (21 features) | regime_std ...
+Running logistic_regression | ablation_macro (21 features) | regime_std ...
+Running xgboost | rv_only (5 features) | baseline ...
+Running logistic_regression | rv_only (5 features) | baseline ...
+Running xgboost | rv_only (5 features) | hmm ...
+Running logistic_regression | rv_only (5 features) | hmm ...
+Running xgboost | rv_only (5 features) | regime_std ...
+Running logistic_regression | rv_only (5 features) | regime_std ...
+Running xgboost | domestic_only (16 features) | hmm_fullsample ...
+Running logistic_regression | domestic_only (16 features) | hmm_fullsample ...
+Running xgboost | cross_market (29 features) | hmm_fullsample ...
+Running logistic_regression | cross_market (29 features) | hmm_fullsample ...
+
+              model       feature_set          label  pr_auc_mean  pr_auc_ci_low  pr_auc_ci_high  f1_mean  mcc_mean  pr_auc_prevalence_baseline
+            xgboost     domestic_only       baseline       0.1888         0.0410          0.4596   0.2285    0.2213                      0.0345
+logistic_regression     domestic_only       baseline       0.2444         0.0473          0.4675   0.3060    0.2814                      0.0345
+            xgboost     domestic_only            hmm       0.1568         0.0354          0.3084   0.2149    0.1895                      0.0305
+logistic_regression     domestic_only            hmm       0.2303         0.0305          0.4330   0.2580    0.2367                      0.0305
+            xgboost     domestic_only     regime_std       0.2552         0.0242          0.4945   0.2443    0.2296                      0.0311
+logistic_regression     domestic_only     regime_std       0.2283         0.0239          0.4366   0.2456    0.2276                      0.0311
+            xgboost      cross_market       baseline       0.1465         0.0421          0.3386   0.2183    0.1938                      0.0345
+logistic_regression      cross_market       baseline       0.2219         0.0534          0.3987   0.2262    0.2130                      0.0345
+            xgboost      cross_market            hmm       0.1232         0.0370          0.2611   0.1380    0.1174                      0.0305
+logistic_regression      cross_market            hmm       0.2024         0.0462          0.3619   0.2086    0.2124                      0.0305
+            xgboost      cross_market     regime_std       0.1284         0.0307          0.2825   0.1541    0.1361                      0.0311
+logistic_regression      cross_market     regime_std       0.2093         0.0277          0.3675   0.1882    0.1822                      0.0311
+            xgboost cross_market_lag0       baseline       0.1740         0.0879          0.2986   0.2376    0.2096                      0.0345
+logistic_regression cross_market_lag0       baseline       0.3101         0.1026          0.5015   0.3400    0.3180                      0.0345
+            xgboost cross_market_lag0            hmm       0.1303         0.0458          0.2324   0.0972    0.0772                      0.0305
+logistic_regression cross_market_lag0            hmm       0.3302         0.0903          0.5129   0.3076    0.2989                      0.0305
+            xgboost cross_market_lag0     regime_std       0.1873         0.0462          0.3883   0.2619    0.2381                      0.0311
+logistic_regression cross_market_lag0     regime_std       0.2571         0.0425          0.4805   0.2958    0.2785                      0.0311
+            xgboost  ablation_foreign       baseline       0.2749         0.0484          0.5236   0.2991    0.2794                      0.0345
+logistic_regression  ablation_foreign       baseline       0.1918         0.0368          0.4162   0.2276    0.2295                      0.0345
+            xgboost  ablation_foreign            hmm       0.1873         0.0330          0.3386   0.2226    0.2136                      0.0305
+logistic_regression  ablation_foreign            hmm       0.2596         0.0352          0.4625   0.2491    0.2358                      0.0305
+            xgboost  ablation_foreign     regime_std       0.1796         0.0300          0.3800   0.2292    0.2044                      0.0311
+logistic_regression  ablation_foreign     regime_std       0.2075         0.0219          0.4167   0.2354    0.2196                      0.0311
+            xgboost    ablation_macro       baseline       0.1755         0.0440          0.3990   0.1937    0.1980                      0.0345
+logistic_regression    ablation_macro       baseline       0.2366         0.0558          0.3930   0.2573    0.2341                      0.0345
+            xgboost    ablation_macro            hmm       0.0987         0.0368          0.2204   0.1147    0.0929                      0.0305
+logistic_regression    ablation_macro            hmm       0.1864         0.0407          0.3390   0.2237    0.2010                      0.0305
+            xgboost    ablation_macro     regime_std       0.1300         0.0292          0.3034   0.1991    0.1782                      0.0311
+logistic_regression    ablation_macro     regime_std       0.2173         0.0292          0.3861   0.2156    0.1990                      0.0311
+            xgboost           rv_only       baseline       0.1123         0.0230          0.2853   0.0864    0.0777                      0.0345
+logistic_regression           rv_only       baseline       0.2621         0.0361          0.5073   0.2277    0.2283                      0.0345
+            xgboost           rv_only            hmm       0.1289         0.0210          0.3262   0.2014    0.1782                      0.0305
+logistic_regression           rv_only            hmm       0.2631         0.0331          0.5059   0.2408    0.2423                      0.0305
+            xgboost           rv_only     regime_std       0.1308         0.0248          0.3407   0.1991    0.1780                      0.0311
+logistic_regression           rv_only     regime_std       0.2526         0.0269          0.4983   0.2276    0.2196                      0.0311
+            xgboost     domestic_only hmm_fullsample       0.2681         0.0236          0.4804   0.2729    0.2643                      0.0258
+logistic_regression     domestic_only hmm_fullsample       0.2447         0.0217          0.4376   0.2613    0.2474                      0.0258
+            xgboost      cross_market hmm_fullsample       0.1077         0.0243          0.2345   0.1250    0.1028                      0.0258
+logistic_regression      cross_market hmm_fullsample       0.2019         0.0329          0.3716   0.2279    0.2323                      0.0258
+
+Saved results/baseline_models_GSPC.csv and results/test_predictions_GSPC.csv
+=== baseline_models.py --index N225 ===
+Input checks passed: no label-derived features, all four label sets reproduce.
+Rows: 5427 feature rows, 5427 with every label set defined (dropped 0)
+Rows: train 3164, validation 754, test 1509
+Running xgboost | domestic_only (16 features) | baseline ...
+Running logistic_regression | domestic_only (16 features) | baseline ...
+Running xgboost | domestic_only (16 features) | hmm ...
+Running logistic_regression | domestic_only (16 features) | hmm ...
+Running xgboost | domestic_only (16 features) | regime_std ...
+Running logistic_regression | domestic_only (16 features) | regime_std ...
+Running xgboost | cross_market (29 features) | baseline ...
+Running logistic_regression | cross_market (29 features) | baseline ...
+Running xgboost | cross_market (29 features) | hmm ...
+Running logistic_regression | cross_market (29 features) | hmm ...
+Running xgboost | cross_market (29 features) | regime_std ...
+Running logistic_regression | cross_market (29 features) | regime_std ...
+Skipping xgboost | cross_market_lag0 | baseline: same columns as cross_market
+Skipping logistic_regression | cross_market_lag0 | baseline: same columns as cross_market
+Skipping xgboost | cross_market_lag0 | hmm: same columns as cross_market
+Skipping logistic_regression | cross_market_lag0 | hmm: same columns as cross_market
+Skipping xgboost | cross_market_lag0 | regime_std: same columns as cross_market
+Skipping logistic_regression | cross_market_lag0 | regime_std: same columns as cross_market
+Running xgboost | ablation_foreign (24 features) | baseline ...
+Running logistic_regression | ablation_foreign (24 features) | baseline ...
+Running xgboost | ablation_foreign (24 features) | hmm ...
+Running logistic_regression | ablation_foreign (24 features) | hmm ...
+Running xgboost | ablation_foreign (24 features) | regime_std ...
+Running logistic_regression | ablation_foreign (24 features) | regime_std ...
+Running xgboost | ablation_macro (21 features) | baseline ...
+Running logistic_regression | ablation_macro (21 features) | baseline ...
+Running xgboost | ablation_macro (21 features) | hmm ...
+Running logistic_regression | ablation_macro (21 features) | hmm ...
+Running xgboost | ablation_macro (21 features) | regime_std ...
+Running logistic_regression | ablation_macro (21 features) | regime_std ...
+Running xgboost | rv_only (5 features) | baseline ...
+Running logistic_regression | rv_only (5 features) | baseline ...
+Running xgboost | rv_only (5 features) | hmm ...
+Running logistic_regression | rv_only (5 features) | hmm ...
+Running xgboost | rv_only (5 features) | regime_std ...
+Running logistic_regression | rv_only (5 features) | regime_std ...
+Running xgboost | domestic_only (16 features) | hmm_fullsample ...
+Running logistic_regression | domestic_only (16 features) | hmm_fullsample ...
+Running xgboost | cross_market (29 features) | hmm_fullsample ...
+Running logistic_regression | cross_market (29 features) | hmm_fullsample ...
+
+              model      feature_set          label  pr_auc_mean  pr_auc_ci_low  pr_auc_ci_high  f1_mean  mcc_mean  pr_auc_prevalence_baseline
+            xgboost    domestic_only       baseline       0.1163         0.0187          0.2986   0.1866    0.1687                      0.0219
+logistic_regression    domestic_only       baseline       0.2173         0.0245          0.4388   0.2872    0.2709                      0.0219
+            xgboost    domestic_only            hmm       0.1151         0.0181          0.2671   0.2328    0.2198                      0.0205
+logistic_regression    domestic_only            hmm       0.1755         0.0181          0.3991   0.2856    0.2726                      0.0205
+            xgboost    domestic_only     regime_std       0.1035         0.0179          0.2330   0.1945    0.1829                      0.0225
+logistic_regression    domestic_only     regime_std       0.2001         0.0255          0.4273   0.2730    0.2564                      0.0225
+            xgboost     cross_market       baseline       0.1158         0.0193          0.2990   0.1676    0.1649                      0.0219
+logistic_regression     cross_market       baseline       0.1601         0.0171          0.3372   0.1951    0.1872                      0.0219
+            xgboost     cross_market            hmm       0.1458         0.0154          0.3200   0.1338    0.1524                      0.0205
+logistic_regression     cross_market            hmm       0.1426         0.0115          0.3313   0.2274    0.2108                      0.0205
+            xgboost     cross_market     regime_std       0.0958         0.0284          0.2423   0.1766    0.1649                      0.0225
+logistic_regression     cross_market     regime_std       0.1539         0.0209          0.3620   0.2299    0.2287                      0.0225
+            xgboost ablation_foreign       baseline       0.1785         0.0183          0.3371   0.2360    0.2267                      0.0219
+logistic_regression ablation_foreign       baseline       0.1965         0.0178          0.4051   0.2665    0.2524                      0.0219
+            xgboost ablation_foreign            hmm       0.1539         0.0176          0.2892   0.2012    0.2064                      0.0205
+logistic_regression ablation_foreign            hmm       0.1878         0.0137          0.3609   0.2976    0.2940                      0.0205
+            xgboost ablation_foreign     regime_std       0.1242         0.0221          0.2442   0.2000    0.1906                      0.0225
+logistic_regression ablation_foreign     regime_std       0.1754         0.0217          0.3910   0.2932    0.2804                      0.0225
+            xgboost   ablation_macro       baseline       0.1090         0.0191          0.2688   0.1309    0.1120                      0.0219
+logistic_regression   ablation_macro       baseline       0.1712         0.0188          0.3857   0.2300    0.2201                      0.0219
+            xgboost   ablation_macro            hmm       0.0783         0.0180          0.1802   0.1244    0.1195                      0.0205
+logistic_regression   ablation_macro            hmm       0.1451         0.0129          0.3743   0.2899    0.2766                      0.0205
+            xgboost   ablation_macro     regime_std       0.0643         0.0201          0.1837   0.1041    0.0836                      0.0225
+logistic_regression   ablation_macro     regime_std       0.1550         0.0216          0.3815   0.2124    0.2135                      0.0225
+            xgboost          rv_only       baseline       0.0708         0.0127          0.1400   0.0886    0.0739                      0.0219
+logistic_regression          rv_only       baseline       0.1191         0.0212          0.2199   0.1844    0.1773                      0.0219
+            xgboost          rv_only            hmm       0.0393         0.0127          0.0729   0.0621    0.0477                      0.0205
+logistic_regression          rv_only            hmm       0.0938         0.0192          0.1551   0.1523    0.1338                      0.0205
+            xgboost          rv_only     regime_std       0.0314         0.0129          0.0535   0.0440    0.0227                      0.0225
+logistic_regression          rv_only     regime_std       0.0911         0.0208          0.1547   0.1647    0.1451                      0.0225
+            xgboost    domestic_only hmm_fullsample       0.1476         0.0204          0.2769   0.2052    0.1925                      0.0192
+logistic_regression    domestic_only hmm_fullsample       0.2023         0.0244          0.3998   0.3138    0.3005                      0.0192
+            xgboost     cross_market hmm_fullsample       0.0891         0.0147          0.2041   0.1302    0.1380                      0.0192
+logistic_regression     cross_market hmm_fullsample       0.1327         0.0129          0.3055   0.2583    0.2437                      0.0192
+
+Saved results/baseline_models_N225.csv and results/test_predictions_N225.csv
+=== baseline_models.py --index FTSE ===
+Input checks passed: no label-derived features, all four label sets reproduce.
+Rows: 6016 feature rows, 6016 with every label set defined (dropped 0)
+Rows: train 3753, validation 754, test 1509
+Running xgboost | domestic_only (16 features) | baseline ...
+Running logistic_regression | domestic_only (16 features) | baseline ...
+Running xgboost | domestic_only (16 features) | hmm ...
+Running logistic_regression | domestic_only (16 features) | hmm ...
+Running xgboost | domestic_only (16 features) | regime_std ...
+Running logistic_regression | domestic_only (16 features) | regime_std ...
+Running xgboost | cross_market (29 features) | baseline ...
+Running logistic_regression | cross_market (29 features) | baseline ...
+Running xgboost | cross_market (29 features) | hmm ...
+Running logistic_regression | cross_market (29 features) | hmm ...
+Running xgboost | cross_market (29 features) | regime_std ...
+Running logistic_regression | cross_market (29 features) | regime_std ...
+Running xgboost | cross_market_lag0 (31 features) | baseline ...
+Running logistic_regression | cross_market_lag0 (31 features) | baseline ...
+Running xgboost | cross_market_lag0 (31 features) | hmm ...
+Running logistic_regression | cross_market_lag0 (31 features) | hmm ...
+Running xgboost | cross_market_lag0 (31 features) | regime_std ...
+Running logistic_regression | cross_market_lag0 (31 features) | regime_std ...
+Running xgboost | ablation_foreign (24 features) | baseline ...
+Running logistic_regression | ablation_foreign (24 features) | baseline ...
+Running xgboost | ablation_foreign (24 features) | hmm ...
+Running logistic_regression | ablation_foreign (24 features) | hmm ...
+Running xgboost | ablation_foreign (24 features) | regime_std ...
+Running logistic_regression | ablation_foreign (24 features) | regime_std ...
+Running xgboost | ablation_macro (21 features) | baseline ...
+Running logistic_regression | ablation_macro (21 features) | baseline ...
+Running xgboost | ablation_macro (21 features) | hmm ...
+Running logistic_regression | ablation_macro (21 features) | hmm ...
+Running xgboost | ablation_macro (21 features) | regime_std ...
+Running logistic_regression | ablation_macro (21 features) | regime_std ...
+Running xgboost | rv_only (5 features) | baseline ...
+Running logistic_regression | rv_only (5 features) | baseline ...
+Running xgboost | rv_only (5 features) | hmm ...
+Running logistic_regression | rv_only (5 features) | hmm ...
+Running xgboost | rv_only (5 features) | regime_std ...
+Running logistic_regression | rv_only (5 features) | regime_std ...
+Running xgboost | domestic_only (16 features) | hmm_fullsample ...
+Running logistic_regression | domestic_only (16 features) | hmm_fullsample ...
+Running xgboost | cross_market (29 features) | hmm_fullsample ...
+Running logistic_regression | cross_market (29 features) | hmm_fullsample ...
+
+              model       feature_set          label  pr_auc_mean  pr_auc_ci_low  pr_auc_ci_high  f1_mean  mcc_mean  pr_auc_prevalence_baseline
+            xgboost     domestic_only       baseline       0.1650         0.0263          0.3142   0.2215    0.2086                      0.0265
+logistic_regression     domestic_only       baseline       0.1724         0.0236          0.3406   0.3006    0.2819                      0.0265
+            xgboost     domestic_only            hmm       0.1419         0.0260          0.2605   0.2050    0.2105                      0.0245
+logistic_regression     domestic_only            hmm       0.1678         0.0239          0.2952   0.3001    0.2829                      0.0245
+            xgboost     domestic_only     regime_std       0.0979         0.0484          0.2018   0.1631    0.1561                      0.0252
+logistic_regression     domestic_only     regime_std       0.1063         0.0351          0.2378   0.1909    0.1696                      0.0252
+            xgboost      cross_market       baseline       0.1093         0.0270          0.2294   0.0341    0.0411                      0.0265
+logistic_regression      cross_market       baseline       0.1594         0.0228          0.3145   0.2296    0.2167                      0.0265
+            xgboost      cross_market            hmm       0.1035         0.0363          0.1893   0.1884    0.1803                      0.0245
+logistic_regression      cross_market            hmm       0.1632         0.0362          0.2793   0.2587    0.2409                      0.0245
+            xgboost      cross_market     regime_std       0.0691         0.0345          0.1042   0.0764    0.0508                      0.0252
+logistic_regression      cross_market     regime_std       0.0951         0.0344          0.2042   0.1316    0.1188                      0.0252
+            xgboost cross_market_lag0       baseline       0.1343         0.0358          0.2632   0.1726    0.1556                      0.0265
+logistic_regression cross_market_lag0       baseline       0.1842         0.0338          0.3296   0.2564    0.2476                      0.0265
+            xgboost cross_market_lag0            hmm       0.1291         0.0452          0.2356   0.0095    0.0098                      0.0245
+logistic_regression cross_market_lag0            hmm       0.2036         0.0504          0.3302   0.2872    0.2725                      0.0245
+            xgboost cross_market_lag0     regime_std       0.0818         0.0475          0.1453   0.0792    0.0696                      0.0252
+logistic_regression cross_market_lag0     regime_std       0.1157         0.0360          0.2712   0.2063    0.1857                      0.0252
+            xgboost  ablation_foreign       baseline       0.1658         0.0295          0.3088   0.2298    0.2209                      0.0265
+logistic_regression  ablation_foreign       baseline       0.1951         0.0272          0.3764   0.2845    0.2652                      0.0265
+            xgboost  ablation_foreign            hmm       0.1763         0.0396          0.2921   0.2041    0.2009                      0.0245
+logistic_regression  ablation_foreign            hmm       0.1941         0.0418          0.3047   0.3133    0.3079                      0.0245
+            xgboost  ablation_foreign     regime_std       0.1031         0.0428          0.1788   0.1440    0.1232                      0.0252
+logistic_regression  ablation_foreign     regime_std       0.1200         0.0448          0.2414   0.1969    0.1782                      0.0252
+            xgboost    ablation_macro       baseline       0.1016         0.0242          0.2191   0.1021    0.0905                      0.0265
+logistic_regression    ablation_macro       baseline       0.1470         0.0209          0.2956   0.2268    0.2093                      0.0265
+            xgboost    ablation_macro            hmm       0.0924         0.0326          0.1820   0.0082   -0.0010                      0.0245
+logistic_regression    ablation_macro            hmm       0.1354         0.0211          0.2566   0.1727    0.1612                      0.0245
+            xgboost    ablation_macro     regime_std       0.0610         0.0339          0.1069   0.1069    0.0847                      0.0252
+logistic_regression    ablation_macro     regime_std       0.0841         0.0273          0.2002   0.1347    0.1260                      0.0252
+            xgboost           rv_only       baseline       0.0772         0.0140          0.2348   0.0180    0.0272                      0.0265
+logistic_regression           rv_only       baseline       0.1524         0.0226          0.3120   0.2004    0.1975                      0.0265
+            xgboost           rv_only            hmm       0.0824         0.0137          0.1938   0.1188    0.0983                      0.0245
+logistic_regression           rv_only            hmm       0.1481         0.0268          0.2792   0.1744    0.1559                      0.0245
+            xgboost           rv_only     regime_std       0.0446         0.0185          0.0723   0.0444    0.0221                      0.0252
+logistic_regression           rv_only     regime_std       0.0690         0.0224          0.1442   0.1006    0.0742                      0.0252
+            xgboost     domestic_only hmm_fullsample       0.1601         0.0230          0.2963   0.2388    0.2317                      0.0219
+logistic_regression     domestic_only hmm_fullsample       0.1606         0.0232          0.2813   0.2619    0.2486                      0.0219
+            xgboost      cross_market hmm_fullsample       0.1046         0.0255          0.2007   0.1660    0.1557                      0.0219
+logistic_regression      cross_market hmm_fullsample       0.1616         0.0282          0.2703   0.2860    0.2723                      0.0219
+
+Saved results/baseline_models_FTSE.csv and results/test_predictions_FTSE.csv
+=== isolation_forest.py --index GSPC ===
+Input checks passed: no label-derived features, all four label sets reproduce.
+Rows: train 3753, validation 754, test 1509
+Running isolation_forest | domestic_only (16 features) ...
+Running isolation_forest | cross_market (29 features) ...
+Running isolation_forest | cross_market_lag0 (33 features) ...
+
+      feature_set      label  pr_auc_mean  pr_auc_ci_low  pr_auc_ci_high  f1_mean  mcc_mean  pr_auc_prevalence_baseline
+    domestic_only   baseline       0.1816         0.0299          0.4247   0.2259    0.2048                      0.0345
+    domestic_only        hmm       0.1708         0.0198          0.4053   0.2538    0.2358                      0.0305
+    domestic_only regime_std       0.1620         0.0203          0.3921   0.1852    0.1721                      0.0311
+     cross_market   baseline       0.1940         0.0387          0.4630   0.2155    0.2126                      0.0345
+     cross_market        hmm       0.1896         0.0249          0.4559   0.2597    0.2404                      0.0305
+     cross_market regime_std       0.1705         0.0225          0.4296   0.1550    0.1554                      0.0311
+cross_market_lag0   baseline       0.1984         0.0452          0.4805   0.2064    0.2171                      0.0345
+cross_market_lag0        hmm       0.1892         0.0276          0.4685   0.1625    0.1815                      0.0305
+cross_market_lag0 regime_std       0.1726         0.0267          0.4455   0.1398    0.1516                      0.0311
+
+Saved results/isolation_forest_GSPC.csv
+=== isolation_forest.py --index N225 ===
+Input checks passed: no label-derived features, all four label sets reproduce.
+Rows: train 3164, validation 754, test 1509
+Running isolation_forest | domestic_only (16 features) ...
+Running isolation_forest | cross_market (29 features) ...
+Skipping cross_market_lag0: same columns as cross_market
+
+  feature_set      label  pr_auc_mean  pr_auc_ci_low  pr_auc_ci_high  f1_mean  mcc_mean  pr_auc_prevalence_baseline
+domestic_only   baseline       0.1413         0.0266          0.2483   0.2514    0.2518                      0.0219
+domestic_only        hmm       0.1117         0.0181          0.2258   0.2184    0.2188                      0.0205
+domestic_only regime_std       0.1101         0.0368          0.2435   0.2264    0.2217                      0.0225
+ cross_market   baseline       0.1544         0.0309          0.2629   0.2441    0.2516                      0.0219
+ cross_market        hmm       0.1234         0.0213          0.2441   0.2225    0.2309                      0.0205
+ cross_market regime_std       0.1201         0.0391          0.2608   0.2362    0.2396                      0.0225
+
+Saved results/isolation_forest_N225.csv
+=== isolation_forest.py --index FTSE ===
+Input checks passed: no label-derived features, all four label sets reproduce.
+Rows: train 3753, validation 754, test 1509
+Running isolation_forest | domestic_only (16 features) ...
+Running isolation_forest | cross_market (29 features) ...
+Running isolation_forest | cross_market_lag0 (31 features) ...
+
+      feature_set      label  pr_auc_mean  pr_auc_ci_low  pr_auc_ci_high  f1_mean  mcc_mean  pr_auc_prevalence_baseline
+    domestic_only   baseline       0.1382         0.0251          0.3707   0.1933    0.1750                      0.0265
+    domestic_only        hmm       0.1216         0.0217          0.3180   0.1876    0.1711                      0.0245
+    domestic_only regime_std       0.0679         0.0265          0.1679   0.1066    0.0813                      0.0252
+     cross_market   baseline       0.1737         0.0329          0.4041   0.2375    0.2187                      0.0265
+     cross_market        hmm       0.1498         0.0253          0.3557   0.2230    0.2079                      0.0245
+     cross_market regime_std       0.0887         0.0308          0.1854   0.1606    0.1379                      0.0252
+cross_market_lag0   baseline       0.1672         0.0326          0.4078   0.2600    0.2394                      0.0265
+cross_market_lag0        hmm       0.1496         0.0284          0.3630   0.2253    0.2098                      0.0245
+cross_market_lag0 regime_std       0.0859         0.0295          0.2086   0.1637    0.1410                      0.0252
+
+Saved results/isolation_forest_FTSE.csv
+=== train.py finished ===
+Sat Nov  7 23:37:56 MPST 2026
+=== dm_tests.py ===
+index      label               model             a                 b  mean_loss_a  mean_loss_b  dm_stat  p_value
+ GSPC   baseline             xgboost domestic_only      cross_market      0.03148      0.03263   -1.419    0.156
+ GSPC   baseline             xgboost domestic_only cross_market_lag0      0.03148       0.0319  -0.4742   0.6354
+ GSPC   baseline             xgboost  cross_market cross_market_lag0      0.03263       0.0319    1.983  0.04754
+ GSPC   baseline logistic_regression domestic_only      cross_market      0.02955      0.03017   -1.026    0.305
+ GSPC   baseline logistic_regression domestic_only cross_market_lag0      0.02955      0.02839    1.174   0.2406
+ GSPC   baseline logistic_regression  cross_market cross_market_lag0      0.03017      0.02839    1.556   0.1198
+ GSPC        hmm             xgboost domestic_only      cross_market      0.02917      0.02988   -1.791  0.07351
+ GSPC        hmm             xgboost domestic_only cross_market_lag0      0.02917      0.02936   -0.436   0.6629
+ GSPC        hmm             xgboost  cross_market cross_market_lag0      0.02988      0.02936    1.964  0.04967
+ GSPC        hmm logistic_regression domestic_only      cross_market      0.02684      0.02745  -0.5892   0.5558
+ GSPC        hmm logistic_regression domestic_only cross_market_lag0      0.02684      0.02457     1.72   0.0857
+ GSPC        hmm logistic_regression  cross_market cross_market_lag0      0.02745      0.02457     1.56    0.119
+ GSPC regime_std             xgboost domestic_only      cross_market      0.02869      0.02992   -1.572   0.1161
+ GSPC regime_std             xgboost domestic_only cross_market_lag0      0.02869      0.02927  -0.8944   0.3712
+ GSPC regime_std             xgboost  cross_market cross_market_lag0      0.02992      0.02927     2.16  0.03096
+ GSPC regime_std logistic_regression domestic_only      cross_market      0.02715      0.02739   -0.405   0.6855
+ GSPC regime_std logistic_regression domestic_only cross_market_lag0      0.02715       0.0282  -0.5252   0.5995
+ GSPC regime_std logistic_regression  cross_market cross_market_lag0      0.02739       0.0282  -0.4485   0.6539
+ N225   baseline             xgboost domestic_only      cross_market      0.02049      0.02077  -0.7472   0.4551
+ N225   baseline logistic_regression domestic_only      cross_market      0.01976      0.02167   -2.272  0.02321
+ N225        hmm             xgboost domestic_only      cross_market      0.01941      0.01938  0.09137   0.9272
+ N225        hmm logistic_regression domestic_only      cross_market      0.02123       0.0217  -0.3754   0.7074
+ N225 regime_std             xgboost domestic_only      cross_market      0.02198      0.02208  -0.1299   0.8967
+ N225 regime_std logistic_regression domestic_only      cross_market      0.02131      0.02225   -1.154   0.2486
+ FTSE   baseline             xgboost domestic_only      cross_market      0.02426      0.02539   -1.803  0.07159
+ FTSE   baseline             xgboost domestic_only cross_market_lag0      0.02426      0.02512   -1.581   0.1142
+ FTSE   baseline             xgboost  cross_market cross_market_lag0      0.02539      0.02512    1.606   0.1085
+ FTSE   baseline logistic_regression domestic_only      cross_market      0.02761       0.0274   0.3262   0.7444
+ FTSE   baseline logistic_regression domestic_only cross_market_lag0      0.02761      0.02619    1.619   0.1056
+ FTSE   baseline logistic_regression  cross_market cross_market_lag0       0.0274      0.02619    1.915  0.05572
+ FTSE        hmm             xgboost domestic_only      cross_market       0.0228      0.02347   -1.477     0.14
+ FTSE        hmm             xgboost domestic_only cross_market_lag0       0.0228      0.02297  -0.4434   0.6575
+ FTSE        hmm             xgboost  cross_market cross_market_lag0      0.02347      0.02297    2.482  0.01316
+ FTSE        hmm logistic_regression domestic_only      cross_market      0.02462      0.02461    0.008   0.9936
+ FTSE        hmm logistic_regression domestic_only cross_market_lag0      0.02462      0.02245     1.65  0.09922
+ FTSE        hmm logistic_regression  cross_market cross_market_lag0      0.02461      0.02245    2.035  0.04198
+ FTSE regime_std             xgboost domestic_only      cross_market      0.02379      0.02476   -2.036  0.04191
+ FTSE regime_std             xgboost domestic_only cross_market_lag0      0.02379      0.02432   -1.494   0.1353
+ FTSE regime_std             xgboost  cross_market cross_market_lag0      0.02476      0.02432    1.982  0.04771
+ FTSE regime_std logistic_regression domestic_only      cross_market      0.02862      0.02879  -0.2294   0.8186
+ FTSE regime_std logistic_regression domestic_only cross_market_lag0      0.02862      0.02833   0.1872   0.8516
+ FTSE regime_std logistic_regression  cross_market cross_market_lag0      0.02879      0.02833   0.4005   0.6889
+
+Saved results/dm_tests.csv
+=== significance.py ===
+                test            model                                comparison  n_blocks  statistic  p_value  median_diff  wins  losses  p_holm                                                                                                                                                  mean_ranks
+Wilcoxon signed-rank    XGBoost, 2016     Cross-Market (lag 1) vs Domestic-Only         9      4.000   0.0273       -0.034   1.0     8.0  0.0820                                                                                                                                                            
+Wilcoxon signed-rank    XGBoost, 2016 Cross-Market (lag 0 + 1) vs Domestic-Only         9      7.000   0.0742       -0.015   1.0     8.0  0.1484                                                                                                                                                            
+Wilcoxon signed-rank    XGBoost, 2016       Domestic + foreign vs Domestic-Only         9      8.000   0.0977        0.031   8.0     1.0  0.1484                                                                                                                                                            
+Wilcoxon signed-rank    XGBoost, 2016         Domestic + macro vs Domestic-Only         9      0.000   0.0039       -0.039   0.0     9.0  0.0195                                                                                                                                                            
+Wilcoxon signed-rank    XGBoost, 2016 Realised volatility only vs Domestic-Only         9      0.000   0.0039       -0.072   0.0     9.0  0.0195                                                                                                                                                            
+            Friedman    XGBoost, 2016                            6 feature sets         9     36.122   0.0000          NaN   NaN     NaN     NaN Domestic-Only 2.11; Cross-Market (lag 1) 4.17; Cross-Market (lag 0 + 1) 3.06; Domestic + foreign 1.22; Domestic + macro 4.89; Realised volatility only 5.56
+Wilcoxon signed-rank         LR, 1958     Cross-Market (lag 1) vs Domestic-Only         9      0.000   0.0039       -0.022   0.0     9.0  0.0195                                                                                                                                                            
+Wilcoxon signed-rank         LR, 1958 Cross-Market (lag 0 + 1) vs Domestic-Only         9     17.000   0.5703        0.012   6.0     3.0  1.0000                                                                                                                                                            
+Wilcoxon signed-rank         LR, 1958       Domestic + foreign vs Domestic-Only         9     22.000   1.0000        0.012   5.0     4.0  1.0000                                                                                                                                                            
+Wilcoxon signed-rank         LR, 1958         Domestic + macro vs Domestic-Only         9      0.000   0.0039       -0.030   0.0     9.0  0.0195                                                                                                                                                            
+Wilcoxon signed-rank         LR, 1958 Realised volatility only vs Domestic-Only         9     10.000   0.1641       -0.020   3.0     6.0  0.4922                                                                                                                                                            
+            Friedman         LR, 1958                            6 feature sets         9     14.551   0.0125          NaN   NaN     NaN     NaN Domestic-Only 2.56; Cross-Market (lag 1) 4.50; Cross-Market (lag 0 + 1) 2.39; Domestic + foreign 2.67; Domestic + macro 4.44; Realised volatility only 4.44
+Wilcoxon signed-rank    iForest, 2008     Cross-Market (lag 1) vs Domestic-Only         9      0.000   0.0039        0.013   9.0     0.0  0.0078                                                                                                                                                            
+Wilcoxon signed-rank    iForest, 2008 Cross-Market (lag 0 + 1) vs Domestic-Only         9      0.000   0.0039        0.017   9.0     0.0  0.0078                                                                                                                                                            
+            Friedman    iForest, 2008                            3 feature sets         9     14.970   0.0006          NaN   NaN     NaN     NaN                                                                                Domestic-Only 3.00; Cross-Market (lag 1) 1.39; Cross-Market (lag 0 + 1) 1.61
+            Friedman all three models                   models on Domestic-Only         9     11.556   0.0031          NaN   NaN     NaN     NaN                                                                                                       XGBoost, 2016 2.22; LR, 1958 1.11; iForest, 2008 2.67
+            Friedman all three models            models on Cross-Market (lag 1)         9     10.889   0.0043          NaN   NaN     NaN     NaN                                                                                                       XGBoost, 2016 2.78; LR, 1958 1.22; iForest, 2008 2.00
+            Friedman all three models        models on Cross-Market (lag 0 + 1)         9     11.556   0.0031          NaN   NaN     NaN     NaN                                                                                                       XGBoost, 2016 2.67; LR, 1958 1.11; iForest, 2008 2.22
+
+Saved results/significance_tests.csv and results/tables/table_significance.csv
+=== shap_analysis.py ===
+SHAP | GSPC | cross_market | baseline ...
+SHAP check passed: TreeExplainer matches XGBoost's exact contributions.
+SHAP | GSPC | cross_market | hmm ...
+SHAP | GSPC | cross_market | regime_std ...
+SHAP | GSPC | cross_market_lag0 | baseline ...
+SHAP | GSPC | cross_market_lag0 | hmm ...
+SHAP | GSPC | cross_market_lag0 | regime_std ...
+SHAP | GSPC | ablation_foreign | baseline ...
+SHAP | GSPC | ablation_foreign | hmm ...
+SHAP | GSPC | ablation_foreign | regime_std ...
+SHAP | N225 | cross_market | baseline ...
+SHAP | N225 | cross_market | hmm ...
+SHAP | N225 | cross_market | regime_std ...
+SHAP | N225 | ablation_foreign | baseline ...
+SHAP | N225 | ablation_foreign | hmm ...
+SHAP | N225 | ablation_foreign | regime_std ...
+SHAP | FTSE | cross_market | baseline ...
+SHAP | FTSE | cross_market | hmm ...
+SHAP | FTSE | cross_market | regime_std ...
+SHAP | FTSE | cross_market_lag0 | baseline ...
+SHAP | FTSE | cross_market_lag0 | hmm ...
+SHAP | FTSE | cross_market_lag0 | regime_std ...
+SHAP | FTSE | ablation_foreign | baseline ...
+SHAP | FTSE | ablation_foreign | hmm ...
+SHAP | FTSE | ablation_foreign | regime_std ...
+     index                      label              feature_set  best_on_validation  test_pr_auc  share_domestic  share_foreign  share_foreign_lag0  share_macro  share_technical
+   S&P 500   Rolling z-score baseline     Cross-Market (lag 1)               False        0.147           0.135          0.138               0.000        0.307            0.421
+   S&P 500 Regime-dependent threshold     Cross-Market (lag 1)               False        0.123           0.243          0.152               0.000        0.266            0.339
+   S&P 500        Regime-standardised     Cross-Market (lag 1)               False        0.128           0.254          0.116               0.000        0.247            0.383
+   S&P 500   Rolling z-score baseline Cross-Market (lag 0 + 1)                True        0.174           0.081          0.041               0.200        0.273            0.405
+   S&P 500 Regime-dependent threshold Cross-Market (lag 0 + 1)                True        0.130           0.186          0.113               0.160        0.235            0.306
+   S&P 500        Regime-standardised Cross-Market (lag 0 + 1)                True        0.187           0.249          0.067               0.167        0.201            0.315
+   S&P 500   Rolling z-score baseline       Domestic + foreign               False        0.275           0.259          0.220               0.000        0.000            0.521
+   S&P 500 Regime-dependent threshold       Domestic + foreign               False        0.187           0.418          0.276               0.000        0.000            0.306
+   S&P 500        Regime-standardised       Domestic + foreign               False        0.180           0.425          0.264               0.000        0.000            0.311
+Nikkei 225   Rolling z-score baseline     Cross-Market (lag 1)                True        0.116           0.363          0.207               0.000        0.251            0.179
+Nikkei 225 Regime-dependent threshold     Cross-Market (lag 1)               False        0.146           0.389          0.226               0.000        0.253            0.132
+Nikkei 225        Regime-standardised     Cross-Market (lag 1)               False        0.096           0.391          0.221               0.000        0.231            0.157
+Nikkei 225   Rolling z-score baseline       Domestic + foreign               False        0.178           0.458          0.272               0.000        0.000            0.270
+Nikkei 225 Regime-dependent threshold       Domestic + foreign                True        0.154           0.507          0.304               0.000        0.000            0.189
+Nikkei 225        Regime-standardised       Domestic + foreign                True        0.124           0.461          0.304               0.000        0.000            0.235
+  FTSE 100   Rolling z-score baseline     Cross-Market (lag 1)               False        0.109           0.263          0.192               0.000        0.293            0.252
+  FTSE 100 Regime-dependent threshold     Cross-Market (lag 1)               False        0.104           0.261          0.218               0.000        0.222            0.300
+  FTSE 100        Regime-standardised     Cross-Market (lag 1)               False        0.069           0.286          0.174               0.000        0.283            0.258
+  FTSE 100   Rolling z-score baseline Cross-Market (lag 0 + 1)                True        0.134           0.240          0.166               0.052        0.287            0.256
+  FTSE 100 Regime-dependent threshold Cross-Market (lag 0 + 1)               False        0.129           0.209          0.209               0.070        0.192            0.319
+  FTSE 100        Regime-standardised Cross-Market (lag 0 + 1)               False        0.082           0.243          0.132               0.074        0.263            0.289
+  FTSE 100   Rolling z-score baseline       Domestic + foreign               False        0.166           0.285          0.217               0.000        0.000            0.499
+  FTSE 100 Regime-dependent threshold       Domestic + foreign                True        0.176           0.300          0.288               0.000        0.000            0.412
+  FTSE 100        Regime-standardised       Domestic + foreign                True        0.103           0.362          0.220               0.000        0.000            0.418
+
+Saved results/shap_group_shares.csv, results/tables/table_shap_group_shares.csv and SHAP figure
+=== figures.py ===
+C:\Users\Remus Reyes\Downloads\deciphering-market-connections folder\deciphering-market-connections\code\figures.py:118: UserWarning: You passed an edgecolor/edgecolors ('black') for an unfilled marker ('x').  Matplotlib is ignoring the edgecolor in favor of the facecolor.  This behavior may change in the future.
+  ax.scatter(d, r.loc[d], marker=marker, s=26 if filled else 30, linewidths=0.8, zorder=3,
+  data/raw/US_Policy_Uncertainty_Data.xlsx: using column 'News_Based_Policy_Uncert_Index' as the EPU value
+  data/raw/Japan_Policy_Uncertainty_Data.xlsx: using column 'News-based Economic Policy Uncertainty Index' as the EPU value
+                             series                                         source               identifier frequency first_date  last_date  missing_pct
+                      S&P 500 close                       Yahoo Finance (yfinance)                    ^GSPC     daily 2000-01-03 2024-12-30          0.0
+                     S&P 500 volume                       Yahoo Finance (yfinance)                    ^GSPC     daily 2000-01-03 2024-12-30          0.0
+                   Nikkei 225 close                       Yahoo Finance (yfinance)                    ^N225     daily 2000-01-04 2024-12-30          5.9
+                  Nikkei 225 volume                       Yahoo Finance (yfinance)                    ^N225     daily 2002-06-10 2024-12-30         15.1
+                     FTSE 100 close                       Yahoo Finance (yfinance)                    ^FTSE     daily 2000-01-04 2024-12-30          1.9
+                    FTSE 100 volume                       Yahoo Finance (yfinance)                    ^FTSE     daily 2000-01-04 2024-12-30          1.9
+                                VIX                                           FRED                   VIXCLS     daily 2000-01-03 2024-12-31          0.0
+                            USD/JPY                                           FRED                  DEXJPUS     daily 2000-01-03 2024-12-31          0.9
+             10-year Treasury yield                                           FRED                    DGS10     daily 2000-01-03 2024-12-31          0.7
+TED spread (excluded from features)                                           FRED                  TEDRATE     daily 2000-01-04 2022-01-21         14.0
+                  EPU United States policyuncertainty.com (Baker, Bloom and Davis) monthly news-based index   monthly 2000-01-01 2024-12-01          0.0
+                          EPU Japan policyuncertainty.com (Baker, Bloom and Davis) monthly news-based index   monthly 2000-01-01 2024-12-01          0.0
+
+Saved results/data_panel_summary.csv and results/figures/fig_regimes_GSPC.png/.pdf
+Caption: S&P 500 daily log-returns around the 2008 financial crisis (top) and the COVID-19 crash (bottom). Grey shading marks days the causal HMM (fit on 2000-2015 realised volatility, filtered probabilities) places in the high-volatility regime. Markers show days flagged as anomalous by the baseline rolling z-score (circles), the regime-dependent threshold (triangles) and the regime-standardised scheme (crosses).
+=== macro_range.py ===
+variable                     stage                feature  train_min  train_max  test_min  test_max  test_days  test_share_below_train_min  test_share_above_train_max  test_share_outside_train_range
+  USDJPY before (raw level, lag 1)            USDJPY_lag1    75.7200   134.7700  102.5200  161.7300       1509                      0.0000                      0.3625                          0.3625
+  USDJPY           before (levels) mac_usdjpy_logchg_lag1    -0.0522     0.0334   -0.0432    0.0262       1509                      0.0000                      0.0000                          0.0000
+  USDJPY        after (stationary) mac_usdjpy_logchg_lag1    -0.0522     0.0334   -0.0432    0.0262       1509                      0.0000                      0.0000                          0.0000
+   DGS10           before (levels)         mac_dgs10_lag1     1.4300     6.7900    0.5200    4.9800       1509                      0.2087                      0.0000                          0.2087
+   DGS10        after (stationary)     mac_dgs10_chg_lag1    -0.5100     0.2500   -0.3000    0.2900       1509                      0.0000                      0.0013                          0.0013
+  BAA10Y           before (levels)        mac_baa10y_lag1     1.4800     6.1600    1.3600    4.3100       1509                      0.0484                      0.0000                          0.0484
+  BAA10Y        after (stationary)    mac_baa10y_chg_lag1    -0.1600     0.4600   -0.2000    0.3800       1509                      0.0007                      0.0000                          0.0007
+  EPU_US           before (levels)        mac_epu_us_lag1    44.7828   283.6656   76.8442  503.9633       1509                      0.0000                      0.1233                          0.1233
+  EPU_US        after (stationary)   mac_epu_us_logz_lag1    -3.2282     4.0812   -5.2839    4.8397       1509                      0.0093                      0.0033                          0.0126
+  EPU_JP           before (levels)        mac_epu_jp_lag1    50.1204   239.8144   77.7913  193.8147       1509                      0.0000                      0.0000                          0.0000
+  EPU_JP        after (stationary)   mac_epu_jp_logz_lag1    -3.7461     4.9904   -2.0839    3.3989       1509                      0.0000                      0.0000                          0.0000
+=== event_tables.py ===
+index     scheme                event window_start window_end  days_in_window  flagged_days_in_window detected  distance_trading_days        nearest_flag
+ GSPC   baseline         Dot-com bust   2002-07-01 2002-10-31              87                      10 detected                      0              inside
+ GSPC        hmm         Dot-com bust   2002-07-01 2002-10-31              87                       2 detected                      0              inside
+ GSPC regime_std         Dot-com bust   2002-07-01 2002-10-31              87                       6 detected                      0              inside
+ GSPC   baseline          Lehman 2008   2008-09-15 2008-10-31              35                      13 detected                      0              inside
+ GSPC        hmm          Lehman 2008   2008-09-15 2008-10-31              35                      10 detected                      0              inside
+ GSPC regime_std          Lehman 2008   2008-09-15 2008-10-31              35                      14 detected                      0              inside
+ GSPC   baseline European Debt Crisis   2011-08-01 2011-08-31              23                       8 detected                      0              inside
+ GSPC        hmm European Debt Crisis   2011-08-01 2011-08-31              23                       7 detected                      0              inside
+ GSPC regime_std European Debt Crisis   2011-08-01 2011-08-31              23                       3 detected                      0              inside
+ GSPC   baseline     Flash Crash 2010   2010-05-06 2010-05-07               2                       1 detected                      0              inside
+ GSPC        hmm     Flash Crash 2010   2010-05-06 2010-05-07               2                       1 detected                      0              inside
+ GSPC regime_std     Flash Crash 2010   2010-05-06 2010-05-07               2                       1 detected                      0              inside
+ GSPC   baseline     COVID March 2020   2020-02-24 2020-03-31              27                      17 detected                      0              inside
+ GSPC        hmm     COVID March 2020   2020-02-24 2020-03-31              27                      17 detected                      0              inside
+ GSPC regime_std     COVID March 2020   2020-02-24 2020-03-31              27                      16 detected                      0              inside
+ GSPC   baseline 2022 rate-hike cycle   2022-09-01 2022-10-14              31                       1 detected                      0              inside
+ GSPC        hmm 2022 rate-hike cycle   2022-09-01 2022-10-14              31                       1 detected                      0              inside
+ GSPC regime_std 2022 rate-hike cycle   2022-09-01 2022-10-14              31                       1 detected                      0              inside
+ N225   baseline         Dot-com bust   2002-07-01 2002-10-31              87                       0   missed                     83 2002-03-04 (before)
+ N225        hmm         Dot-com bust   2002-07-01 2002-10-31              87                       0   missed                     83 2002-03-04 (before)
+ N225 regime_std         Dot-com bust   2002-07-01 2002-10-31              87                       0   missed                     83 2002-03-04 (before)
+ N225   baseline          Lehman 2008   2008-09-15 2008-10-31              35                      11 detected                      0              inside
+ N225        hmm          Lehman 2008   2008-09-15 2008-10-31              35                       8 detected                      0              inside
+ N225 regime_std          Lehman 2008   2008-09-15 2008-10-31              35                      11 detected                      0              inside
+ N225   baseline European Debt Crisis   2011-08-01 2011-08-31              23                       1 detected                      0              inside
+ N225        hmm European Debt Crisis   2011-08-01 2011-08-31              23                       1 detected                      0              inside
+ N225 regime_std European Debt Crisis   2011-08-01 2011-08-31              23                       1 detected                      0              inside
+ N225   baseline     Flash Crash 2010   2010-05-06 2010-05-07               2                       1 detected                      0              inside
+ N225        hmm     Flash Crash 2010   2010-05-06 2010-05-07               2                       1 detected                      0              inside
+ N225 regime_std     Flash Crash 2010   2010-05-06 2010-05-07               2                       0   missed                     20  2010-06-07 (after)
+ N225   baseline     COVID March 2020   2020-02-24 2020-03-31              27                      10 detected                      0              inside
+ N225        hmm     COVID March 2020   2020-02-24 2020-03-31              27                       9 detected                      0              inside
+ N225 regime_std     COVID March 2020   2020-02-24 2020-03-31              27                       9 detected                      0              inside
+ N225   baseline 2022 rate-hike cycle   2022-09-01 2022-10-14              31                       0   missed                    116 2022-03-17 (before)
+ N225        hmm 2022 rate-hike cycle   2022-09-01 2022-10-14              31                       0   missed                    116 2022-03-17 (before)
+ N225 regime_std 2022 rate-hike cycle   2022-09-01 2022-10-14              31                       1 detected                      0              inside
+ FTSE   baseline         Dot-com bust   2002-07-01 2002-10-31              87                      15 detected                      0              inside
+ FTSE        hmm         Dot-com bust   2002-07-01 2002-10-31              87                       9 detected                      0              inside
+ FTSE regime_std         Dot-com bust   2002-07-01 2002-10-31              87                      13 detected                      0              inside
+ FTSE   baseline          Lehman 2008   2008-09-15 2008-10-31              35                      12 detected                      0              inside
+ FTSE        hmm          Lehman 2008   2008-09-15 2008-10-31              35                       8 detected                      0              inside
+ FTSE regime_std          Lehman 2008   2008-09-15 2008-10-31              35                      13 detected                      0              inside
+ FTSE   baseline European Debt Crisis   2011-08-01 2011-08-31              23                       8 detected                      0              inside
+ FTSE        hmm European Debt Crisis   2011-08-01 2011-08-31              23                       7 detected                      0              inside
+ FTSE regime_std European Debt Crisis   2011-08-01 2011-08-31              23                       6 detected                      0              inside
+ FTSE   baseline     Flash Crash 2010   2010-05-06 2010-05-07               2                       1 detected                      0              inside
+ FTSE        hmm     Flash Crash 2010   2010-05-06 2010-05-07               2                       1 detected                      0              inside
+ FTSE regime_std     Flash Crash 2010   2010-05-06 2010-05-07               2                       0   missed                      1  2010-05-10 (after)
+ FTSE   baseline     COVID March 2020   2020-02-24 2020-03-31              27                      13 detected                      0              inside
+ FTSE        hmm     COVID March 2020   2020-02-24 2020-03-31              27                      12 detected                      0              inside
+ FTSE regime_std     COVID March 2020   2020-02-24 2020-03-31              27                       9 detected                      0              inside
+ FTSE   baseline 2022 rate-hike cycle   2022-09-01 2022-10-14              31                       0   missed                     48 2022-06-24 (before)
+ FTSE        hmm 2022 rate-hike cycle   2022-09-01 2022-10-14              31                       0   missed                     48 2022-06-24 (before)
+ FTSE regime_std 2022 rate-hike cycle   2022-09-01 2022-10-14              31                       1 detected                      0              inside
+index     scheme  rows  scheme_flags  matched_threshold_abs_z  control_flags  control_share_flags_high_vol  scheme_share_flags_high_vol  high_vol_share_of_days
+ GSPC        hmm  6036           150                   2.7126            150                        0.4733                       0.3333                  0.2334
+ GSPC regime_std  6036           167                   2.6130            167                        0.5090                       0.3054                  0.2334
+ N225        hmm  6035           127                   2.6003            127                        0.4016                       0.2677                  0.1718
+ N225 regime_std  6013           147                   2.4902            147                        0.3537                       0.2449                  0.1688
+ FTSE        hmm  6035           146                   2.6539            146                        0.4384                       0.2877                  0.1848
+ FTSE regime_std  6035           164                   2.5783            164                        0.4451                       0.2683                  0.1848
+=== report_tables.py ===
+
+=== table_labelling_evaluation
+     index                                  scheme  days       from         to  prevalence_pct  mean_run_length_days  concordance_pct                      events_missed
+   S&P 500              Baseline (rolling z-score)  6036 2001-01-02 2024-12-30            3.25                  1.24            100.0                               none
+   S&P 500 Regime-dependent threshold (causal HMM)  6036 2001-01-02 2024-12-30            2.49                  1.24            100.0                               none
+   S&P 500        Regime-standardised (causal HMM)  6036 2001-01-02 2024-12-30            2.77                  1.23            100.0                               none
+Nikkei 225              Baseline (rolling z-score)  6013 2001-01-03 2024-12-30            2.41                  1.20             66.7 Dot-com bust; 2022 rate-hike cycle
+Nikkei 225 Regime-dependent threshold (causal HMM)  6013 2001-01-03 2024-12-30            2.08                  1.18             66.7 Dot-com bust; 2022 rate-hike cycle
+Nikkei 225        Regime-standardised (causal HMM)  6013 2001-01-03 2024-12-30            2.44                  1.19             66.7     Dot-com bust; Flash Crash 2010
+  FTSE 100              Baseline (rolling z-score)  6035 2001-01-03 2024-12-30            3.03                  1.24             83.3               2022 rate-hike cycle
+  FTSE 100 Regime-dependent threshold (causal HMM)  6035 2001-01-03 2024-12-30            2.42                  1.23             83.3               2022 rate-hike cycle
+  FTSE 100        Regime-standardised (causal HMM)  6035 2001-01-03 2024-12-30            2.72                  1.23             83.3                   Flash Crash 2010
+
+=== table_hmm_sensitivity
+     index                                  hmm_fit  high_vol_days_pct  prevalence_pct  mean_run_length_days  concordance_pct  regime_agreement_pct pr_auc_xgboost_domestic_only pr_auc_logistic_regression_domestic_only pr_auc_xgboost_cross_market pr_auc_logistic_regression_cross_market
+   S&P 500     Causal HMM (fit 2000-2015, filtered)               23.3            2.49                  1.24            100.0                  95.4                0.157 (0.013)                            0.230 (0.004)               0.123 (0.015)                           0.202 (0.007)
+   S&P 500 Full-sample HMM (fit 2000-2024, Viterbi)               26.7            2.30                  1.25            100.0                  95.4                0.268 (0.014)                            0.245 (0.004)               0.108 (0.013)                           0.202 (0.006)
+Nikkei 225     Causal HMM (fit 2000-2015, filtered)               17.2            2.10                  1.18             66.7                  92.5                0.115 (0.008)                            0.176 (0.002)               0.146 (0.010)                           0.143 (0.009)
+Nikkei 225 Full-sample HMM (fit 2000-2024, Viterbi)               23.8            1.91                  1.16             66.7                  92.5                0.148 (0.014)                            0.202 (0.001)               0.089 (0.004)                           0.133 (0.003)
+  FTSE 100     Causal HMM (fit 2000-2015, filtered)               18.5            2.42                  1.23             83.3                  93.7                0.142 (0.011)                            0.168 (0.003)               0.104 (0.014)                           0.163 (0.003)
+  FTSE 100 Full-sample HMM (fit 2000-2024, Viterbi)               24.1            2.14                  1.19             66.7                  93.7                0.160 (0.014)                            0.161 (0.001)               0.105 (0.009)                           0.162 (0.003)
+
+=== table_model_results
+     index                                        label              feature_set         model  n_features  prevalence_baseline                       pr_auc                           f1                            mcc
+   S&P 500                     Rolling z-score baseline            Domestic-Only XGBoost, 2016          16               0.0345 0.189 (0.018) [0.041, 0.460] 0.228 (0.029) [0.062, 0.422]   0.221 (0.020) [0.045, 0.407]
+   S&P 500                     Rolling z-score baseline            Domestic-Only      LR, 1958          16               0.0345 0.244 (0.003) [0.047, 0.467] 0.306 (0.009) [0.057, 0.519]   0.281 (0.009) [0.040, 0.498]
+   S&P 500                   Regime-dependent threshold            Domestic-Only XGBoost, 2016          16               0.0305 0.157 (0.013) [0.035, 0.308] 0.215 (0.025) [0.022, 0.388]  0.190 (0.026) [-0.002, 0.353]
+   S&P 500                   Regime-dependent threshold            Domestic-Only      LR, 1958          16               0.0305 0.230 (0.004) [0.030, 0.433] 0.258 (0.008) [0.000, 0.469]  0.237 (0.008) [-0.018, 0.449]
+   S&P 500                          Regime-standardised            Domestic-Only XGBoost, 2016          16               0.0311 0.255 (0.013) [0.024, 0.495] 0.244 (0.012) [0.030, 0.455]   0.230 (0.017) [0.007, 0.430]
+   S&P 500                          Regime-standardised            Domestic-Only      LR, 1958          16               0.0311 0.228 (0.006) [0.024, 0.437] 0.246 (0.020) [0.024, 0.463]  0.228 (0.015) [-0.000, 0.440]
+   S&P 500                     Rolling z-score baseline     Cross-Market (lag 1) XGBoost, 2016          29               0.0345 0.147 (0.015) [0.042, 0.339] 0.218 (0.020) [0.055, 0.353]   0.194 (0.018) [0.037, 0.323]
+   S&P 500                     Rolling z-score baseline     Cross-Market (lag 1)      LR, 1958          29               0.0345 0.222 (0.008) [0.053, 0.399] 0.226 (0.015) [0.083, 0.355]   0.213 (0.013) [0.075, 0.323]
+   S&P 500                   Regime-dependent threshold     Cross-Market (lag 1) XGBoost, 2016          29               0.0305 0.123 (0.015) [0.037, 0.261] 0.138 (0.046) [0.032, 0.235]   0.117 (0.041) [0.016, 0.212]
+   S&P 500                   Regime-dependent threshold     Cross-Market (lag 1)      LR, 1958          29               0.0305 0.202 (0.007) [0.046, 0.362] 0.209 (0.022) [0.062, 0.332]   0.212 (0.025) [0.059, 0.322]
+   S&P 500                          Regime-standardised     Cross-Market (lag 1) XGBoost, 2016          29               0.0311 0.128 (0.006) [0.031, 0.283] 0.154 (0.032) [0.022, 0.250]  0.136 (0.035) [-0.004, 0.237]
+   S&P 500                          Regime-standardised     Cross-Market (lag 1)      LR, 1958          29               0.0311 0.209 (0.004) [0.028, 0.368] 0.188 (0.022) [0.051, 0.345]   0.182 (0.014) [0.033, 0.325]
+   S&P 500                     Rolling z-score baseline Cross-Market (lag 0 + 1) XGBoost, 2016          33               0.0345 0.174 (0.006) [0.088, 0.299] 0.238 (0.016) [0.098, 0.332]   0.210 (0.017) [0.080, 0.299]
+   S&P 500                     Rolling z-score baseline Cross-Market (lag 0 + 1)      LR, 1958          33               0.0345 0.310 (0.008) [0.103, 0.501] 0.340 (0.026) [0.154, 0.477]   0.318 (0.023) [0.140, 0.449]
+   S&P 500                   Regime-dependent threshold Cross-Market (lag 0 + 1) XGBoost, 2016          33               0.0305 0.130 (0.008) [0.046, 0.232] 0.097 (0.029) [0.017, 0.157]  0.077 (0.029) [-0.000, 0.148]
+   S&P 500                   Regime-dependent threshold Cross-Market (lag 0 + 1)      LR, 1958          33               0.0305 0.330 (0.002) [0.090, 0.513] 0.308 (0.042) [0.097, 0.457]   0.299 (0.040) [0.094, 0.446]
+   S&P 500                          Regime-standardised Cross-Market (lag 0 + 1) XGBoost, 2016          33               0.0311 0.187 (0.015) [0.046, 0.388] 0.262 (0.014) [0.053, 0.414]   0.238 (0.015) [0.032, 0.383]
+   S&P 500                          Regime-standardised Cross-Market (lag 0 + 1)      LR, 1958          33               0.0311 0.257 (0.005) [0.042, 0.480] 0.296 (0.044) [0.054, 0.473]   0.279 (0.040) [0.038, 0.454]
+   S&P 500                     Rolling z-score baseline       Domestic + foreign XGBoost, 2016          24               0.0345 0.275 (0.005) [0.048, 0.524] 0.299 (0.040) [0.069, 0.507]   0.279 (0.031) [0.052, 0.484]
+   S&P 500                     Rolling z-score baseline       Domestic + foreign      LR, 1958          24               0.0345 0.192 (0.002) [0.037, 0.416] 0.228 (0.005) [0.060, 0.408]   0.229 (0.005) [0.045, 0.397]
+   S&P 500                   Regime-dependent threshold       Domestic + foreign XGBoost, 2016          24               0.0305 0.187 (0.016) [0.033, 0.339] 0.223 (0.024) [0.027, 0.339]   0.214 (0.020) [0.013, 0.325]
+   S&P 500                   Regime-dependent threshold       Domestic + foreign      LR, 1958          24               0.0305 0.260 (0.006) [0.035, 0.462] 0.249 (0.003) [0.043, 0.440]   0.236 (0.003) [0.022, 0.415]
+   S&P 500                          Regime-standardised       Domestic + foreign XGBoost, 2016          24               0.0311 0.180 (0.017) [0.030, 0.380] 0.229 (0.009) [0.026, 0.414]   0.204 (0.011) [0.004, 0.383]
+   S&P 500                          Regime-standardised       Domestic + foreign      LR, 1958          24               0.0311 0.208 (0.005) [0.022, 0.417] 0.235 (0.008) [0.020, 0.456]  0.220 (0.008) [-0.007, 0.433]
+   S&P 500                     Rolling z-score baseline         Domestic + macro XGBoost, 2016          21               0.0345 0.176 (0.016) [0.044, 0.399] 0.194 (0.046) [0.008, 0.356]  0.198 (0.027) [-0.003, 0.380]
+   S&P 500                     Rolling z-score baseline         Domestic + macro      LR, 1958          21               0.0345 0.237 (0.002) [0.056, 0.393] 0.257 (0.009) [0.077, 0.377]   0.234 (0.007) [0.061, 0.354]
+   S&P 500                   Regime-dependent threshold         Domestic + macro XGBoost, 2016          21               0.0305 0.099 (0.007) [0.037, 0.220] 0.115 (0.047) [0.000, 0.211]  0.093 (0.045) [-0.018, 0.193]
+   S&P 500                   Regime-dependent threshold         Domestic + macro      LR, 1958          21               0.0305 0.186 (0.010) [0.041, 0.339] 0.224 (0.008) [0.040, 0.366]   0.201 (0.010) [0.023, 0.333]
+   S&P 500                          Regime-standardised         Domestic + macro XGBoost, 2016          21               0.0311 0.130 (0.014) [0.029, 0.303] 0.199 (0.042) [0.019, 0.336]   0.178 (0.042) [0.002, 0.320]
+   S&P 500                          Regime-standardised         Domestic + macro      LR, 1958          21               0.0311 0.217 (0.009) [0.029, 0.386] 0.216 (0.022) [0.039, 0.378]   0.199 (0.013) [0.017, 0.349]
+   S&P 500                     Rolling z-score baseline Realised volatility only XGBoost, 2016           5               0.0345 0.112 (0.006) [0.023, 0.285] 0.086 (0.080) [0.016, 0.158]   0.078 (0.078) [0.003, 0.147]
+   S&P 500                     Rolling z-score baseline Realised volatility only      LR, 1958           5               0.0345 0.262 (0.001) [0.036, 0.507] 0.228 (0.004) [0.048, 0.421]   0.228 (0.004) [0.027, 0.416]
+   S&P 500                   Regime-dependent threshold Realised volatility only XGBoost, 2016           5               0.0305 0.129 (0.015) [0.021, 0.326] 0.201 (0.026) [0.032, 0.353]   0.178 (0.026) [0.014, 0.318]
+   S&P 500                   Regime-dependent threshold Realised volatility only      LR, 1958           5               0.0305 0.263 (0.003) [0.033, 0.506] 0.241 (0.010) [0.061, 0.459]   0.242 (0.012) [0.051, 0.451]
+   S&P 500                          Regime-standardised Realised volatility only XGBoost, 2016           5               0.0311 0.131 (0.009) [0.025, 0.341] 0.199 (0.018) [0.025, 0.344]   0.178 (0.013) [0.006, 0.324]
+   S&P 500                          Regime-standardised Realised volatility only      LR, 1958           5               0.0311 0.253 (0.002) [0.027, 0.498] 0.228 (0.016) [0.031, 0.446]   0.220 (0.013) [0.002, 0.436]
+   S&P 500 Regime-dependent threshold (full-sample HMM)            Domestic-Only XGBoost, 2016          16               0.0258 0.268 (0.014) [0.024, 0.480] 0.273 (0.028) [0.022, 0.455]   0.264 (0.020) [0.007, 0.433]
+   S&P 500 Regime-dependent threshold (full-sample HMM)            Domestic-Only      LR, 1958          16               0.0258 0.245 (0.004) [0.022, 0.438] 0.261 (0.030) [0.000, 0.485]  0.247 (0.030) [-0.018, 0.461]
+   S&P 500 Regime-dependent threshold (full-sample HMM)     Cross-Market (lag 1) XGBoost, 2016          29               0.0258 0.108 (0.013) [0.024, 0.234] 0.125 (0.014) [0.010, 0.233]  0.103 (0.017) [-0.009, 0.202]
+   S&P 500 Regime-dependent threshold (full-sample HMM)     Cross-Market (lag 1)      LR, 1958          29               0.0258 0.202 (0.006) [0.033, 0.372] 0.228 (0.024) [0.000, 0.340]  0.232 (0.008) [-0.007, 0.356]
+Nikkei 225                     Rolling z-score baseline            Domestic-Only XGBoost, 2016          16               0.0219 0.116 (0.006) [0.019, 0.299] 0.187 (0.022) [0.000, 0.332]  0.169 (0.022) [-0.008, 0.316]
+Nikkei 225                     Rolling z-score baseline            Domestic-Only      LR, 1958          16               0.0219 0.217 (0.005) [0.024, 0.439] 0.287 (0.006) [0.000, 0.439]  0.271 (0.006) [-0.012, 0.426]
+Nikkei 225                   Regime-dependent threshold            Domestic-Only XGBoost, 2016          16               0.0205 0.115 (0.008) [0.018, 0.267] 0.233 (0.021) [0.000, 0.372]  0.220 (0.019) [-0.010, 0.366]
+Nikkei 225                   Regime-dependent threshold            Domestic-Only      LR, 1958          16               0.0205 0.176 (0.002) [0.018, 0.399] 0.286 (0.005) [0.000, 0.459]  0.273 (0.006) [-0.014, 0.453]
+Nikkei 225                          Regime-standardised            Domestic-Only XGBoost, 2016          16               0.0225 0.104 (0.010) [0.018, 0.233] 0.194 (0.032) [0.000, 0.296]  0.183 (0.029) [-0.011, 0.289]
+Nikkei 225                          Regime-standardised            Domestic-Only      LR, 1958          16               0.0225 0.200 (0.004) [0.026, 0.427] 0.273 (0.032) [0.000, 0.454]  0.256 (0.033) [-0.012, 0.441]
+Nikkei 225                     Rolling z-score baseline     Cross-Market (lag 1) XGBoost, 2016          29               0.0219 0.116 (0.014) [0.019, 0.299] 0.168 (0.031) [0.035, 0.267]   0.165 (0.026) [0.023, 0.267]
+Nikkei 225                     Rolling z-score baseline     Cross-Market (lag 1)      LR, 1958          29               0.0219 0.160 (0.002) [0.017, 0.337] 0.195 (0.028) [0.000, 0.309]  0.187 (0.028) [-0.007, 0.303]
+Nikkei 225                   Regime-dependent threshold     Cross-Market (lag 1) XGBoost, 2016          29               0.0205 0.146 (0.010) [0.015, 0.320] 0.134 (0.007) [0.022, 0.237]  0.152 (0.010) [-0.000, 0.271]
+Nikkei 225                   Regime-dependent threshold     Cross-Market (lag 1)      LR, 1958          29               0.0205 0.143 (0.009) [0.011, 0.331] 0.227 (0.011) [0.000, 0.387]  0.211 (0.012) [-0.011, 0.373]
+Nikkei 225                          Regime-standardised     Cross-Market (lag 1) XGBoost, 2016          29               0.0225 0.096 (0.023) [0.028, 0.242] 0.177 (0.045) [0.048, 0.305]   0.165 (0.050) [0.039, 0.302]
+Nikkei 225                          Regime-standardised     Cross-Market (lag 1)      LR, 1958          29               0.0225 0.154 (0.007) [0.021, 0.362] 0.230 (0.002) [0.000, 0.364]  0.229 (0.003) [-0.006, 0.366]
+Nikkei 225                     Rolling z-score baseline       Domestic + foreign XGBoost, 2016          24               0.0219 0.178 (0.013) [0.018, 0.337] 0.236 (0.027) [0.000, 0.357]  0.227 (0.024) [-0.008, 0.353]
+Nikkei 225                     Rolling z-score baseline       Domestic + foreign      LR, 1958          24               0.0219 0.197 (0.003) [0.018, 0.405] 0.266 (0.025) [0.000, 0.400]  0.252 (0.024) [-0.008, 0.390]
+Nikkei 225                   Regime-dependent threshold       Domestic + foreign XGBoost, 2016          24               0.0205 0.154 (0.017) [0.018, 0.289] 0.201 (0.034) [0.025, 0.322]   0.206 (0.025) [0.008, 0.337]
+Nikkei 225                   Regime-dependent threshold       Domestic + foreign      LR, 1958          24               0.0205 0.188 (0.002) [0.014, 0.361] 0.298 (0.014) [0.000, 0.432]  0.294 (0.010) [-0.015, 0.438]
+Nikkei 225                          Regime-standardised       Domestic + foreign XGBoost, 2016          24               0.0225 0.124 (0.014) [0.022, 0.244] 0.200 (0.017) [0.018, 0.334]  0.191 (0.016) [-0.002, 0.322]
+Nikkei 225                          Regime-standardised       Domestic + foreign      LR, 1958          24               0.0225 0.175 (0.001) [0.022, 0.391] 0.293 (0.004) [0.000, 0.451]  0.280 (0.005) [-0.008, 0.439]
+Nikkei 225                     Rolling z-score baseline         Domestic + macro XGBoost, 2016          21               0.0219 0.109 (0.024) [0.019, 0.269] 0.131 (0.027) [0.000, 0.248]  0.112 (0.030) [-0.011, 0.234]
+Nikkei 225                     Rolling z-score baseline         Domestic + macro      LR, 1958          21               0.0219 0.171 (0.006) [0.019, 0.386] 0.230 (0.016) [0.000, 0.433]  0.220 (0.016) [-0.011, 0.424]
+Nikkei 225                   Regime-dependent threshold         Domestic + macro XGBoost, 2016          21               0.0205 0.078 (0.012) [0.018, 0.180] 0.124 (0.010) [0.032, 0.204]   0.119 (0.008) [0.020, 0.198]
+Nikkei 225                   Regime-dependent threshold         Domestic + macro      LR, 1958          21               0.0205 0.145 (0.005) [0.013, 0.374] 0.290 (0.014) [0.000, 0.486]  0.277 (0.016) [-0.009, 0.476]
+Nikkei 225                          Regime-standardised         Domestic + macro XGBoost, 2016          21               0.0225 0.064 (0.009) [0.020, 0.184] 0.104 (0.024) [0.013, 0.244]  0.084 (0.024) [-0.005, 0.232]
+Nikkei 225                          Regime-standardised         Domestic + macro      LR, 1958          21               0.0225 0.155 (0.002) [0.022, 0.381] 0.212 (0.019) [0.000, 0.389]  0.214 (0.019) [-0.010, 0.397]
+Nikkei 225                     Rolling z-score baseline Realised volatility only XGBoost, 2016           5               0.0219 0.071 (0.011) [0.013, 0.140] 0.089 (0.018) [0.012, 0.134]  0.074 (0.015) [-0.017, 0.125]
+Nikkei 225                     Rolling z-score baseline Realised volatility only      LR, 1958           5               0.0219 0.119 (0.001) [0.021, 0.220] 0.184 (0.030) [0.015, 0.271]   0.177 (0.012) [0.008, 0.266]
+Nikkei 225                   Regime-dependent threshold Realised volatility only XGBoost, 2016           5               0.0205 0.039 (0.002) [0.013, 0.073] 0.062 (0.005) [0.019, 0.093]  0.048 (0.010) [-0.011, 0.088]
+Nikkei 225                   Regime-dependent threshold Realised volatility only      LR, 1958           5               0.0205 0.094 (0.002) [0.019, 0.155] 0.152 (0.019) [0.000, 0.243]  0.134 (0.020) [-0.013, 0.230]
+Nikkei 225                          Regime-standardised Realised volatility only XGBoost, 2016           5               0.0225 0.031 (0.003) [0.013, 0.054] 0.044 (0.033) [0.011, 0.072]  0.023 (0.037) [-0.014, 0.058]
+Nikkei 225                          Regime-standardised Realised volatility only      LR, 1958           5               0.0225 0.091 (0.003) [0.021, 0.155] 0.165 (0.005) [0.000, 0.234]  0.145 (0.004) [-0.010, 0.218]
+Nikkei 225 Regime-dependent threshold (full-sample HMM)            Domestic-Only XGBoost, 2016          16               0.0192 0.148 (0.014) [0.020, 0.277] 0.205 (0.021) [0.016, 0.311]   0.193 (0.023) [0.003, 0.302]
+Nikkei 225 Regime-dependent threshold (full-sample HMM)            Domestic-Only      LR, 1958          16               0.0192 0.202 (0.001) [0.024, 0.400] 0.314 (0.012) [0.000, 0.451]  0.301 (0.011) [-0.010, 0.441]
+Nikkei 225 Regime-dependent threshold (full-sample HMM)     Cross-Market (lag 1) XGBoost, 2016          29               0.0192 0.089 (0.004) [0.015, 0.204] 0.130 (0.040) [0.022, 0.209]   0.138 (0.039) [0.014, 0.221]
+Nikkei 225 Regime-dependent threshold (full-sample HMM)     Cross-Market (lag 1)      LR, 1958          29               0.0192 0.133 (0.003) [0.013, 0.305] 0.258 (0.006) [0.000, 0.367]  0.244 (0.006) [-0.008, 0.353]
+  FTSE 100                     Rolling z-score baseline            Domestic-Only XGBoost, 2016          16               0.0265 0.165 (0.022) [0.026, 0.314] 0.222 (0.016) [0.024, 0.413]   0.209 (0.018) [0.001, 0.401]
+  FTSE 100                     Rolling z-score baseline            Domestic-Only      LR, 1958          16               0.0265 0.172 (0.002) [0.024, 0.341] 0.301 (0.017) [0.000, 0.524]  0.282 (0.017) [-0.016, 0.507]
+  FTSE 100                   Regime-dependent threshold            Domestic-Only XGBoost, 2016          16               0.0245 0.142 (0.011) [0.026, 0.261] 0.205 (0.019) [0.052, 0.342]   0.210 (0.017) [0.044, 0.334]
+  FTSE 100                   Regime-dependent threshold            Domestic-Only      LR, 1958          16               0.0245 0.168 (0.003) [0.024, 0.295] 0.300 (0.017) [0.000, 0.458]  0.283 (0.017) [-0.010, 0.438]
+  FTSE 100                          Regime-standardised            Domestic-Only XGBoost, 2016          16               0.0252 0.098 (0.003) [0.048, 0.202] 0.163 (0.009) [0.061, 0.269]   0.156 (0.014) [0.040, 0.262]
+  FTSE 100                          Regime-standardised            Domestic-Only      LR, 1958          16               0.0252 0.106 (0.002) [0.035, 0.238] 0.191 (0.020) [0.005, 0.343]  0.170 (0.020) [-0.010, 0.324]
+  FTSE 100                     Rolling z-score baseline     Cross-Market (lag 1) XGBoost, 2016          29               0.0265 0.109 (0.012) [0.027, 0.229] 0.034 (0.035) [0.000, 0.062]  0.041 (0.046) [-0.005, 0.097]
+  FTSE 100                     Rolling z-score baseline     Cross-Market (lag 1)      LR, 1958          29               0.0265 0.159 (0.002) [0.023, 0.315] 0.230 (0.010) [0.007, 0.403]  0.217 (0.010) [-0.005, 0.384]
+  FTSE 100                   Regime-dependent threshold     Cross-Market (lag 1) XGBoost, 2016          29               0.0245 0.104 (0.014) [0.036, 0.189] 0.188 (0.024) [0.062, 0.292]   0.180 (0.035) [0.052, 0.274]
+  FTSE 100                   Regime-dependent threshold     Cross-Market (lag 1)      LR, 1958          29               0.0245 0.163 (0.003) [0.036, 0.279] 0.259 (0.012) [0.033, 0.392]   0.241 (0.012) [0.019, 0.368]
+  FTSE 100                          Regime-standardised     Cross-Market (lag 1) XGBoost, 2016          29               0.0252 0.069 (0.006) [0.034, 0.104] 0.076 (0.024) [0.032, 0.115]   0.051 (0.035) [0.005, 0.098]
+  FTSE 100                          Regime-standardised     Cross-Market (lag 1)      LR, 1958          29               0.0252 0.095 (0.002) [0.034, 0.204] 0.132 (0.002) [0.000, 0.257]  0.119 (0.003) [-0.011, 0.255]
+  FTSE 100                     Rolling z-score baseline Cross-Market (lag 0 + 1) XGBoost, 2016          31               0.0265 0.134 (0.016) [0.036, 0.263] 0.173 (0.099) [0.038, 0.279]   0.156 (0.094) [0.025, 0.260]
+  FTSE 100                     Rolling z-score baseline Cross-Market (lag 0 + 1)      LR, 1958          31               0.0265 0.184 (0.002) [0.034, 0.330] 0.256 (0.018) [0.032, 0.408]   0.248 (0.022) [0.025, 0.391]
+  FTSE 100                   Regime-dependent threshold Cross-Market (lag 0 + 1) XGBoost, 2016          31               0.0245 0.129 (0.007) [0.045, 0.236] 0.010 (0.021) [0.000, 0.027]  0.010 (0.031) [-0.007, 0.034]
+  FTSE 100                   Regime-dependent threshold Cross-Market (lag 0 + 1)      LR, 1958          31               0.0245 0.204 (0.002) [0.050, 0.330] 0.287 (0.027) [0.059, 0.416]   0.273 (0.028) [0.052, 0.397]
+  FTSE 100                          Regime-standardised Cross-Market (lag 0 + 1) XGBoost, 2016          31               0.0252 0.082 (0.007) [0.047, 0.145] 0.079 (0.071) [0.038, 0.109]   0.070 (0.084) [0.032, 0.100]
+  FTSE 100                          Regime-standardised Cross-Market (lag 0 + 1)      LR, 1958          31               0.0252 0.116 (0.002) [0.036, 0.271] 0.206 (0.013) [0.000, 0.366]  0.186 (0.014) [-0.015, 0.348]
+  FTSE 100                     Rolling z-score baseline       Domestic + foreign XGBoost, 2016          24               0.0265 0.166 (0.012) [0.029, 0.309] 0.230 (0.035) [0.039, 0.402]   0.221 (0.024) [0.022, 0.394]
+  FTSE 100                     Rolling z-score baseline       Domestic + foreign      LR, 1958          24               0.0265 0.195 (0.003) [0.027, 0.376] 0.285 (0.022) [0.000, 0.484]  0.265 (0.023) [-0.007, 0.465]
+  FTSE 100                   Regime-dependent threshold       Domestic + foreign XGBoost, 2016          24               0.0245 0.176 (0.015) [0.040, 0.292] 0.204 (0.018) [0.030, 0.289]   0.201 (0.008) [0.023, 0.277]
+  FTSE 100                   Regime-dependent threshold       Domestic + foreign      LR, 1958          24               0.0245 0.194 (0.003) [0.042, 0.305] 0.313 (0.018) [0.000, 0.453]  0.308 (0.023) [-0.003, 0.433]
+  FTSE 100                          Regime-standardised       Domestic + foreign XGBoost, 2016          24               0.0252 0.103 (0.010) [0.043, 0.179] 0.144 (0.029) [0.050, 0.226]   0.123 (0.031) [0.029, 0.208]
+  FTSE 100                          Regime-standardised       Domestic + foreign      LR, 1958          24               0.0252 0.120 (0.002) [0.045, 0.241] 0.197 (0.013) [0.000, 0.350]  0.178 (0.013) [-0.010, 0.334]
+  FTSE 100                     Rolling z-score baseline         Domestic + macro XGBoost, 2016          21               0.0265 0.102 (0.020) [0.024, 0.219] 0.102 (0.073) [0.018, 0.182]   0.091 (0.068) [0.006, 0.165]
+  FTSE 100                     Rolling z-score baseline         Domestic + macro      LR, 1958          21               0.0265 0.147 (0.002) [0.021, 0.296] 0.227 (0.016) [0.000, 0.392]  0.209 (0.011) [-0.011, 0.371]
+  FTSE 100                   Regime-dependent threshold         Domestic + macro XGBoost, 2016          21               0.0245 0.092 (0.007) [0.033, 0.182] 0.008 (0.018) [0.000, 0.016] -0.001 (0.020) [-0.012, 0.011]
+  FTSE 100                   Regime-dependent threshold         Domestic + macro      LR, 1958          21               0.0245 0.135 (0.003) [0.021, 0.257] 0.173 (0.013) [0.000, 0.304]  0.161 (0.014) [-0.013, 0.281]
+  FTSE 100                          Regime-standardised         Domestic + macro XGBoost, 2016          21               0.0252 0.061 (0.003) [0.034, 0.107] 0.107 (0.014) [0.043, 0.168]   0.085 (0.016) [0.017, 0.148]
+  FTSE 100                          Regime-standardised         Domestic + macro      LR, 1958          21               0.0252 0.084 (0.002) [0.027, 0.200] 0.135 (0.008) [0.036, 0.241]   0.126 (0.008) [0.008, 0.235]
+  FTSE 100                     Rolling z-score baseline Realised volatility only XGBoost, 2016           5               0.0265 0.077 (0.008) [0.014, 0.235] 0.018 (0.025) [0.000, 0.037]  0.027 (0.051) [-0.004, 0.058]
+  FTSE 100                     Rolling z-score baseline Realised volatility only      LR, 1958           5               0.0265 0.152 (0.003) [0.023, 0.312] 0.200 (0.005) [0.028, 0.369]   0.197 (0.006) [0.007, 0.367]
+  FTSE 100                   Regime-dependent threshold Realised volatility only XGBoost, 2016           5               0.0245 0.082 (0.006) [0.014, 0.194] 0.119 (0.034) [0.000, 0.240]  0.098 (0.033) [-0.023, 0.216]
+  FTSE 100                   Regime-dependent threshold Realised volatility only      LR, 1958           5               0.0245 0.148 (0.004) [0.027, 0.279] 0.174 (0.005) [0.000, 0.292]  0.156 (0.006) [-0.018, 0.266]
+  FTSE 100                          Regime-standardised Realised volatility only XGBoost, 2016           5               0.0252 0.045 (0.010) [0.019, 0.072] 0.044 (0.014) [0.000, 0.077]  0.022 (0.014) [-0.026, 0.056]
+  FTSE 100                          Regime-standardised Realised volatility only      LR, 1958           5               0.0252 0.069 (0.003) [0.022, 0.144] 0.101 (0.009) [0.000, 0.171]  0.074 (0.010) [-0.025, 0.143]
+  FTSE 100 Regime-dependent threshold (full-sample HMM)            Domestic-Only XGBoost, 2016          16               0.0219 0.160 (0.014) [0.023, 0.296] 0.239 (0.052) [0.009, 0.400]   0.232 (0.038) [0.001, 0.390]
+  FTSE 100 Regime-dependent threshold (full-sample HMM)            Domestic-Only      LR, 1958          16               0.0219 0.161 (0.001) [0.023, 0.281] 0.262 (0.029) [0.000, 0.408]  0.249 (0.023) [-0.012, 0.395]
+  FTSE 100 Regime-dependent threshold (full-sample HMM)     Cross-Market (lag 1) XGBoost, 2016          29               0.0219 0.105 (0.009) [0.026, 0.201] 0.166 (0.047) [0.022, 0.247]   0.156 (0.039) [0.014, 0.235]
+  FTSE 100 Regime-dependent threshold (full-sample HMM)     Cross-Market (lag 1)      LR, 1958          29               0.0219 0.162 (0.003) [0.028, 0.270] 0.286 (0.011) [0.045, 0.418]   0.272 (0.011) [0.034, 0.401]
+   S&P 500                     Rolling z-score baseline            Domestic-Only iForest, 2008          16               0.0345 0.182 (0.013) [0.030, 0.425] 0.226 (0.021) [0.023, 0.476]  0.205 (0.015) [-0.004, 0.454]
+   S&P 500                   Regime-dependent threshold            Domestic-Only iForest, 2008          16               0.0305 0.171 (0.010) [0.020, 0.405] 0.254 (0.041) [0.003, 0.522]  0.236 (0.031) [-0.021, 0.506]
+   S&P 500                          Regime-standardised            Domestic-Only iForest, 2008          16               0.0311 0.162 (0.013) [0.020, 0.392] 0.185 (0.047) [0.016, 0.395]  0.172 (0.040) [-0.016, 0.384]
+   S&P 500                     Rolling z-score baseline     Cross-Market (lag 1) iForest, 2008          29               0.0345 0.194 (0.010) [0.039, 0.463] 0.216 (0.053) [0.059, 0.407]   0.213 (0.034) [0.045, 0.397]
+   S&P 500                   Regime-dependent threshold     Cross-Market (lag 1) iForest, 2008          29               0.0305 0.190 (0.011) [0.025, 0.456] 0.260 (0.032) [0.000, 0.521]  0.240 (0.030) [-0.024, 0.499]
+   S&P 500                          Regime-standardised     Cross-Market (lag 1) iForest, 2008          29               0.0311 0.171 (0.011) [0.022, 0.430] 0.155 (0.055) [0.031, 0.314]   0.155 (0.042) [0.005, 0.314]
+   S&P 500                     Rolling z-score baseline Cross-Market (lag 0 + 1) iForest, 2008          33               0.0345 0.198 (0.009) [0.045, 0.481] 0.206 (0.039) [0.069, 0.388]   0.217 (0.026) [0.062, 0.389]
+   S&P 500                   Regime-dependent threshold Cross-Market (lag 0 + 1) iForest, 2008          33               0.0305 0.189 (0.010) [0.028, 0.469] 0.162 (0.046) [0.042, 0.319]   0.181 (0.031) [0.034, 0.327]
+   S&P 500                          Regime-standardised Cross-Market (lag 0 + 1) iForest, 2008          33               0.0311 0.173 (0.009) [0.027, 0.446] 0.140 (0.023) [0.041, 0.282]   0.152 (0.024) [0.022, 0.290]
+Nikkei 225                     Rolling z-score baseline            Domestic-Only iForest, 2008          16               0.0219 0.141 (0.006) [0.027, 0.248] 0.251 (0.014) [0.017, 0.382]   0.252 (0.013) [0.007, 0.380]
+Nikkei 225                   Regime-dependent threshold            Domestic-Only iForest, 2008          16               0.0205 0.112 (0.005) [0.018, 0.226] 0.218 (0.014) [0.000, 0.365]  0.219 (0.013) [-0.014, 0.360]
+Nikkei 225                          Regime-standardised            Domestic-Only iForest, 2008          16               0.0225 0.110 (0.004) [0.037, 0.244] 0.226 (0.013) [0.051, 0.365]   0.222 (0.014) [0.042, 0.350]
+Nikkei 225                     Rolling z-score baseline     Cross-Market (lag 1) iForest, 2008          29               0.0219 0.154 (0.012) [0.031, 0.263] 0.244 (0.021) [0.052, 0.366]   0.252 (0.021) [0.044, 0.367]
+Nikkei 225                   Regime-dependent threshold     Cross-Market (lag 1) iForest, 2008          29               0.0205 0.123 (0.007) [0.021, 0.244] 0.222 (0.022) [0.037, 0.350]   0.231 (0.025) [0.026, 0.351]
+Nikkei 225                          Regime-standardised     Cross-Market (lag 1) iForest, 2008          29               0.0225 0.120 (0.006) [0.039, 0.261] 0.236 (0.022) [0.085, 0.355]   0.240 (0.025) [0.082, 0.346]
+  FTSE 100                     Rolling z-score baseline            Domestic-Only iForest, 2008          16               0.0265 0.138 (0.007) [0.025, 0.371] 0.193 (0.022) [0.000, 0.408]  0.175 (0.019) [-0.026, 0.389]
+  FTSE 100                   Regime-dependent threshold            Domestic-Only iForest, 2008          16               0.0245 0.122 (0.009) [0.022, 0.318] 0.188 (0.020) [0.000, 0.379]  0.171 (0.017) [-0.024, 0.358]
+  FTSE 100                          Regime-standardised            Domestic-Only iForest, 2008          16               0.0252 0.068 (0.003) [0.027, 0.168] 0.107 (0.019) [0.002, 0.218]  0.081 (0.021) [-0.029, 0.194]
+  FTSE 100                     Rolling z-score baseline     Cross-Market (lag 1) iForest, 2008          29               0.0265 0.174 (0.018) [0.033, 0.404] 0.237 (0.014) [0.009, 0.457]  0.219 (0.013) [-0.011, 0.439]
+  FTSE 100                   Regime-dependent threshold     Cross-Market (lag 1) iForest, 2008          29               0.0245 0.150 (0.023) [0.025, 0.356] 0.223 (0.017) [0.012, 0.414]  0.208 (0.019) [-0.004, 0.397]
+  FTSE 100                          Regime-standardised     Cross-Market (lag 1) iForest, 2008          29               0.0252 0.089 (0.012) [0.031, 0.185] 0.161 (0.011) [0.000, 0.293]  0.138 (0.011) [-0.022, 0.278]
+  FTSE 100                     Rolling z-score baseline Cross-Market (lag 0 + 1) iForest, 2008          31               0.0265 0.167 (0.005) [0.033, 0.408] 0.260 (0.009) [0.000, 0.486]  0.239 (0.009) [-0.020, 0.467]
+  FTSE 100                   Regime-dependent threshold Cross-Market (lag 0 + 1) iForest, 2008          31               0.0245 0.150 (0.010) [0.028, 0.363] 0.225 (0.028) [0.000, 0.422]  0.210 (0.023) [-0.013, 0.406]
+  FTSE 100                          Regime-standardised Cross-Market (lag 0 + 1) iForest, 2008          31               0.0252 0.086 (0.007) [0.030, 0.209] 0.164 (0.013) [0.000, 0.296]  0.141 (0.013) [-0.021, 0.281]
+
+=== table_session_close_times
+index              exchange local_close   local_close_changes        time_zone                                    utc_close                                                                                                           daylight_saving
+ GSPC                  NYSE       16:00                  none America/New_York 20:00 UTC (3992 days); 21:00 UTC (2296 days) EDT: second Sunday of March to first Sunday of November from 2007; first Sunday of April to last Sunday of October before
+ N225  Tokyo Stock Exchange       15:00 15:30 from 2024-11-05       Asia/Tokyo   06:00 UTC (6250 days); 06:30 UTC (38 days)                                                                                  none (Japan has no daylight saving time)
+ FTSE London Stock Exchange       16:35                  none    Europe/London 15:35 UTC (3723 days); 16:35 UTC (2565 days)                                                                       BST: last Sunday of March to last Sunday of October
+
+=== table_lag0_ordering
+target foreign  days  foreign_closes_first_days  gap_hours_min  gap_hours_max latest_foreign_session_at_target_close
+  GSPC    N225  6288                       6288          14.00          15.00                      same date (lag 0)
+  GSPC    FTSE  6288                       6288           3.42           5.42                      same date (lag 0)
+  N225    GSPC  6288                          0         -15.00         -14.00                  previous date (lag 1)
+  N225    FTSE  6288                          0         -10.58          -9.58                  previous date (lag 1)
+  FTSE    GSPC  6288                          0          -5.42          -3.42                  previous date (lag 1)
+  FTSE    N225  6288                       6288           9.58          10.58                      same date (lag 0)
+
+=== table_dm_tests
+     index                      label         model                                       comparison      n  mean_brier_a  mean_brier_b  dm_stat  p_value               lower_loss
+   S&P 500   Rolling z-score baseline XGBoost, 2016            Domestic-Only vs Cross-Market (lag 1) 1509.0       0.03148       0.03263   -1.419   0.1560            Domestic-Only
+   S&P 500   Rolling z-score baseline XGBoost, 2016        Domestic-Only vs Cross-Market (lag 0 + 1) 1509.0       0.03148       0.03190   -0.474   0.6354            Domestic-Only
+   S&P 500   Rolling z-score baseline XGBoost, 2016 Cross-Market (lag 1) vs Cross-Market (lag 0 + 1) 1509.0       0.03263       0.03190    1.983   0.0475 Cross-Market (lag 0 + 1)
+   S&P 500   Rolling z-score baseline      LR, 1958            Domestic-Only vs Cross-Market (lag 1) 1509.0       0.02955       0.03017   -1.026   0.3050            Domestic-Only
+   S&P 500   Rolling z-score baseline      LR, 1958        Domestic-Only vs Cross-Market (lag 0 + 1) 1509.0       0.02955       0.02839    1.174   0.2406 Cross-Market (lag 0 + 1)
+   S&P 500   Rolling z-score baseline      LR, 1958 Cross-Market (lag 1) vs Cross-Market (lag 0 + 1) 1509.0       0.03017       0.02839    1.556   0.1198 Cross-Market (lag 0 + 1)
+   S&P 500 Regime-dependent threshold XGBoost, 2016            Domestic-Only vs Cross-Market (lag 1) 1509.0       0.02917       0.02988   -1.791   0.0735            Domestic-Only
+   S&P 500 Regime-dependent threshold XGBoost, 2016        Domestic-Only vs Cross-Market (lag 0 + 1) 1509.0       0.02917       0.02936   -0.436   0.6629            Domestic-Only
+   S&P 500 Regime-dependent threshold XGBoost, 2016 Cross-Market (lag 1) vs Cross-Market (lag 0 + 1) 1509.0       0.02988       0.02936    1.964   0.0497 Cross-Market (lag 0 + 1)
+   S&P 500 Regime-dependent threshold      LR, 1958            Domestic-Only vs Cross-Market (lag 1) 1509.0       0.02684       0.02745   -0.589   0.5558            Domestic-Only
+   S&P 500 Regime-dependent threshold      LR, 1958        Domestic-Only vs Cross-Market (lag 0 + 1) 1509.0       0.02684       0.02457    1.720   0.0857 Cross-Market (lag 0 + 1)
+   S&P 500 Regime-dependent threshold      LR, 1958 Cross-Market (lag 1) vs Cross-Market (lag 0 + 1) 1509.0       0.02745       0.02457    1.560   0.1190 Cross-Market (lag 0 + 1)
+   S&P 500        Regime-standardised XGBoost, 2016            Domestic-Only vs Cross-Market (lag 1) 1509.0       0.02869       0.02992   -1.572   0.1161            Domestic-Only
+   S&P 500        Regime-standardised XGBoost, 2016        Domestic-Only vs Cross-Market (lag 0 + 1) 1509.0       0.02869       0.02927   -0.894   0.3712            Domestic-Only
+   S&P 500        Regime-standardised XGBoost, 2016 Cross-Market (lag 1) vs Cross-Market (lag 0 + 1) 1509.0       0.02992       0.02927    2.160   0.0310 Cross-Market (lag 0 + 1)
+   S&P 500        Regime-standardised      LR, 1958            Domestic-Only vs Cross-Market (lag 1) 1509.0       0.02715       0.02739   -0.405   0.6855            Domestic-Only
+   S&P 500        Regime-standardised      LR, 1958        Domestic-Only vs Cross-Market (lag 0 + 1) 1509.0       0.02715       0.02820   -0.525   0.5995            Domestic-Only
+   S&P 500        Regime-standardised      LR, 1958 Cross-Market (lag 1) vs Cross-Market (lag 0 + 1) 1509.0       0.02739       0.02820   -0.449   0.6539     Cross-Market (lag 1)
+Nikkei 225   Rolling z-score baseline XGBoost, 2016            Domestic-Only vs Cross-Market (lag 1) 1509.0       0.02049       0.02077   -0.747   0.4551            Domestic-Only
+Nikkei 225   Rolling z-score baseline      LR, 1958            Domestic-Only vs Cross-Market (lag 1) 1509.0       0.01976       0.02167   -2.272   0.0232            Domestic-Only
+Nikkei 225 Regime-dependent threshold XGBoost, 2016            Domestic-Only vs Cross-Market (lag 1) 1509.0       0.01941       0.01938    0.091   0.9272     Cross-Market (lag 1)
+Nikkei 225 Regime-dependent threshold      LR, 1958            Domestic-Only vs Cross-Market (lag 1) 1509.0       0.02123       0.02170   -0.375   0.7074            Domestic-Only
+Nikkei 225        Regime-standardised XGBoost, 2016            Domestic-Only vs Cross-Market (lag 1) 1509.0       0.02198       0.02208   -0.130   0.8967            Domestic-Only
+Nikkei 225        Regime-standardised      LR, 1958            Domestic-Only vs Cross-Market (lag 1) 1509.0       0.02131       0.02225   -1.154   0.2486            Domestic-Only
+  FTSE 100   Rolling z-score baseline XGBoost, 2016            Domestic-Only vs Cross-Market (lag 1) 1509.0       0.02426       0.02539   -1.803   0.0716            Domestic-Only
+  FTSE 100   Rolling z-score baseline XGBoost, 2016        Domestic-Only vs Cross-Market (lag 0 + 1) 1509.0       0.02426       0.02512   -1.581   0.1142            Domestic-Only
+  FTSE 100   Rolling z-score baseline XGBoost, 2016 Cross-Market (lag 1) vs Cross-Market (lag 0 + 1) 1509.0       0.02539       0.02512    1.606   0.1085 Cross-Market (lag 0 + 1)
+  FTSE 100   Rolling z-score baseline      LR, 1958            Domestic-Only vs Cross-Market (lag 1) 1509.0       0.02761       0.02740    0.326   0.7444     Cross-Market (lag 1)
+  FTSE 100   Rolling z-score baseline      LR, 1958        Domestic-Only vs Cross-Market (lag 0 + 1) 1509.0       0.02761       0.02619    1.619   0.1056 Cross-Market (lag 0 + 1)
+  FTSE 100   Rolling z-score baseline      LR, 1958 Cross-Market (lag 1) vs Cross-Market (lag 0 + 1) 1509.0       0.02740       0.02619    1.915   0.0557 Cross-Market (lag 0 + 1)
+  FTSE 100 Regime-dependent threshold XGBoost, 2016            Domestic-Only vs Cross-Market (lag 1) 1509.0       0.02280       0.02347   -1.477   0.1400            Domestic-Only
+  FTSE 100 Regime-dependent threshold XGBoost, 2016        Domestic-Only vs Cross-Market (lag 0 + 1) 1509.0       0.02280       0.02297   -0.443   0.6575            Domestic-Only
+  FTSE 100 Regime-dependent threshold XGBoost, 2016 Cross-Market (lag 1) vs Cross-Market (lag 0 + 1) 1509.0       0.02347       0.02297    2.482   0.0132 Cross-Market (lag 0 + 1)
+  FTSE 100 Regime-dependent threshold      LR, 1958            Domestic-Only vs Cross-Market (lag 1) 1509.0       0.02462       0.02461    0.008   0.9936     Cross-Market (lag 1)
+  FTSE 100 Regime-dependent threshold      LR, 1958        Domestic-Only vs Cross-Market (lag 0 + 1) 1509.0       0.02462       0.02245    1.650   0.0992 Cross-Market (lag 0 + 1)
+  FTSE 100 Regime-dependent threshold      LR, 1958 Cross-Market (lag 1) vs Cross-Market (lag 0 + 1) 1509.0       0.02461       0.02245    2.035   0.0420 Cross-Market (lag 0 + 1)
+  FTSE 100        Regime-standardised XGBoost, 2016            Domestic-Only vs Cross-Market (lag 1) 1509.0       0.02379       0.02476   -2.036   0.0419            Domestic-Only
+  FTSE 100        Regime-standardised XGBoost, 2016        Domestic-Only vs Cross-Market (lag 0 + 1) 1509.0       0.02379       0.02432   -1.494   0.1353            Domestic-Only
+  FTSE 100        Regime-standardised XGBoost, 2016 Cross-Market (lag 1) vs Cross-Market (lag 0 + 1) 1509.0       0.02476       0.02432    1.982   0.0477 Cross-Market (lag 0 + 1)
+  FTSE 100        Regime-standardised      LR, 1958            Domestic-Only vs Cross-Market (lag 1) 1509.0       0.02862       0.02879   -0.229   0.8186            Domestic-Only
+  FTSE 100        Regime-standardised      LR, 1958        Domestic-Only vs Cross-Market (lag 0 + 1) 1509.0       0.02862       0.02833    0.187   0.8516 Cross-Market (lag 0 + 1)
+  FTSE 100        Regime-standardised      LR, 1958 Cross-Market (lag 1) vs Cross-Market (lag 0 + 1) 1509.0       0.02879       0.02833    0.400   0.6889 Cross-Market (lag 0 + 1)
+=== test.py finished ===
+EXIT=0
+Sat Nov  7 23:38:46 MPST 2026

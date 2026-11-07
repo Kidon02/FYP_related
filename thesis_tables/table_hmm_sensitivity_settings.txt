@@ -1,4 +1,4 @@
-Dataset: S&P 500, Nikkei 225, FTSE 100 (panel_full_2026-10-27.csv)
+Dataset: S&P 500, Nikkei 225, FTSE 100 (panel_full_2026-11-07.csv)
 Feature set: label statistics: none; PR-AUC: domestic_only and cross_market
 Label strategy: hmm (causal: fit 2000-2015, filtered) vs hmm_fullsample (fit 2000-2024, Viterbi path)
 Model: 2-state Gaussian HMM; xgboost and logistic_regression for PR-AUC

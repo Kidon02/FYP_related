@@ -1,4 +1,4 @@
-Dataset: S&P 500, Nikkei 225, FTSE 100 (panel_full_2026-10-27.csv); rows where every label set is defined
+Dataset: S&P 500, Nikkei 225, FTSE 100 (panel_full_2026-11-07.csv); rows where every label set is defined
 Feature set: domestic_only, cross_market (lag 1), cross_market_lag0, ablation_foreign, ablation_macro, rv_only
 Label strategy: baseline, hmm, regime_std; hmm_fullsample as sensitivity
 Model: XGBoost (2016), L2 logistic regression (LR, 1958), Isolation Forest (iForest, 2008; unsupervised, domestic_only/cross_market/cross_market_lag0 only); grid on validation PR-AUC; F1 threshold on validation

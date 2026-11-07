@@ -1,4 +1,4 @@
-Dataset: N225 (panel_full_2026-10-27.csv); same rows as baseline_models.py
+Dataset: N225 (panel_full_2026-11-07.csv); same rows as baseline_models.py
 Feature set: domestic_only, cross_market, cross_market_lag0 (configs/features.yaml)
 Label strategy: baseline, hmm, regime_std (labels used only for selection and scoring)
 Model: isolation_forest (sklearn IsolationForest, unsupervised, fit on 2000-2015 features only)

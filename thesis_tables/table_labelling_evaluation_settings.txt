@@ -1,4 +1,4 @@
-Dataset: S&P 500, Nikkei 225, FTSE 100 (panel_full_2026-10-27.csv); days where all three schemes are defined
+Dataset: S&P 500, Nikkei 225, FTSE 100 (panel_full_2026-11-07.csv); days where all three schemes are defined
 Feature set: n/a (labels only)
 Label strategy: baseline (|z|>2.5), hmm (2.5/3.0 by filtered regime), regime_std (one threshold 2.5)
 Model: 2-state Gaussian HMM on rv21, fit 2000-2015, filtered/predicted probabilities

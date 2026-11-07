@@ -1,43 +1,43 @@
 index,label,model,comparison,n,mean_brier_a,mean_brier_b,dm_stat,p_value,lower_loss
-S&P 500,Rolling z-score baseline,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 1),1509.0,0.03143,0.03385,-1.745,0.0811,Domestic-Only
-S&P 500,Rolling z-score baseline,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 0 + 1),1509.0,0.03143,0.03267,-1.204,0.2288,Domestic-Only
-S&P 500,Rolling z-score baseline,"XGBoost, 2016",Cross-Market (lag 1) vs Cross-Market (lag 0 + 1),1509.0,0.03385,0.03267,2.132,0.0331,Cross-Market (lag 0 + 1)
-S&P 500,Rolling z-score baseline,"LR, 1958",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02958,0.02968,-0.244,0.8074,Domestic-Only
-S&P 500,Rolling z-score baseline,"LR, 1958",Domestic-Only vs Cross-Market (lag 0 + 1),1509.0,0.02958,0.02851,0.881,0.3787,Cross-Market (lag 0 + 1)
-S&P 500,Rolling z-score baseline,"LR, 1958",Cross-Market (lag 1) vs Cross-Market (lag 0 + 1),1509.0,0.02968,0.02851,1.079,0.2808,Cross-Market (lag 0 + 1)
-S&P 500,Regime-dependent threshold,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02916,0.03013,-1.807,0.071,Domestic-Only
-S&P 500,Regime-dependent threshold,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 0 + 1),1509.0,0.02916,0.02881,1.414,0.1576,Cross-Market (lag 0 + 1)
-S&P 500,Regime-dependent threshold,"XGBoost, 2016",Cross-Market (lag 1) vs Cross-Market (lag 0 + 1),1509.0,0.03013,0.02881,2.32,0.0205,Cross-Market (lag 0 + 1)
-S&P 500,Regime-dependent threshold,"LR, 1958",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02665,0.02617,0.879,0.3795,Cross-Market (lag 1)
-S&P 500,Regime-dependent threshold,"LR, 1958",Domestic-Only vs Cross-Market (lag 0 + 1),1509.0,0.02665,0.02449,1.503,0.1331,Cross-Market (lag 0 + 1)
-S&P 500,Regime-dependent threshold,"LR, 1958",Cross-Market (lag 1) vs Cross-Market (lag 0 + 1),1509.0,0.02617,0.02449,1.291,0.197,Cross-Market (lag 0 + 1)
-S&P 500,Regime-standardised,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02882,0.03094,-1.851,0.0644,Domestic-Only
-S&P 500,Regime-standardised,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 0 + 1),1509.0,0.02882,0.029,-0.58,0.5622,Domestic-Only
-S&P 500,Regime-standardised,"XGBoost, 2016",Cross-Market (lag 1) vs Cross-Market (lag 0 + 1),1509.0,0.03094,0.029,2.105,0.0355,Cross-Market (lag 0 + 1)
-S&P 500,Regime-standardised,"LR, 1958",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02716,0.02757,-0.885,0.3763,Domestic-Only
-S&P 500,Regime-standardised,"LR, 1958",Domestic-Only vs Cross-Market (lag 0 + 1),1509.0,0.02716,0.0266,0.39,0.6965,Cross-Market (lag 0 + 1)
-S&P 500,Regime-standardised,"LR, 1958",Cross-Market (lag 1) vs Cross-Market (lag 0 + 1),1509.0,0.02757,0.0266,0.861,0.3896,Cross-Market (lag 0 + 1)
-Nikkei 225,Rolling z-score baseline,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02049,0.02099,-0.926,0.3547,Domestic-Only
-Nikkei 225,Rolling z-score baseline,"LR, 1958",Domestic-Only vs Cross-Market (lag 1),1509.0,0.01976,0.02073,-1.461,0.1443,Domestic-Only
-Nikkei 225,Regime-dependent threshold,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 1),1509.0,0.01941,0.01972,-0.709,0.4786,Domestic-Only
-Nikkei 225,Regime-dependent threshold,"LR, 1958",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02123,0.02205,-0.673,0.5008,Domestic-Only
-Nikkei 225,Regime-standardised,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02198,0.02176,0.321,0.748,Cross-Market (lag 1)
-Nikkei 225,Regime-standardised,"LR, 1958",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02131,0.02228,-1.118,0.2638,Domestic-Only
-FTSE 100,Rolling z-score baseline,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02427,0.02458,-0.898,0.3692,Domestic-Only
-FTSE 100,Rolling z-score baseline,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 0 + 1),1509.0,0.02427,0.02554,-2.03,0.0425,Domestic-Only
-FTSE 100,Rolling z-score baseline,"XGBoost, 2016",Cross-Market (lag 1) vs Cross-Market (lag 0 + 1),1509.0,0.02458,0.02554,-2.82,0.0049,Cross-Market (lag 1)
-FTSE 100,Rolling z-score baseline,"LR, 1958",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02753,0.02623,1.679,0.0933,Cross-Market (lag 1)
-FTSE 100,Rolling z-score baseline,"LR, 1958",Domestic-Only vs Cross-Market (lag 0 + 1),1509.0,0.02753,0.02521,1.98,0.0478,Cross-Market (lag 0 + 1)
-FTSE 100,Rolling z-score baseline,"LR, 1958",Cross-Market (lag 1) vs Cross-Market (lag 0 + 1),1509.0,0.02623,0.02521,1.189,0.2345,Cross-Market (lag 0 + 1)
-FTSE 100,Regime-dependent threshold,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02275,0.02409,-1.961,0.05,Domestic-Only
-FTSE 100,Regime-dependent threshold,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 0 + 1),1509.0,0.02275,0.02434,-2.168,0.0303,Domestic-Only
-FTSE 100,Regime-dependent threshold,"XGBoost, 2016",Cross-Market (lag 1) vs Cross-Market (lag 0 + 1),1509.0,0.02409,0.02434,-2.047,0.0408,Cross-Market (lag 1)
-FTSE 100,Regime-dependent threshold,"LR, 1958",Domestic-Only vs Cross-Market (lag 1),1509.0,0.0246,0.02379,1.209,0.227,Cross-Market (lag 1)
-FTSE 100,Regime-dependent threshold,"LR, 1958",Domestic-Only vs Cross-Market (lag 0 + 1),1509.0,0.0246,0.02278,1.835,0.0667,Cross-Market (lag 0 + 1)
-FTSE 100,Regime-dependent threshold,"LR, 1958",Cross-Market (lag 1) vs Cross-Market (lag 0 + 1),1509.0,0.02379,0.02278,1.418,0.1563,Cross-Market (lag 0 + 1)
-FTSE 100,Regime-standardised,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02379,0.02453,-1.642,0.1007,Domestic-Only
-FTSE 100,Regime-standardised,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 0 + 1),1509.0,0.02379,0.02475,-2.069,0.0387,Domestic-Only
-FTSE 100,Regime-standardised,"XGBoost, 2016",Cross-Market (lag 1) vs Cross-Market (lag 0 + 1),1509.0,0.02453,0.02475,-2.067,0.0389,Cross-Market (lag 1)
-FTSE 100,Regime-standardised,"LR, 1958",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02868,0.02911,-0.722,0.4704,Domestic-Only
-FTSE 100,Regime-standardised,"LR, 1958",Domestic-Only vs Cross-Market (lag 0 + 1),1509.0,0.02868,0.02819,0.725,0.4686,Cross-Market (lag 0 + 1)
-FTSE 100,Regime-standardised,"LR, 1958",Cross-Market (lag 1) vs Cross-Market (lag 0 + 1),1509.0,0.02911,0.02819,1.964,0.0497,Cross-Market (lag 0 + 1)
+S&P 500,Rolling z-score baseline,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 1),1509.0,0.03148,0.03263,-1.419,0.156,Domestic-Only
+S&P 500,Rolling z-score baseline,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 0 + 1),1509.0,0.03148,0.0319,-0.474,0.6354,Domestic-Only
+S&P 500,Rolling z-score baseline,"XGBoost, 2016",Cross-Market (lag 1) vs Cross-Market (lag 0 + 1),1509.0,0.03263,0.0319,1.983,0.0475,Cross-Market (lag 0 + 1)
+S&P 500,Rolling z-score baseline,"LR, 1958",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02955,0.03017,-1.026,0.305,Domestic-Only
+S&P 500,Rolling z-score baseline,"LR, 1958",Domestic-Only vs Cross-Market (lag 0 + 1),1509.0,0.02955,0.02839,1.174,0.2406,Cross-Market (lag 0 + 1)
+S&P 500,Rolling z-score baseline,"LR, 1958",Cross-Market (lag 1) vs Cross-Market (lag 0 + 1),1509.0,0.03017,0.02839,1.556,0.1198,Cross-Market (lag 0 + 1)
+S&P 500,Regime-dependent threshold,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02917,0.02988,-1.791,0.0735,Domestic-Only
+S&P 500,Regime-dependent threshold,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 0 + 1),1509.0,0.02917,0.02936,-0.436,0.6629,Domestic-Only
+S&P 500,Regime-dependent threshold,"XGBoost, 2016",Cross-Market (lag 1) vs Cross-Market (lag 0 + 1),1509.0,0.02988,0.02936,1.964,0.0497,Cross-Market (lag 0 + 1)
+S&P 500,Regime-dependent threshold,"LR, 1958",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02684,0.02745,-0.589,0.5558,Domestic-Only
+S&P 500,Regime-dependent threshold,"LR, 1958",Domestic-Only vs Cross-Market (lag 0 + 1),1509.0,0.02684,0.02457,1.72,0.0857,Cross-Market (lag 0 + 1)
+S&P 500,Regime-dependent threshold,"LR, 1958",Cross-Market (lag 1) vs Cross-Market (lag 0 + 1),1509.0,0.02745,0.02457,1.56,0.119,Cross-Market (lag 0 + 1)
+S&P 500,Regime-standardised,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02869,0.02992,-1.572,0.1161,Domestic-Only
+S&P 500,Regime-standardised,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 0 + 1),1509.0,0.02869,0.02927,-0.894,0.3712,Domestic-Only
+S&P 500,Regime-standardised,"XGBoost, 2016",Cross-Market (lag 1) vs Cross-Market (lag 0 + 1),1509.0,0.02992,0.02927,2.16,0.031,Cross-Market (lag 0 + 1)
+S&P 500,Regime-standardised,"LR, 1958",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02715,0.02739,-0.405,0.6855,Domestic-Only
+S&P 500,Regime-standardised,"LR, 1958",Domestic-Only vs Cross-Market (lag 0 + 1),1509.0,0.02715,0.0282,-0.525,0.5995,Domestic-Only
+S&P 500,Regime-standardised,"LR, 1958",Cross-Market (lag 1) vs Cross-Market (lag 0 + 1),1509.0,0.02739,0.0282,-0.449,0.6539,Cross-Market (lag 1)
+Nikkei 225,Rolling z-score baseline,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02049,0.02077,-0.747,0.4551,Domestic-Only
+Nikkei 225,Rolling z-score baseline,"LR, 1958",Domestic-Only vs Cross-Market (lag 1),1509.0,0.01976,0.02167,-2.272,0.0232,Domestic-Only
+Nikkei 225,Regime-dependent threshold,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 1),1509.0,0.01941,0.01938,0.091,0.9272,Cross-Market (lag 1)
+Nikkei 225,Regime-dependent threshold,"LR, 1958",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02123,0.0217,-0.375,0.7074,Domestic-Only
+Nikkei 225,Regime-standardised,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02198,0.02208,-0.13,0.8967,Domestic-Only
+Nikkei 225,Regime-standardised,"LR, 1958",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02131,0.02225,-1.154,0.2486,Domestic-Only
+FTSE 100,Rolling z-score baseline,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02426,0.02539,-1.803,0.0716,Domestic-Only
+FTSE 100,Rolling z-score baseline,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 0 + 1),1509.0,0.02426,0.02512,-1.581,0.1142,Domestic-Only
+FTSE 100,Rolling z-score baseline,"XGBoost, 2016",Cross-Market (lag 1) vs Cross-Market (lag 0 + 1),1509.0,0.02539,0.02512,1.606,0.1085,Cross-Market (lag 0 + 1)
+FTSE 100,Rolling z-score baseline,"LR, 1958",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02761,0.0274,0.326,0.7444,Cross-Market (lag 1)
+FTSE 100,Rolling z-score baseline,"LR, 1958",Domestic-Only vs Cross-Market (lag 0 + 1),1509.0,0.02761,0.02619,1.619,0.1056,Cross-Market (lag 0 + 1)
+FTSE 100,Rolling z-score baseline,"LR, 1958",Cross-Market (lag 1) vs Cross-Market (lag 0 + 1),1509.0,0.0274,0.02619,1.915,0.0557,Cross-Market (lag 0 + 1)
+FTSE 100,Regime-dependent threshold,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 1),1509.0,0.0228,0.02347,-1.477,0.14,Domestic-Only
+FTSE 100,Regime-dependent threshold,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 0 + 1),1509.0,0.0228,0.02297,-0.443,0.6575,Domestic-Only
+FTSE 100,Regime-dependent threshold,"XGBoost, 2016",Cross-Market (lag 1) vs Cross-Market (lag 0 + 1),1509.0,0.02347,0.02297,2.482,0.0132,Cross-Market (lag 0 + 1)
+FTSE 100,Regime-dependent threshold,"LR, 1958",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02462,0.02461,0.008,0.9936,Cross-Market (lag 1)
+FTSE 100,Regime-dependent threshold,"LR, 1958",Domestic-Only vs Cross-Market (lag 0 + 1),1509.0,0.02462,0.02245,1.65,0.0992,Cross-Market (lag 0 + 1)
+FTSE 100,Regime-dependent threshold,"LR, 1958",Cross-Market (lag 1) vs Cross-Market (lag 0 + 1),1509.0,0.02461,0.02245,2.035,0.042,Cross-Market (lag 0 + 1)
+FTSE 100,Regime-standardised,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02379,0.02476,-2.036,0.0419,Domestic-Only
+FTSE 100,Regime-standardised,"XGBoost, 2016",Domestic-Only vs Cross-Market (lag 0 + 1),1509.0,0.02379,0.02432,-1.494,0.1353,Domestic-Only
+FTSE 100,Regime-standardised,"XGBoost, 2016",Cross-Market (lag 1) vs Cross-Market (lag 0 + 1),1509.0,0.02476,0.02432,1.982,0.0477,Cross-Market (lag 0 + 1)
+FTSE 100,Regime-standardised,"LR, 1958",Domestic-Only vs Cross-Market (lag 1),1509.0,0.02862,0.02879,-0.229,0.8186,Domestic-Only
+FTSE 100,Regime-standardised,"LR, 1958",Domestic-Only vs Cross-Market (lag 0 + 1),1509.0,0.02862,0.02833,0.187,0.8516,Cross-Market (lag 0 + 1)
+FTSE 100,Regime-standardised,"LR, 1958",Cross-Market (lag 1) vs Cross-Market (lag 0 + 1),1509.0,0.02879,0.02833,0.4,0.6889,Cross-Market (lag 0 + 1)
