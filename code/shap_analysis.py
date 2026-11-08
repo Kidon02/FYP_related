@@ -5,7 +5,9 @@ features, and at which lags, drive the anomaly predictions.
 For each target, label set and foreign-containing feature set, refits XGBoost with the
 hyperparameters already chosen on validation (results/baseline_models_{IDX}.csv), on
 the same rows, split, scaler, SMOTE and seeds as code/baseline_models.py. TreeSHAP
-values (Lundberg & Lee, 2017; shap.TreeExplainer) are computed on the 2019-2024 test
+values (path-dependent Tree SHAP, Lundberg et al., 2020, Nat. Mach. Intell. 2(1), 56-67,
+doi:10.1038/s42256-019-0138-9; SHAP values as defined by Lundberg & Lee, 2017;
+shap.TreeExplainer without background data) are computed on the 2019-2024 test
 days; mean |SHAP| per feature is averaged over the 5 seeds. Group shares are each
 group's share of the total mean |SHAP| (domestic, foreign lag 1+, foreign lag 0, macro,
 technical). The first model's SHAP values are checked against XGBoost's own exact
@@ -164,7 +166,7 @@ def main():
             "Dataset: S&P 500, Nikkei 225, FTSE 100 test windows 2019-2024 (same rows as baseline_models.py)",
             f"Feature set: {', '.join(cfg['feature_set_names'])} (N225 lag 0 = lag 1, not repeated)",
             f"Label strategy: {', '.join(cfg['label_sets'])}",
-            "Model: XGBoost (2016) with validation-chosen hyperparameters; TreeSHAP (Lundberg & Lee, 2017)",
+            "Model: XGBoost (2016) with validation-chosen hyperparameters; path-dependent Tree SHAP (Lundberg et al., 2020; SHAP values: Lundberg & Lee, 2017)",
             "Seed: 42-46 (mean |SHAP| averaged over seeds)", "Config file: configs/shap.yaml, configs/baseline_models.yaml",
             "Checkpoint: not saved (refit in code/shap_analysis.py)", "Test window: 2019-01-01 to 2024-12-31",
             "Notes: share_g = group's share of total mean |SHAP| on test days (log-odds scale, standardised "

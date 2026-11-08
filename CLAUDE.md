@@ -117,6 +117,9 @@ code/, configs/, data/raw, data/processed, results/, logs/, thesis_tables/, data
   the causal HMM vs 0.268 with the full-sample HMM (3 Nov 2026 run, regime-dependent
   threshold labels). After the Part A rerun (7 Nov, 6016 rows) it is 0.157 vs 0.268.
 - Reference [16] is Mostafavi and Hooman (2025).
+- SHAP: shap.TreeExplainer without background data = path-dependent Tree SHAP. Cite Lundberg et al.
+  (2020), Nature Machine Intelligence 2(1), 56-67, doi:10.1038/s42256-019-0138-9, as well as
+  Lundberg & Lee (2017), which defines SHAP values but has no tree algorithm.
 - Attachments sent to the supervisor always get a distinct dated or versioned file name.
 
 ## Supervisor decisions (reply to the October update)
